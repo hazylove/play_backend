@@ -1,13 +1,12 @@
 package com.example.qasystem.org.controller;
 
+import com.example.qasystem.basic.utils.JsonResult;
+import com.example.qasystem.org.domain.dto.PageList;
 import com.example.qasystem.org.domain.entity.Question;
 import com.example.qasystem.org.domain.query.QuestionQuery;
 import com.example.qasystem.org.service.IQuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/questions")
@@ -17,8 +16,13 @@ public class QuestionController {
     private IQuestionService iQuestionService;
 
     @PostMapping("/list")
-    public Question getQuestionPage(@RequestBody QuestionQuery questionQuery){
+    public JsonResult getQuestionPage(@RequestBody QuestionQuery questionQuery){
+        PageList<Question> pageList = iQuestionService.getQuestionList(questionQuery);
+        return new JsonResult().setData(pageList);
+    }
 
-        return null;
+    @GetMapping("/hello")
+    public String hello(){
+        return "Hello 111!";
     }
 }
