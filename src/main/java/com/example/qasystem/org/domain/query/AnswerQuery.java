@@ -6,12 +6,13 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-@Data
 @EqualsAndHashCode(callSuper = true)
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class QuestionQuery extends PageQuery {
+public class AnswerQuery extends PageQuery {
+    private Long questionId;
     private String keywords;
-    private String sortField = "question_created_date";
+    private String sortField = "answer_created_date";
     private String sortOrder = "desc";
 }

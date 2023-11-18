@@ -12,4 +12,8 @@ public interface QuestionMapper {
     Long count(QuestionQuery questionQuery);
 
     List<Question> getQuestionList(QuestionQuery questionQuery);
+
+    void insert(Question question);
+
+    Question selectById(Long id);
 }

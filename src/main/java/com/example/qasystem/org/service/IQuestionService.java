@@ -6,4 +6,8 @@ import com.example.qasystem.org.domain.query.QuestionQuery;
 
 public interface IQuestionService {
     PageList<Question> getQuestionList(QuestionQuery questionQuery);
+
+    void insert(Question question);
+
+    Question selectById(Long id);
 }
