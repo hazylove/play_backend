@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.qasystem.org.mapper.QuestionMapper">
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="id"  parameterType="Question">
+        insert into t_question (
+            question_title,
+            question_content,
+            question_created_date
+        ) values (
+                     #{questionTitle},
+                     #{questionContent},
+                     #{questionCreatedDate}
+                 )
+    </insert>
+    <select id="count" resultType="java.lang.Long">
+        select count(id) from t_question q
+        <include refid="query"/>
+    </select>
+    <select id="getQuestionList" resultMap="questionMap">
+        select
+            q.id,
+            q.question_title,
+            q.question_content,
+            q.question_created_date
+        from t_question q
+        <include refid="query"/>
+        <include refid="orderSql"/>
+        limit #{page},#{pageSize}
+    </select>
+    <select id="selectById" resultMap="questionMap">
+        select
+            q.id,
+            q.question_title,
+            q.question_content,
+            q.question_created_date
+        from t_question q
+        where q.id = #{id}
+    </select>
+    <sql id="query">
+        <where>
+            <if test="keywords != null and keywords !=''">
+                and (q.title like concat('%',#{keywords},'%') or q.content like concat('%',#{keywords},'%'))
+            </if>
+        </where>
+    </sql>
+    <sql id="orderSql">
+        <choose>
+            <when test="(sortField == 'question_created_date' or sortField == 'question_title') and (sortOrder.toLowerCase() == 'asc' or sortOrder.toLowerCase() == 'desc')">
+                <![CDATA[ORDER BY ${sortField} ${sortOrder}]]>
+            </when>
+            <otherwise>
+                ORDER BY question_created_date DESC
+            </otherwise>
+        </choose>
+    </sql>
+    <resultMap id="questionMap" type="Question">
+        <id property="id" column="id"/>
+        <result property="questionTitle" column="question_title"/>
+        <result property="questionContent" column="question_content"/>
+        <result property="questionTag" column="question_tag"/>
+        <result property="questionCreatedId" column="question_created_id"/>
+        <result property="questionCreatedDate" column="question_created_date"/>
+<!--        <association property="questionCreatedBy" javaType="User" column="question_created_id"-->
+<!--                     select="com.example.qasystem.org.mapper.UserMapper.selectUserById"/>-->
+    </resultMap>
+
+</mapper>

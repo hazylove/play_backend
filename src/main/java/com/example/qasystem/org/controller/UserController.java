@@ -1,7 +1,8 @@
-package com.example.qasystem.controller;
+package com.example.qasystem.org.controller;
 
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class UserController {
+
 }
