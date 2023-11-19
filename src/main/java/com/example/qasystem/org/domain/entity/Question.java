@@ -19,4 +19,5 @@ public class Question {
     private Long questionCreatedId;
     private User questionCreatedBy;
     private Date questionCreatedDate;
+    private int questionAnswerNum;
 }
