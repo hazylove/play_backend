@@ -24,8 +24,13 @@ public class AnswerController {
 
     @PostMapping("/list")
     public JsonResult getAnswerPage(@RequestBody AnswerQuery answerQuery){
-        PageList<Question> pageList = iAnswerService.getList(answerQuery);
-        return new JsonResult().setData(pageList);
+        try {
+            PageList<Question> pageList = iAnswerService.getList(answerQuery);
+            return new JsonResult().setData(pageList);
+        } catch (Exception e) {
+            log.error("答案列表出现异常：", e);
+            return new JsonResult().setCode(500).setSuccess(false).setMassage("服务器异常");
+        }
     }
 
     // 新增
@@ -40,8 +45,8 @@ public class AnswerController {
                 return new JsonResult().setCode(500).setSuccess(false).setMassage("数据错误！");
             }
         }catch (Exception e){
-            e.printStackTrace();
-            return new JsonResult().setCode(500).setSuccess(false).setMassage("操作失败");
+            log.error("答案保存时出现异常：", e);
+            return new JsonResult().setCode(500).setSuccess(false).setMassage("服务器异常");
         }
     }
 

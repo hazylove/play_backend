@@ -19,8 +19,13 @@ public class QuestionController {
 
     @PostMapping("/list")
     public JsonResult getQuestionPage(@RequestBody QuestionQuery questionQuery){
-        PageList<Question> pageList = iQuestionService.getQuestionList(questionQuery);
-        return new JsonResult().setData(pageList);
+        try {
+            PageList<Question> pageList = iQuestionService.getQuestionList(questionQuery);
+            return new JsonResult().setData(pageList);
+        } catch (Exception e) {
+            log.error("问题列表出现异常：", e);
+            return new JsonResult().setCode(500).setSuccess(false).setMassage("服务器异常");
+        }
     }
 
     // 新增
@@ -35,7 +40,7 @@ public class QuestionController {
                 return new JsonResult().setCode(500).setSuccess(false).setMassage("数据错误！");
             }
         }catch (Exception e){
-            e.printStackTrace();
+            log.error("问题保存时出现异常：", e);
             return new JsonResult().setCode(500).setSuccess(false).setMassage("操作失败");
         }
     }
@@ -47,7 +52,7 @@ public class QuestionController {
             Question question=iQuestionService.selectById(id);
             return new  JsonResult().setData(question);
         }catch (Exception e){
-            e.printStackTrace();
+            log.error("获取问题详情时出现异常：", e);
             return new JsonResult().setSuccess(false).setCode(500).setMassage("系统繁忙请稍后再试！");
         }
     }
