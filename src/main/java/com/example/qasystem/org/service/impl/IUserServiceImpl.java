@@ -7,16 +7,21 @@ import com.example.qasystem.org.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.Calendar;
 import java.util.Objects;
 
 @Service
+@Transactional(propagation = Propagation.SUPPORTS)
 public class IUserServiceImpl implements IUserService {
 
     @Autowired
     private UserMapper userMapper;
 
     @Override
+    @Transactional
     public int register(UserRegistration userRegistration) {
         // 校验输入格式
         if (isInvalidUsername(userRegistration.getUsername()) || isInvalidPassword(userRegistration.getPassword1())) {
@@ -64,4 +69,6 @@ public class IUserServiceImpl implements IUserService {
         final int MAX_PASSWORD_LENGTH = 18;
         return password == null || password.length() < MIN_PASSWORD_LENGTH || password.length() > MAX_PASSWORD_LENGTH;
     }
+
+
 }
