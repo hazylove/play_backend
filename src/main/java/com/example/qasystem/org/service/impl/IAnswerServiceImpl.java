@@ -8,11 +8,14 @@ import com.example.qasystem.org.mapper.AnswerMapper;
 import com.example.qasystem.org.service.IAnswerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
 import java.util.List;
 
 @Service
+@Transactional(propagation = Propagation.SUPPORTS)
 public class IAnswerServiceImpl implements IAnswerService {
 
     @Autowired
@@ -29,8 +32,11 @@ public class IAnswerServiceImpl implements IAnswerService {
     }
 
     @Override
+    @Transactional
     public void insert(Answer answer) {
         answer.setAnswerCreatedDate(Calendar.getInstance().getTime());
         answerMapper.insert(answer);
     }
+
+
 }

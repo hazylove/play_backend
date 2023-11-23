@@ -21,8 +21,21 @@ spring:
     url: jdbc:mysql:///qa_db?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
     driver-class-name: com.mysql.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource #指定使用druid的连接池
+  servlet:
+    multipart:
+      max-file-size: 10MB
+  mvc:
+    # 资源访问的前缀
+    static-path-pattern: /${file.image-pattern-path}/**
+  # 扫描的资源路径
+  resources:
+    static-locations: classpath:/resources/,classpath:/static/,file:${file.image-upload-path}
 
 mybatis:
   type-aliases-package: "com.example.qasystem.org.domain.entity, com.example.qasystem.org.domain.query" # 别名
 #  mapper-locations: classpath:mapper/UserMapper.xml #扫描SQL映射文件
   #config-location: mybatis-config.xml #mybatis配置文件
+
+file:
+  image-pattern-path: files
+  image-upload-path: D:/workspace/QASystem/QA_backed/uploads/images/

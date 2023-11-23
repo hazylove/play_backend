@@ -15,7 +15,7 @@ import java.util.Calendar;
 import java.util.List;
 
 @Service
-@Transactional(readOnly = true,propagation = Propagation.SUPPORTS)
+@Transactional(propagation = Propagation.SUPPORTS)
 public class IQuestionServiceImpl implements IQuestionService {
     @Autowired
     private QuestionMapper questionMapper;
