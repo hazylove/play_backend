@@ -1,6 +1,7 @@
 package com.example.qasystem.org.controller;
 
-import com.example.qasystem.basic.utils.JsonResult;
+import com.example.qasystem.basic.utils.ImgResult;
+import com.example.qasystem.org.domain.dto.ImageData;
 import com.example.qasystem.org.service.IImageService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,17 +22,19 @@ public class ImageController {
     private IImageService iImageService;
 
     @PostMapping("/upload")
-    public JsonResult uploadImage(@RequestParam MultipartFile imageFile){
+    public ImgResult uploadImage(@RequestParam MultipartFile imageFile) {
+        ImageData imageData;
         try {
-            iImageService.uploadImage(imageFile);
-        }  catch (IOException e) {
+            imageData = iImageService.uploadImage(imageFile);
+        } catch (IOException e) {
             log.error("文件上传出现异常：", e);
-            return new JsonResult().setCode(500).setSuccess(false).setMassage("文件上传出现异常");
+
+            return new ImgResult().setErrno(1).setMessage("文件上传失败 ");
         } catch (Exception e) {
             log.error("文件上传出现异常：", e);
-            return new JsonResult().setCode(500).setSuccess(false).setMassage("服务器错误，上传失败");
+            return new ImgResult().setErrno(2).setMessage("文件上传失败");
         }
 
-        return new JsonResult().setMassage("上传成功");
+        return new ImgResult().setErrno(0).setData(imageData);
     }
 }

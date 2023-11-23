@@ -1,9 +1,10 @@
 package com.example.qasystem.org.service;
 
+import com.example.qasystem.org.domain.dto.ImageData;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
 public interface IImageService {
-    void uploadImage(MultipartFile imageFile) throws IOException;
+    ImageData uploadImage(MultipartFile imageFile) throws IOException;
 }
