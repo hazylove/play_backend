@@ -33,6 +33,9 @@ public class IImageServiceImpl implements IImageService {
     @Value("${file.image-pattern-path}")
     private String pathPattern;
 
+    @Value("${server.port}")
+    private String port;
+
     @Override
     @Transactional
     public ImageData uploadImage(MultipartFile imageFile) throws IOException {
@@ -65,7 +68,7 @@ public class IImageServiceImpl implements IImageService {
             imageFile.transferTo(dest);
 
             String separator = "/";
-            String path = "http://" + serverIpAddress + ":8080" + separator + pathPattern + separator + originalFileName;
+            String path = "http://" + serverIpAddress + ":" + port + separator + pathPattern + separator + originalFileName;
 
             Image image = new Image();
             image.setImageUrl(path);
