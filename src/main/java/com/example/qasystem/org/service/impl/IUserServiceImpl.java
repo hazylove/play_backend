@@ -1,17 +1,20 @@
 package com.example.qasystem.org.service.impl;
 
+import com.example.qasystem.basic.utils.JWT.JwtUtil;
 import com.example.qasystem.org.domain.dto.UserLogin;
 import com.example.qasystem.org.domain.dto.UserRegistration;
+import com.example.qasystem.org.domain.entity.User;
 import com.example.qasystem.org.mapper.UserMapper;
 import com.example.qasystem.org.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.Calendar;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Transactional(propagation = Propagation.SUPPORTS)
@@ -19,6 +22,12 @@ public class IUserServiceImpl implements IUserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private RedisTemplate<String, String> redisTemplate;
 
     @Override
     @Transactional
@@ -46,16 +55,27 @@ public class IUserServiceImpl implements IUserService {
         return 1;
     }
 
+    /**
+     * 登录业务
+     * @param userLogin 用户信息
+     * @return token
+     */
     @Override
-    public boolean login(UserLogin userLogin) {
+    public String login(UserLogin userLogin) {
         // 校验验证码
 
-        // 查询密码
-        String password = userMapper.getPasswordByUsername(userLogin.getUsername());
+        // 查询用户
+         User user = userMapper.getUserByUsername(userLogin.getUsername());
         // 加密校验操作
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         // 加密校验操作
-        return passwordEncoder.matches(userLogin.getPassword(), password);
+        if (passwordEncoder.matches(userLogin.getPassword(), user.getPassword())) {
+            String token = jwtUtil.generateToken(user.getId());
+            redisTemplate.opsForValue().set("TOKEN_" + user.getId(), token, jwtUtil.getExpiration(), TimeUnit.SECONDS);
+            return token;
+        }else {
+            return null;
+        }
     }
 
     // 用户名为空检查

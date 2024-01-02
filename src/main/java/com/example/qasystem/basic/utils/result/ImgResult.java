@@ -1,4 +1,4 @@
-package com.example.qasystem.basic.utils;
+package com.example.qasystem.basic.utils.result;
 
 import lombok.Data;
 

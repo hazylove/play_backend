@@ -1,6 +1,6 @@
 package com.example.qasystem.org.controller;
 
-import com.example.qasystem.basic.utils.JsonResult;
+import com.example.qasystem.basic.utils.result.JsonResult;
 import com.example.qasystem.org.domain.dto.UserLogin;
 import com.example.qasystem.org.domain.dto.UserRegistration;
 import com.example.qasystem.org.service.IUserService;
@@ -45,10 +45,10 @@ public class UserController {
     @PostMapping("/login")
     public JsonResult userLogin(@RequestBody UserLogin userLogin){
         try {
-            boolean result = iUserService.login(userLogin);
+            String token = iUserService.login(userLogin);
             JsonResult jsonResult = new JsonResult();
-            if (result){
-                jsonResult.setMassage("登录成功");
+            if (token != null){
+                jsonResult.setData(token).setMassage("登录成功");
             }
             else {
                 jsonResult.setSuccess(false).setMassage("用户名或密码错误，登录失败");

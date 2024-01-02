@@ -6,5 +6,5 @@ import com.example.qasystem.org.domain.dto.UserRegistration;
 public interface IUserService {
     int register(UserRegistration userRegistration);
 
-    boolean login(UserLogin userLogin);
+    String login(UserLogin userLogin);
 }
