@@ -1,6 +1,6 @@
 package com.example.qasystem.org.controller;
 
-import com.example.qasystem.basic.utils.ImgResult;
+import com.example.qasystem.basic.utils.result.ImgResult;
 import com.example.qasystem.org.domain.dto.ImageData;
 import com.example.qasystem.org.service.IImageService;
 import lombok.extern.slf4j.Slf4j;

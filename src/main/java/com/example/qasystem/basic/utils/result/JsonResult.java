@@ -1,4 +1,4 @@
-package com.example.qasystem.basic.utils;
+package com.example.qasystem.basic.utils.result;
 
 import lombok.Data;
 
@@ -10,12 +10,12 @@ public class JsonResult {
     private Object data;
     private Object resultObj;
 
-    public static JsonResult me(){
-        return new JsonResult();
-    }
-    public static JsonResult me(Object data){
-        return new JsonResult().setData(data);
-    }
+//    public static JsonResult me(){
+//        return new JsonResult();
+//    }
+//    public static JsonResult me(Object data){
+//        return new JsonResult().setData(data);
+//    }
 
     public JsonResult setSuccess(Boolean success){
         this.success=success;

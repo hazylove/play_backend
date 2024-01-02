@@ -36,6 +36,12 @@ public class IImageServiceImpl implements IImageService {
     @Value("${server.port}")
     private String port;
 
+    /**
+     *
+     * @param imageFile 图片文件
+     * @return 图片上传返回值
+     * @throws IOException 异常
+     */
     @Override
     @Transactional
     public ImageData uploadImage(MultipartFile imageFile) throws IOException {

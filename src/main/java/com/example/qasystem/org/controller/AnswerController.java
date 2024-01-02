@@ -1,6 +1,6 @@
 package com.example.qasystem.org.controller;
 
-import com.example.qasystem.basic.utils.JsonResult;
+import com.example.qasystem.basic.utils.result.JsonResult;
 import com.example.qasystem.org.domain.dto.PageList;
 import com.example.qasystem.org.domain.entity.Answer;
 import com.example.qasystem.org.domain.entity.Question;
