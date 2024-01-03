@@ -3,7 +3,6 @@ package com.example.qasystem.basic.config;
 import com.example.qasystem.basic.utils.JWT.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -18,11 +17,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private JwtFilter jwtFilter;
 
     /**
-     *  配置哪些请求不拦截
+     * 配置哪些请求不拦截
      */
     @Override
     public void configure(WebSecurity web) {
-        web.ignoring().antMatchers(HttpMethod.POST, "/users/login");
+        web.ignoring().antMatchers("/users/login", "/users/register");
     }
 
     /**
@@ -31,10 +30,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests()
+                .antMatchers("/users/login").permitAll()
+                .antMatchers("/users/register").permitAll()
                 .anyRequest()
-                .authenticated()
-                .and()
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                .authenticated();
     }
+
 }
