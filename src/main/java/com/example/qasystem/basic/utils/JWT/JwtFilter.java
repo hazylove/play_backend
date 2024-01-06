@@ -32,7 +32,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
     /**
-     *
+     * 忽略请求
      */
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
