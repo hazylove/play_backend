@@ -37,7 +37,7 @@ public class SecurityConfig{
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         // 仅仅作为演示
-        return (web) -> web.ignoring().antMatchers("/users/login", "/users/register");
+        return (web) -> web.ignoring().antMatchers("/users/login", "/users/register", "/questions/hello");
     }
 
 }

@@ -60,4 +60,4 @@ file:
 jwt:
   secret: 2bbbd6fbdd4274ac5c5713bdb5666fefdc8a9773567d4b53eda59bf83289c4d7  # 加密秘钥
   expiration: 600  # 有效期
-  ignore-paths: /users/login,/users/register
+  ignore-paths: /users/login,/users/register,/questions/hello

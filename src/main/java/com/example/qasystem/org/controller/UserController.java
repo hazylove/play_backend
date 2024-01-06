@@ -20,44 +20,34 @@ public class UserController {
 
     @PostMapping("/register")
     public JsonResult userRegister(@RequestBody UserRegistration userRegistration){
-        try {
-            int result = iUserService.register(userRegistration);
-            JsonResult jsonResult = new JsonResult();
-            if (result == -2){
-                jsonResult.setSuccess(false).setMassage("用户名、密码格式不正确");
-            }
-            else if (result == 0){
-                jsonResult.setSuccess(false).setMassage("两次输入密码不一致");
-            }
-            else if (result == -1){
-                jsonResult.setSuccess(false).setMassage("用户名已存在");
-            }
-            else {
-                jsonResult.setMassage("注册成功");
-            }
-            return jsonResult;
-        }catch (Exception e){
-            log.error("用户注册出现异常：", e);
-            return new JsonResult().setCode(500).setSuccess(false).setMassage("服务器异常");
+        int result = iUserService.register(userRegistration);
+        JsonResult jsonResult = new JsonResult();
+        if (result == -2){
+            jsonResult.setSuccess(false).setMassage("用户名、密码格式不正确");
         }
+        else if (result == 0){
+            jsonResult.setSuccess(false).setMassage("两次输入密码不一致");
+        }
+        else if (result == -1){
+            jsonResult.setSuccess(false).setMassage("用户名已存在");
+        }
+        else {
+            jsonResult.setMassage("注册成功");
+        }
+        return jsonResult;
     }
 
     @PostMapping("/login")
     public JsonResult userLogin(@RequestBody UserLogin userLogin){
-        try {
-            String token = iUserService.login(userLogin);
-            JsonResult jsonResult = new JsonResult();
-            if (token != null){
-                jsonResult.setData(token).setMassage("登录成功");
-            }
-            else {
-                jsonResult.setSuccess(false).setMassage("用户名或密码错误，登录失败");
-            }
-            return jsonResult;
-        }catch (Exception e){
-            log.error("用户登录出现异常：", e);
-            return new JsonResult().setCode(500).setSuccess(false).setMassage("服务器异常");
+        String token = iUserService.login(userLogin);
+        JsonResult jsonResult = new JsonResult();
+        if (token != null){
+            jsonResult.setData(token).setMassage("登录成功");
         }
+        else {
+            jsonResult.setSuccess(false).setMassage("用户名或密码错误，登录失败");
+        }
+        return jsonResult;
     }
 
 
