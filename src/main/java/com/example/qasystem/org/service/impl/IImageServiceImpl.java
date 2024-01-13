@@ -14,8 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.Calendar;
 
 @Service
@@ -33,8 +31,6 @@ public class IImageServiceImpl implements IImageService {
     @Value("${file.image-pattern-path}")
     private String pathPattern;
 
-    @Value("${server.port}")
-    private String port;
 
     @Override
     @Transactional
@@ -57,13 +53,7 @@ public class IImageServiceImpl implements IImageService {
                     log.error("图片上传目录创建失败");
                 }
             }
-            String serverIpAddress;
-            try {
-                serverIpAddress = InetAddress.getLocalHost().getHostAddress();
-            } catch (UnknownHostException e) {
-                // 处理异常
-                serverIpAddress = "localhost";
-            }
+
             // 将上传的文件保存到目标文件中
             imageFile.transferTo(dest);
 
