@@ -68,8 +68,7 @@ public class IImageServiceImpl implements IImageService {
             imageFile.transferTo(dest);
 
             String separator = "/";
-            String path = "http://" + serverIpAddress + ":" + port + separator + pathPattern + separator + originalFileName;
-
+            String path = "http://121.40.225.229:8090" + separator + pathPattern + separator + originalFileName;
             Image image = new Image();
             image.setImageUrl(path);
             image.setImageStatus(0);
@@ -96,7 +95,6 @@ public class IImageServiceImpl implements IImageService {
             throw e; // 继续抛出异常，使事务回滚
         }
     }
-
 
 
 }

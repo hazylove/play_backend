@@ -17,8 +17,8 @@ logging:
 spring:
   datasource:
     username: root
-    password: '000423'
-    url: jdbc:mysql:///qa_db?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    password: 'A@123456.'
+    url: jdbc:mysql://121.40.225.229:3306/Forum?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
     driver-class-name: com.mysql.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource #指定使用druid的连接池
   servlet:
@@ -38,4 +38,4 @@ mybatis:
 
 file:
   image-pattern-path: files
-  image-upload-path: D:/workspace/QASystem/QA_backed/uploads/images/
+  image-upload-path: /qa/uploads/images/
