@@ -63,7 +63,7 @@ public class JwtFilter extends OncePerRequestFilter {
             try {
                 userId = jwtUtil.getUserIdFromToken(authToken);
             } catch (JwtException ignored) {
-                sendUnauthorizedResponse(httpServletResponse, HttpStatus.UNAUTHORIZED.value(), "token解析失败，请携带正确token！");
+                sendUnauthorizedResponse(httpServletResponse, HttpStatus.UNAUTHORIZED.value(), "token解析失败，请重新登录！");
                 return;
             }
             Object tokenInRedis = redisTemplate.opsForValue().get("TOKEN_" + userId);
@@ -71,7 +71,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 sendUnauthorizedResponse(httpServletResponse, HttpStatus.UNAUTHORIZED.value(), "Token验证失败或已过期，请重新登录！");
                 return;
             }
-
+            redisTemplate.opsForValue().set("TOKEN_" + userId, authToken, jwtUtil.getExpiration(), TimeUnit.SECONDS);
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userId, null, null);
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);

@@ -15,7 +15,7 @@ import java.util.List;
 
 @Service
 @Transactional(propagation = Propagation.SUPPORTS)
-public class IQuestionServiceImpl implements IQuestionService {
+public class QuestionServiceImpl implements IQuestionService {
     @Autowired
     private QuestionMapper questionMapper;
     @Override
