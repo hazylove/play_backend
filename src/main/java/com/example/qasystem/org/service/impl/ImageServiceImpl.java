@@ -21,7 +21,7 @@ import java.util.Calendar;
 @Service
 @Transactional(propagation = Propagation.SUPPORTS)
 @Slf4j
-public class IImageServiceImpl implements IImageService {
+public class ImageServiceImpl implements IImageService {
 
     @Autowired
     private ImageMapper imageMapper;

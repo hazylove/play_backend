@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @Transactional(propagation = Propagation.SUPPORTS)
-public class IUserServiceImpl implements IUserService {
+public class UserServiceImpl implements IUserService {
 
     @Autowired
     private UserMapper userMapper;
@@ -65,11 +65,11 @@ public class IUserServiceImpl implements IUserService {
         // 校验验证码
 
         // 查询用户
-         User user = userMapper.getUserByUsername(userLogin.getUsername());
+        User user = userMapper.getUserByUsername(userLogin.getUsername());
         // 加密校验操作
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         // 加密校验操作
-        if (passwordEncoder.matches(userLogin.getPassword(), user.getPassword())) {
+        if (user != null && passwordEncoder.matches(userLogin.getPassword(), user.getPassword())) {
             String token = jwtUtil.generateToken(user.getId());
             redisTemplate.opsForValue().set("TOKEN_" + user.getId(), token, jwtUtil.getExpiration(), TimeUnit.SECONDS);
             return token;

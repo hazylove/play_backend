@@ -16,7 +16,7 @@ import java.util.List;
 
 @Service
 @Transactional(propagation = Propagation.SUPPORTS)
-public class IAnswerServiceImpl implements IAnswerService {
+public class AnswerServiceImpl implements IAnswerService {
 
     @Autowired
     private AnswerMapper answerMapper;
