@@ -3,6 +3,7 @@ package com.example.qasystem.basic.config;
 import com.example.qasystem.basic.utils.JWT.JwtFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -15,6 +16,9 @@ public class SecurityConfig{
     @Autowired
     private JwtFilter jwtFilter;
 
+    @Value("${api.prefix}")
+    private String apiPrefix;
+
     /**
      * 配置安全策略
      */
@@ -24,8 +28,8 @@ public class SecurityConfig{
                 .csrf().disable()
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeRequests(authorize -> authorize
-                        .antMatchers("/users/login").permitAll()
-                        .antMatchers("/users/register").permitAll()
+                        .antMatchers(apiPrefix + "/users/login").permitAll()
+                        .antMatchers(apiPrefix + "/users/register").permitAll()
                         .anyRequest().authenticated()
                 )
                 .build();
@@ -37,7 +41,7 @@ public class SecurityConfig{
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         // 仅仅作为演示
-        return (web) -> web.ignoring().antMatchers("/users/login", "/users/register", "/questions/hello");
+        return (web) -> web.ignoring().antMatchers(apiPrefix + "/users/login", apiPrefix + "/users/register", apiPrefix + "/questions/hello");
     }
 
 }

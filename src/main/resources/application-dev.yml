@@ -21,14 +21,27 @@ logging:
 spring:
   datasource:
     username: root
-    password: '123456'
-    url: jdbc:mysql:///Forum?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
-    driver-class-name: com.mysql.jdbc.Driver
+    password: 'Aa123456'
+    url: jdbc:mysql://123.57.83.114:3306/forum?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource #指定使用druid的连接池
+    druid:
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      max-wait: 60000
+      time-between-eviction-runs-millis: 30000
+      min-evictable-idle-time-millis: 300000
+      validation-query: SELECT 1
+      test-while-idle: true
+      test-on-borrow: false
+      test-on-return: false
+      pool-prepared-statements: true
+      max-open-prepared-statements: 20
   redis:
-    host: localhost
+    host: 123.57.83.114
     port: 6379
-    password: ''
+    password: 'Aa123456.'
     lettuce:
       pool:
         max-active: 8
@@ -47,7 +60,7 @@ spring:
       static-locations: classpath:/resources/,classpath:/static/,file:${file.image-upload-path}
 
 mybatis:
-  type-aliases-package: "com.example.qasystem.org.domain.entity, com.example.qasystem.org.domain.query" # 别名
+  type-aliases-package: "com.example.qasystem.*.domain.*" # 别名
   #  mapper-locations: classpath:mapper/UserMapper.xml #扫描SQL映射文件
   #config-location: mybatis-config.xml #mybatis配置文件
 
@@ -60,4 +73,7 @@ file:
 jwt:
   secret: 2bbbd6fbdd4274ac5c5713bdb5666fefdc8a9773567d4b53eda59bf83289c4d7  # 加密秘钥
   expiration: 600  # 有效期
-  ignore-paths: /users/login,/users/register,/questions/hello
+  ignore-paths: ${api.prefix}/users/login,${api.prefix}/users/register
+
+api:
+  prefix: /api
