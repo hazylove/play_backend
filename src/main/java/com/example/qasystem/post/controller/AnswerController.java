@@ -24,29 +24,19 @@ public class AnswerController {
 
     @PostMapping("/list")
     public JsonResult getAnswerPage(@RequestBody AnswerQuery answerQuery){
-        try {
-            PageList<Question> pageList = iAnswerService.getList(answerQuery);
-            return new JsonResult().setData(pageList);
-        } catch (Exception e) {
-            log.error("答案列表出现异常：", e);
-            return new JsonResult().setCode(500).setSuccess(false).setMassage("服务器异常");
-        }
+        PageList<Question> pageList = iAnswerService.getList(answerQuery);
+        return new JsonResult().setData(pageList);
     }
 
     // 新增
     @PostMapping("/save")
     public JsonResult addQuestion(@RequestBody Answer answer){
-        try {
-            if (answer.getId() == null) {
-                iAnswerService.insert(answer);
-                return new JsonResult().setMassage("添加成功！");
-            } else {
-//                iAnswerService.update(answer);
-                return new JsonResult().setCode(500).setSuccess(false).setMassage("数据错误！");
-            }
-        }catch (Exception e){
-            log.error("答案保存时出现异常：", e);
-            return new JsonResult().setCode(500).setSuccess(false).setMassage("服务器异常");
+        if (answer.getId() == null) {
+            iAnswerService.insert(answer);
+            return new JsonResult().setMassage("添加成功！");
+        } else {
+//          iAnswerService.update(answer);
+            return new JsonResult().setCode(500).setSuccess(false).setMassage("数据错误！");
         }
     }
 

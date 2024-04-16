@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-
 @RestController
 @RequestMapping("${api.prefix}/img")
 @Slf4j
@@ -26,15 +24,10 @@ public class ImageController {
         ImageData imageData;
         try {
             imageData = iImageService.uploadImage(imageFile);
-        } catch (IOException e) {
-            log.error("文件上传出现异常：", e);
-
-            return new ImgResult().setErrno(1).setMessage("文件上传失败 ");
         } catch (Exception e) {
             log.error("文件上传出现异常：", e);
-            return new ImgResult().setErrno(2).setMessage("文件上传失败");
+            return new ImgResult().setErrno(1).setMessage("文件上传失败");
         }
-
         return new ImgResult().setErrno(0).setData(imageData);
     }
 }

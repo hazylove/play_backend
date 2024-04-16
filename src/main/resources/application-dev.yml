@@ -22,8 +22,8 @@ spring:
   datasource:
     username: root
     password: 'Aa123456'
-    url: jdbc:mysql://123.57.83.114:3306/Forum?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
-    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://123.57.83.114:3306/forum?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource #指定使用druid的连接池
     druid:
       initial-size: 5

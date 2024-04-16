@@ -1,6 +1,7 @@
 package com.example.qasystem.basic.utils.JWT;
 
 import com.alibaba.fastjson.JSONObject;
+import io.jsonwebtoken.JwtException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -32,7 +33,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final AntPathMatcher pathMatcher = new AntPathMatcher();
     /**
-     *
+     * 忽略请求
      */
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
@@ -58,19 +59,24 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (StringUtils.hasText(authToken) && authToken.startsWith("Bearer ")) {
             authToken = authToken.substring(7);
-
-            String userId = jwtUtil.getUserIdFromToken(authToken);
-            Object tokenInRedis = redisTemplate.opsForValue().get("TOKEN_" + userId);
-            if (tokenInRedis == null || !tokenInRedis.equals(authToken)) {
-                sendUnauthorizedResponse(httpServletResponse,  HttpStatus.UNAUTHORIZED.value(), "Token验证失败或已过期，请重新登录！");
+            String userId;
+            try {
+                userId = jwtUtil.getUserIdFromToken(authToken);
+            } catch (JwtException ignored) {
+                sendUnauthorizedResponse(httpServletResponse, HttpStatus.UNAUTHORIZED.value(), "token解析失败，请重新登录！");
                 return;
             }
-
+            Object tokenInRedis = redisTemplate.opsForValue().get("TOKEN_" + userId);
+            if (tokenInRedis == null || !tokenInRedis.equals(authToken)) {
+                sendUnauthorizedResponse(httpServletResponse, HttpStatus.UNAUTHORIZED.value(), "Token验证失败或已过期，请重新登录！");
+                return;
+            }
+            redisTemplate.opsForValue().set("TOKEN_" + userId, authToken, jwtUtil.getExpiration(), TimeUnit.SECONDS);
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userId, null, null);
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-                redisTemplate.opsForValue().set(userId, authToken, jwtUtil.getExpiration(), TimeUnit.SECONDS);
+                redisTemplate.opsForValue().set("TOKEN_" + userId, authToken, jwtUtil.getExpiration(), TimeUnit.SECONDS);
             }
         }
 
