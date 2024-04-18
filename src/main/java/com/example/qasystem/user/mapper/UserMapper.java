@@ -13,4 +13,6 @@ public interface UserMapper {
     String getPasswordByUsername(String username);
 
     User getUserByUsername(String username);
+
+    User selectUserInfoById(Long id);
 }

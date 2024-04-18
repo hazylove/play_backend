@@ -1,4 +1,4 @@
-package com.example.qasystem.file.domain.query;
+package com.example.qasystem.post.domain.query;
 
 import com.example.qasystem.basic.utils.dto.PageQuery;
 import lombok.AllArgsConstructor;
@@ -10,8 +10,8 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class QuestionQuery extends PageQuery {
+public class PostQuery extends PageQuery {
     private String keywords;
-    private String sortField = "question_created_date";
+    private String sortField = "post_created_date";
     private String sortOrder = "desc";
 }

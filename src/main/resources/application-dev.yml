@@ -72,8 +72,14 @@ file:
 # jwt配置
 jwt:
   secret: 2bbbd6fbdd4274ac5c5713bdb5666fefdc8a9773567d4b53eda59bf83289c4d7  # 加密秘钥
-  expiration: 600  # 有效期
+  expiration: 12000  # token有效期
   ignore-paths: ${api.prefix}/users/login,${api.prefix}/users/register
 
 api:
   prefix: /api
+
+# 时间格式
+custom:
+#  date-format: "yyyy-MM-dd"
+  datetime-format: "yyyy-MM-dd HH:mm:ss"
+#  sdf-fatetime-format: "yyyy-MM-dd HH:mm:ss.SSS"
