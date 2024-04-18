@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.example.qasystem.post.mapper.CommentMapper">
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="id"  parameterType="Comment">
+        INSERT INTO
+            t_comment(
+            comment_content,
+            comment_post_id,
+            comment_created_id,
+            comment_created_date
+        )VALUES (
+                    #{commentContent},
+                    #{commentPostId},
+                    #{commentCreatedId},
+                    #{commentCreatedDate}
+                )
+    </insert>
+    <sql id="baseColumns">
+        c1.id, c1.comment_content, c1.comment_post_id, c1.comment_likes_num, c1.comment_black_num, c1.comment_created_id, c1.comment_created_date
+    </sql>
+    <select id="count" resultType="java.lang.Long">
+        SELECT
+            count(c1.id)
+        FROM t_comment c1
+        <include refid="query"/>
+    </select>
+    <select id="getMainCommentList" resultMap="mainCommentMap">
+        SELECT
+        COUNT(c2.id) AS sub_count,
+        <include refid="baseColumns"/>
+        FROM t_comment c1
+        LEFT JOIN t_comment c2 ON c2.comment_main_id = c1.id AND c2.comment_post_id = c1.comment_post_id
+        <include refid="query"/>
+        GROUP BY
+        c1.id,
+        c1.comment_content,
+        c1.comment_created_id,
+        c1.comment_created_date
+        <include refid="orderSql"/>
+        LIMIT #{page},#{pageSize}
+    </select>
+
+    <select id="getSubCommentList" resultMap="subCommentMap">
+        SELECT
+        c1.comment_main_id,
+        c1.comment_reply_id,
+        <include refid="baseColumns"/>
+        FROM t_comment c1
+        <include refid="subCommentQuery"/>
+        <include refid="subCommentOrderBy"/>
+        LIMIT #{page},#{pageSize}
+    </select>
+
+    <sql id="query">
+        <where>
+            <if test="isMain == true">
+                and (c1.comment_main_id = '' or c1.comment_main_id is null)
+            </if>
+            <if test="isMain == false">
+                and c1.comment_main_id = #{mainId}
+            </if>
+            and c1.comment_post_id = #{postId}
+        </where>
+    </sql>
+
+    <sql id="subCommentQuery">
+        <where>
+            <if test="isMain == true">
+                and (c1.comment_main_id = '' or c1.comment_main_id is null)
+            </if>
+            <if test="isMain == false">
+                and (c1.comment_main_id = #{mainId})
+            </if>
+            and c1.comment_post_id = #{postId}
+            and c1.comment_main_id = #{mainId}
+        </where>
+    </sql>
+    <sql id="subCommentOrderBy">
+    ORDER BY
+        IF(c1.comment_reply_id IS NULL, c1.comment_likes_num, NULL) DESC,
+        IF(c1.comment_reply_id IS NOT NULL, c1.comment_reply_id, NULL) ASC,
+        c1.comment_likes_num DESC,
+        c1.comment_created_date DESC
+</sql>
+
+    <sql id="orderSql">
+        <choose>
+            <when test="sortField == 'comment_created_date' and (sortOrder.toLowerCase() == 'asc' or sortOrder.toLowerCase() == 'desc')">
+                ORDER BY ${sortField} ${sortOrder}
+            </when>
+            <otherwise>
+                ORDER BY comment_created_date DESC
+            </otherwise>
+        </choose>
+    </sql>
+    <resultMap id="mainCommentMap" type="Comment">
+        <id property="id" column="id"/>
+        <result property="commentContent" column="comment_content"/>
+        <result property="commentPostId" column="comment_post_id"/>
+        <result property="commentLikesNum" column="comment_likes_num"/>
+        <result property="commentBlackNum" column="comment_black_num"/>
+        <result property="commentCreatedId" column="comment_created_id"/>
+        <result property="commentCreatedDate" column="comment_created_date" typeHandler="com.example.qasystem.basic.handler.CustomDateTypeHandler"/>
+        <result property="commentSubCount" column="sub_count"/>
+        <association property="commentCreatedBy" javaType="User" column="comment_created_id" select="com.example.qasystem.user.mapper.UserMapper.selectUserInfoById">
+            <id property="id" column="comment_created_id"/>
+        </association>
+    </resultMap>
+
+    <resultMap id="subCommentMap" type="Comment">
+        <id property="id" column="id"/>
+        <result property="commentContent" column="comment_content"/>
+        <result property="commentPostId" column="comment_post_id"/>
+        <result property="commentMainId" column="comment_main_id"/>
+        <result property="commentReplyId" column="comment_reply_id"/>
+        <result property="commentLikesNum" column="comment_likes_num"/>
+        <result property="commentBlackNum" column="comment_black_num"/>
+        <result property="commentCreatedId" column="comment_created_id"/>
+        <result property="commentCreatedDate" column="comment_created_date" typeHandler="com.example.qasystem.basic.handler.CustomDateTypeHandler"/>
+        <association property="commentCreatedBy" javaType="User" column="comment_created_id" select="com.example.qasystem.user.mapper.UserMapper.selectUserInfoById">
+            <id property="id" column="comment_created_id"/>
+        </association>
+    </resultMap>
+</mapper>

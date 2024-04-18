@@ -11,14 +11,14 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Alias("Question")
-public class Question {
+@Alias("Post")
+public class Post {
     private Long id;
-    private String questionTitle;
-    private String questionContent;
-    private String questionTag;
-    private Long questionCreatedId;
-    private User questionCreatedBy;
-    private Date questionCreatedDate;
-    private int questionAnswerNum;
+    private String postTitle;
+    private String postContent;
+    private String postTag;
+    private Long postCreatedId;
+    private User postCreatedBy;
+    private Date postCreatedDate;
+    private int postCommentNum;
 }

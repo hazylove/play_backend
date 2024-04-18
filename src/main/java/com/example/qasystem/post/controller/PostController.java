@@ -2,35 +2,35 @@ package com.example.qasystem.post.controller;
 
 import com.example.qasystem.basic.utils.result.JsonResult;
 import com.example.qasystem.basic.utils.dto.PageList;
-import com.example.qasystem.post.domain.entity.Question;
-import com.example.qasystem.file.domain.query.QuestionQuery;
-import com.example.qasystem.post.service.IQuestionService;
+import com.example.qasystem.post.domain.entity.Post;
+import com.example.qasystem.post.domain.query.PostQuery;
+import com.example.qasystem.post.service.IPostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("${api.prefix}/questions")
+@RequestMapping("${api.prefix}/post")
 @Slf4j
-public class QuestionController {
+public class PostController {
 
     @Autowired
-    private IQuestionService iQuestionService;
+    private IPostService iPostService;
 
     @PostMapping("/list")
-    public JsonResult getQuestionPage(@RequestBody QuestionQuery questionQuery){
-        PageList<Question> pageList = iQuestionService.getQuestionList(questionQuery);
+    public JsonResult getPostPage(@RequestBody PostQuery postQuery){
+        PageList<Post> pageList = iPostService.getPostList(postQuery);
         return new JsonResult().setData(pageList);
     }
 
     // 新增
     @PostMapping("/save")
-    public JsonResult addQuestion(@RequestBody Question question){
-        if (question.getId() == null) {
-            iQuestionService.insert(question);
+    public JsonResult addPost(@RequestBody Post post){
+        if (post.getId() == null) {
+            iPostService.insert(post);
             return new JsonResult().setMassage("添加成功！");
         } else {
-//          iQuestionService.update(question);
+//          iPostService.update(post);
             return new JsonResult().setCode(500).setSuccess(false).setMassage("数据错误！");
         }
 
@@ -39,8 +39,8 @@ public class QuestionController {
     // 根据id获取详情
     @GetMapping("/{id}")
     public JsonResult selectOne(@PathVariable Long id){
-        Question question=iQuestionService.selectById(id);
-        return new  JsonResult().setData(question);
+        Post post = iPostService.selectById(id);
+        return new  JsonResult().setData(post);
     }
 
     @GetMapping("/hello")

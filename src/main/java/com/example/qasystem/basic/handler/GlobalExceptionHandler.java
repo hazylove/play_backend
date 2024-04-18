@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public JsonResult handleException(Exception e, HttpServletRequest request) {
         String requestUrl = request.getRequestURL().toString();
-        log.error("接口：{}，发生异常", requestUrl, e);
+        log.error("接口：{}：发生异常", requestUrl, e);
         return new JsonResult().setCode(500).setSuccess(false).setMassage("服务器错误");
     }
 
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public JsonResult handleValidationException(MethodArgumentNotValidException e, HttpServletRequest request) {
         String requestUrl = request.getRequestURL().toString();
-        log.error("接口：{}，参数校验失败", requestUrl, e);
+        log.error("接口：{}：参数校验失败", requestUrl, e);
 
         BindingResult bindingResult = e.getBindingResult();
         Map<String, String> errorMap = new HashMap<>();
@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public JsonResult handleBindException(BindException e, HttpServletRequest request) {
         String requestUrl = request.getRequestURL().toString();
-        log.error("接口：{}，参数绑定失败", requestUrl, e);
+        log.error("接口：{}：参数绑定失败", requestUrl, e);
 
         BindingResult bindingResult = e.getBindingResult();
         Map<String, String> errorMap = new HashMap<>();
@@ -92,7 +92,7 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public JsonResult handleHttpMessageNotReadableException(HttpMessageNotReadableException e, HttpServletRequest request) {
         String requestUrl = request.getRequestURL().toString();
-        log.error("接口：{}，请求体解析失败", requestUrl, e);
+        log.error("接口：{}：请求体解析失败", requestUrl, e);
 
         return new JsonResult().setCode(400).setSuccess(false).setMassage("请求体解析失败");
     }

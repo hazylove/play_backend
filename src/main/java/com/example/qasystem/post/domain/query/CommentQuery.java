@@ -1,4 +1,4 @@
-package com.example.qasystem.file.domain.query;
+package com.example.qasystem.post.domain.query;
 
 import com.example.qasystem.basic.utils.dto.PageQuery;
 import lombok.AllArgsConstructor;
@@ -10,9 +10,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class AnswerQuery extends PageQuery {
-    private Long questionId;
-    private String keywords;
-    private String sortField = "answer_created_date";
+public class CommentQuery extends PageQuery {
+    private Long postId;
+    private String sortField = "comment_created_date";
     private String sortOrder = "desc";
+    private Boolean isMain;
+    private Long mainId;
 }
