@@ -1,6 +1,6 @@
 package com.example.qasystem.post.domain.entity;
 
-import com.example.qasystem.user.domain.entity.User;
+import com.example.qasystem.user.domain.entity.base.UserBase;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,7 +18,7 @@ public class Post {
     private String postContent;
     private String postTag;
     private Long postCreatedId;
-    private User postCreatedBy;
+    private UserBase postCreatedBy;
     private Date postCreatedDate;
     private int postCommentNum;
 }

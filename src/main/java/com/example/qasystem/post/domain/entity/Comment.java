@@ -1,6 +1,6 @@
 package com.example.qasystem.post.domain.entity;
 
-import com.example.qasystem.user.domain.entity.User;
+import com.example.qasystem.user.domain.entity.base.UserBase;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -30,7 +30,7 @@ public class Comment {
     // 创建人id
     private Long commentCreatedId;
     // 创建人
-    private User commentCreatedBy;
+    private UserBase commentCreatedBy;
     // 创建时间
     private Date commentCreatedDate;
     // 子评论数量
