@@ -1,5 +1,6 @@
 package com.example.qasystem.post.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.qasystem.basic.utils.dto.PageList;
 import com.example.qasystem.post.domain.entity.Comment;
 import com.example.qasystem.post.domain.query.CommentQuery;
@@ -15,7 +16,7 @@ import java.util.List;
 
 @Service
 @Transactional(propagation = Propagation.SUPPORTS)
-public class CommentServiceImpl implements ICommentService {
+public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> implements ICommentService {
 
     @Autowired
     private CommentMapper commentMapper;

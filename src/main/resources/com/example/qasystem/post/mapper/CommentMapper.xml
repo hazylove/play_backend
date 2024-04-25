@@ -1,20 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.example.qasystem.post.mapper.CommentMapper">
-    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="id"  parameterType="Comment">
-        INSERT INTO
-            t_comment(
-            comment_content,
-            comment_post_id,
-            comment_created_id,
-            comment_created_date
-        )VALUES (
-                    #{commentContent},
-                    #{commentPostId},
-                    #{commentCreatedId},
-                    #{commentCreatedDate}
-                )
-    </insert>
     <sql id="baseColumns">
         c1.id, c1.comment_content, c1.comment_post_id, c1.comment_likes_num, c1.comment_black_num, c1.comment_created_id, c1.comment_created_date
     </sql>
@@ -93,7 +79,7 @@
             </otherwise>
         </choose>
     </sql>
-    <resultMap id="mainCommentMap" type="Comment">
+    <resultMap id="mainCommentMap" type="com.example.qasystem.post.domain.entity.Comment">
         <id property="id" column="id"/>
         <result property="commentContent" column="comment_content"/>
         <result property="commentPostId" column="comment_post_id"/>
@@ -102,12 +88,12 @@
         <result property="commentCreatedId" column="comment_created_id"/>
         <result property="commentCreatedDate" column="comment_created_date" typeHandler="com.example.qasystem.basic.handler.CustomDateTypeHandler"/>
         <result property="commentSubCount" column="sub_count"/>
-        <association property="commentCreatedBy" javaType="User" column="comment_created_id" select="com.example.qasystem.user.mapper.UserMapper.selectUserInfoById">
+        <association property="commentCreatedBy" javaType="com.example.qasystem.user.domain.entity.User" column="comment_created_id" select="com.example.qasystem.user.mapper.UserMapper.selectUserInfoById">
             <id property="id" column="comment_created_id"/>
         </association>
     </resultMap>
 
-    <resultMap id="subCommentMap" type="Comment">
+    <resultMap id="subCommentMap" type="com.example.qasystem.post.domain.entity.Comment">
         <id property="id" column="id"/>
         <result property="commentContent" column="comment_content"/>
         <result property="commentPostId" column="comment_post_id"/>
@@ -117,7 +103,7 @@
         <result property="commentBlackNum" column="comment_black_num"/>
         <result property="commentCreatedId" column="comment_created_id"/>
         <result property="commentCreatedDate" column="comment_created_date" typeHandler="com.example.qasystem.basic.handler.CustomDateTypeHandler"/>
-        <association property="commentCreatedBy" javaType="User" column="comment_created_id" select="com.example.qasystem.user.mapper.UserMapper.selectUserInfoById">
+        <association property="commentCreatedBy" javaType="com.example.qasystem.user.domain.entity.base.UserBase" column="comment_created_id" select="com.example.qasystem.user.mapper.UserMapper.selectUserInfoById">
             <id property="id" column="comment_created_id"/>
         </association>
     </resultMap>

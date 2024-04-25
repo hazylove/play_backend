@@ -1,11 +1,13 @@
 package com.example.qasystem.user.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.example.qasystem.user.domain.dto.UserRegistration;
 import com.example.qasystem.user.domain.entity.User;
+import com.example.qasystem.user.domain.entity.base.UserBase;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface UserMapper {
+public interface UserMapper extends BaseMapper<User> {
     Long getUserIdByUsername(String username);
 
     void insert(UserRegistration userRegistration);
@@ -14,5 +16,5 @@ public interface UserMapper {
 
     User getUserByUsername(String username);
 
-    User selectUserInfoById(Long id);
+    UserBase selectUserInfoById(Long id);
 }

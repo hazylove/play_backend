@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.example.qasystem.user.mapper.UserMapper">
-    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="id"  parameterType="UserRegistration">
+    <insert id="insert" useGeneratedKeys="true" keyColumn="id" keyProperty="id"  parameterType="com.example.qasystem.user.domain.dto.UserRegistration">
         INSERT INTO t_user(
                            username, password, phone, email, created_date
         ) VALUE (
@@ -22,14 +22,14 @@
         WHERE username = #{username}
         LIMIT 1
     </select>
-    <select id="getUserByUsername" resultType="User">
+    <select id="getUserByUsername" resultType="com.example.qasystem.user.domain.entity.User">
         SELECT
             id, username, password, phone, email
         FROM t_user
         WHERE username = #{username}
         LIMIT 1
     </select>
-    <select id="selectUserInfoById" resultType="UserBase">
+    <select id="selectUserInfoById" resultType="com.example.qasystem.user.domain.entity.base.UserBase">
         SELECT
             id, username
         FROM t_user

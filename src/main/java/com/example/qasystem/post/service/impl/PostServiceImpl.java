@@ -1,5 +1,6 @@
 package com.example.qasystem.post.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.qasystem.basic.utils.dto.PageList;
 import com.example.qasystem.post.domain.entity.Post;
 import com.example.qasystem.post.domain.query.PostQuery;
@@ -10,14 +11,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.Calendar;
 import java.util.List;
 
 @Service
 @Transactional(propagation = Propagation.SUPPORTS)
-public class PostServiceImpl implements IPostService {
-    @Autowired
+public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IPostService {
+    @Resource
     private PostMapper postMapper;
+
     @Override
     public PageList<Post> getPostList(PostQuery postQuery) {
         //条数

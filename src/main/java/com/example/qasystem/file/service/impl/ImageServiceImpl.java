@@ -1,5 +1,6 @@
 package com.example.qasystem.file.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.qasystem.file.domain.dto.ImageData;
 import com.example.qasystem.file.domain.entity.Image;
 import com.example.qasystem.file.mapper.ImageMapper;
@@ -21,7 +22,7 @@ import java.util.Calendar;
 @Service
 @Transactional(propagation = Propagation.SUPPORTS)
 @Slf4j
-public class ImageServiceImpl implements IImageService {
+public class ImageServiceImpl extends ServiceImpl<ImageMapper, Image> implements IImageService {
 
     @Autowired
     private ImageMapper imageMapper;
