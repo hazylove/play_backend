@@ -1,5 +1,6 @@
 package com.example.qasystem.user.service.impl;
 
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.qasystem.basic.utils.JWT.JwtUtil;
 import com.example.qasystem.user.domain.dto.UserLogin;
 import com.example.qasystem.user.domain.dto.UserRegistration;
@@ -12,13 +13,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
 import java.util.Calendar;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 @Service
 @Transactional(propagation = Propagation.SUPPORTS)
-public class UserServiceImpl implements IUserService {
+public class IUserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
 
     @Autowired
     private UserMapper userMapper;
@@ -72,6 +75,7 @@ public class UserServiceImpl implements IUserService {
         if (user != null && passwordEncoder.matches(userLogin.getPassword(), user.getPassword())) {
             String token = jwtUtil.generateToken(user.getId());
             redisTemplate.opsForValue().set("TOKEN_" + user.getId(), token, jwtUtil.getExpiration(), TimeUnit.SECONDS);
+            System.out.println("TOKEN_" + user.getId());
             return token;
         }else {
             return null;
