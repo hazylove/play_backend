@@ -13,9 +13,10 @@ public class JsonResult {
 //    public static JsonResult me(){
 //        return new JsonResult();
 //    }
-//    public static JsonResult me(Object data){
-//        return new JsonResult().setData(data);
-//    }
+
+    public static JsonResult success(Object data){
+        return new JsonResult().setData(data);
+    }
 
     public JsonResult setSuccess(Boolean success){
         this.success=success;

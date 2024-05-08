@@ -88,7 +88,7 @@
         <result property="commentCreatedId" column="comment_created_id"/>
         <result property="commentCreatedDate" column="comment_created_date" typeHandler="com.example.qasystem.basic.handler.CustomDateTypeHandler"/>
         <result property="commentSubCount" column="sub_count"/>
-        <association property="commentCreatedBy" javaType="com.example.qasystem.user.domain.entity.User" column="comment_created_id" select="com.example.qasystem.user.mapper.UserMapper.selectUserInfoById">
+        <association property="commentCreatedBy" javaType="com.example.qasystem.user.domain.entity.User" column="comment_created_id" select="com.example.qasystem.user.mapper.UserMapper.selectById">
             <id property="id" column="comment_created_id"/>
         </association>
     </resultMap>
@@ -103,7 +103,7 @@
         <result property="commentBlackNum" column="comment_black_num"/>
         <result property="commentCreatedId" column="comment_created_id"/>
         <result property="commentCreatedDate" column="comment_created_date" typeHandler="com.example.qasystem.basic.handler.CustomDateTypeHandler"/>
-        <association property="commentCreatedBy" javaType="com.example.qasystem.user.domain.entity.base.UserBase" column="comment_created_id" select="com.example.qasystem.user.mapper.UserMapper.selectUserInfoById">
+        <association property="commentCreatedBy" javaType="com.example.qasystem.user.domain.entity.User" column="comment_created_id" select="com.example.qasystem.user.mapper.UserMapper.selectById">
             <id property="id" column="comment_created_id"/>
         </association>
     </resultMap>

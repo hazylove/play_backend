@@ -2,6 +2,7 @@ package com.example.qasystem.post.controller;
 
 import com.example.qasystem.basic.utils.result.JsonResult;
 import com.example.qasystem.basic.utils.dto.PageList;
+import com.example.qasystem.basic.utils.result.ResultCode;
 import com.example.qasystem.post.domain.entity.Comment;
 import com.example.qasystem.post.domain.query.CommentQuery;
 import com.example.qasystem.post.service.ICommentService;
@@ -50,7 +51,7 @@ public class CommentController {
             return new JsonResult().setMassage("添加成功！");
         } else {
 //          iCommentService.update(comment);
-            return new JsonResult().setCode(500).setSuccess(false).setMassage("数据错误！");
+            return new JsonResult().setCode(ResultCode.ERROR_CODE).setSuccess(false).setMassage("数据错误！");
         }
     }
 

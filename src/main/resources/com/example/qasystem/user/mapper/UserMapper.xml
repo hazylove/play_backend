@@ -29,11 +29,4 @@
         WHERE username = #{username}
         LIMIT 1
     </select>
-    <select id="selectUserInfoById" resultType="com.example.qasystem.user.domain.entity.base.UserBase">
-        SELECT
-            id, username
-        FROM t_user
-        WHERE id = #{id}
-        LIMIT 1
-    </select>
 </mapper>
