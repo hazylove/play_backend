@@ -1,7 +1,6 @@
 package com.example.qasystem.user.controller;
 
 import com.example.qasystem.basic.utils.result.JsonResult;
-import com.example.qasystem.user.domain.dto.UserLogin;
 import com.example.qasystem.user.domain.dto.UserRegistration;
 import com.example.qasystem.user.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
@@ -12,12 +11,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("${api.prefix}/users")
+@RequestMapping("${api.prefix}")
 @Slf4j
 public class UserController {
     @Autowired
     private IUserService iUserService;
 
+    /**
+     * 用户注册
+     * @param userRegistration 注册信息
+     * @return JsonResult
+     */
     @PostMapping("/register")
     public JsonResult userRegister(@RequestBody UserRegistration userRegistration){
         try {
@@ -41,24 +45,5 @@ public class UserController {
             return new JsonResult().setCode(500).setSuccess(false).setMassage("服务器异常");
         }
     }
-
-    @PostMapping("/login")
-    public JsonResult userLogin(@RequestBody UserLogin userLogin){
-        try {
-            String token = iUserService.login(userLogin);
-            JsonResult jsonResult = new JsonResult();
-            if (token != null){
-                jsonResult.setData(token).setMassage("登录成功");
-            }
-            else {
-                jsonResult.setSuccess(false).setMassage("用户名或密码错误，登录失败");
-            }
-            return jsonResult;
-        }catch (Exception e){
-            log.error("用户登录出现异常：", e);
-            return new JsonResult().setCode(500).setSuccess(false).setMassage("服务器异常");
-        }
-    }
-
 
 }
