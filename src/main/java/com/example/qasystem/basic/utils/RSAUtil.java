@@ -344,11 +344,10 @@ public class RSAUtil {
      *公钥字符串开头要加上“-----BEGIN PUBLIC KEY-----\n”，结尾加上“\n-----END PUBLIC KEY-----\n”
      * 私钥字符串开头要加上“-----BEGIN RSA PRIVATE KEY-----\n”，结尾加上“\n-----END RSA PRIVATE KEY-----\n”
      * @author xiaobu
-     * @date 2020/3/18 16:40
+     * {@code @date}  2020/3/18 16:40
      * @param str 要格式的字符串, flag
      * @param  flag true为公 false为私
      * @return java.lang.String
-     * @version 1.0
      */
     public static String formatStr(String str,boolean flag){
         StringBuilder sb = new StringBuilder(str);
