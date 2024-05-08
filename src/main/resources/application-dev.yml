@@ -70,9 +70,10 @@ file:
 
 # jwt配置
 jwt:
+  header: Authorization
   secret: 2bbbd6fbdd4274ac5c5713bdb5666fefdc8a9773567d4b53eda59bf83289c4d7  # 加密秘钥
   expiration: 12000  # token有效期
-  ignore-paths: ${api.prefix}/users/login,${api.prefix}/users/register
+  ignore-paths: ${api.prefix}/login,${api.prefix}/register,${api.prefix}/logout,${api.prefix}/captcha/create
 
 api:
   prefix: /api

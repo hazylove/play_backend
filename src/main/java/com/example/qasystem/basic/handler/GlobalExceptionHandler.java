@@ -1,6 +1,7 @@
 package com.example.qasystem.basic.handler;
 
 import com.example.qasystem.basic.utils.result.JsonResult;
+import com.example.qasystem.basic.utils.result.ResultCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
@@ -33,7 +34,7 @@ public class GlobalExceptionHandler {
     public JsonResult handleException(Exception e, HttpServletRequest request) {
         String requestUrl = request.getRequestURL().toString();
         log.error("接口：{}：发生异常", requestUrl, e);
-        return new JsonResult().setCode(500).setSuccess(false).setMassage("服务器错误");
+        return new JsonResult().setCode(ResultCode.ERROR_CODE).setSuccess(false).setMassage("服务器错误");
     }
 
     /**
@@ -55,7 +56,7 @@ public class GlobalExceptionHandler {
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
             errorMap.put(fieldError.getField(), fieldError.getDefaultMessage());
         }
-        return new JsonResult().setCode(400).setSuccess(false).setMassage("参数校验失败").setData(errorMap);
+        return new JsonResult().setCode(ResultCode.BAD_REQUEST_CODE).setSuccess(false).setMassage("参数校验失败").setData(errorMap);
     }
 
     /**
@@ -77,7 +78,7 @@ public class GlobalExceptionHandler {
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
             errorMap.put(fieldError.getField(), fieldError.getDefaultMessage());
         }
-        return new JsonResult().setCode(400).setSuccess(false).setMassage("参数绑定失败").setData(errorMap);
+        return new JsonResult().setCode(ResultCode.BAD_REQUEST_CODE).setSuccess(false).setMassage("参数绑定失败").setData(errorMap);
     }
 
     /**
@@ -93,8 +94,6 @@ public class GlobalExceptionHandler {
     public JsonResult handleHttpMessageNotReadableException(HttpMessageNotReadableException e, HttpServletRequest request) {
         String requestUrl = request.getRequestURL().toString();
         log.error("接口：{}：请求体解析失败", requestUrl, e);
-
-        return new JsonResult().setCode(400).setSuccess(false).setMassage("请求体解析失败");
+        return new JsonResult().setCode(ResultCode.BAD_REQUEST_CODE).setSuccess(false).setMassage("请求体解析失败");
     }
-
 }

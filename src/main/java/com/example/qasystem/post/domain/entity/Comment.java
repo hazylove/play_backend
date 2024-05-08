@@ -1,7 +1,7 @@
 package com.example.qasystem.post.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
-import com.example.qasystem.user.domain.entity.base.UserBase;
+import com.example.qasystem.user.domain.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,7 +32,7 @@ public class Comment {
     private Long commentCreatedId; // 创建人id
 
     @TableField(exist = false)
-    private UserBase commentCreatedBy; // 创建人
+    private User commentCreatedBy; // 创建人
 
     private Date commentCreatedDate; // 创建时间
 
