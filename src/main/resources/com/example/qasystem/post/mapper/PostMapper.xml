@@ -52,7 +52,7 @@
         <result property="postCreatedId" column="post_created_id"/>
         <result property="postCreatedDate" column="post_created_date"/>
         <result property="postCommentNum" column="comment_count"/>
-        <association property="postCreatedBy" javaType="com.example.qasystem.user.domain.entity.User" column="post_created_id" select="com.example.qasystem.user.mapper.UserMapper.selectById">
+        <association property="postCreatedBy" javaType="com.example.qasystem.user.domain.entity.User" column="post_created_id" select="com.example.qasystem.user.mapper.UserMapper.getUserInfoById">
             <id property="id" column="comment_created_id"/>
         </association>
     </resultMap>
