@@ -8,6 +8,8 @@ import com.example.qasystem.post.domain.query.CommentQuery;
 import com.example.qasystem.post.service.ICommentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,14 +48,20 @@ public class CommentController {
      */
     @PostMapping("/save")
     public JsonResult addQuestion(@RequestBody Comment comment){
-        if (comment.getId() == null) {
-            iCommentService.insert(comment);
-            return new JsonResult().setMassage("添加成功！");
-        } else {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            Long userId = Long.valueOf(authentication.getName());
+            if (comment.getId() == null) {
+                comment.setCommentCreatedId(userId);
+                iCommentService.insert(comment);
+                return new JsonResult().setMassage("添加成功！");
+            } else {
 //          iCommentService.update(comment);
-            return new JsonResult().setCode(ResultCode.ERROR_CODE).setSuccess(false).setMassage("数据错误！");
+                return new JsonResult().setCode(ResultCode.ERROR_CODE).setSuccess(false).setMassage("数据错误！");
+            }
+        } else {
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
         }
     }
-
 
 }

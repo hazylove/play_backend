@@ -8,4 +8,6 @@ public interface IUserService extends IService<User> {
     int register(UserRegistration userRegistration);
 
     User getUserByUsername(String username);
+
+    User getUserInfoById(Long id);
 }

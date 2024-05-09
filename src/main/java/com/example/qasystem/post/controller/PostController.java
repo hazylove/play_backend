@@ -41,7 +41,7 @@ public class PostController {
                 return new JsonResult().setCode(ResultCode.ERROR_CODE).setSuccess(false).setMassage("数据错误！");
             }
         }else {
-            return new JsonResult().setCode(ResultCode.UNAUTHORIZED_CODE).setSuccess(false).setMassage("未认证用户！");
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
         }
     }
 
@@ -54,7 +54,6 @@ public class PostController {
 
     @GetMapping("/hello")
     public String hello() {
-//        throw new Exception("服务器异常");
         return "Hello Word!";
     }
 }

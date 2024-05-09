@@ -58,6 +58,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return userMapper.selectOne(queryWrapper);
     }
 
+    @Override
+    public User getUserInfoById(Long id) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.select("id", "username");
+        queryWrapper.eq("id", id);
+
+        return userMapper.getUserInfoById(id);
+    }
+
     // 用户名为空检查
     private boolean isInvalidUsername(String username) {
         return username == null || username.isEmpty();
