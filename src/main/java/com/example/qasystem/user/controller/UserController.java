@@ -1,6 +1,7 @@
 package com.example.qasystem.user.controller;
 
 import com.example.qasystem.basic.utils.result.JsonResult;
+import com.example.qasystem.basic.utils.result.ResultCode;
 import com.example.qasystem.user.domain.dto.UserRegistration;
 import com.example.qasystem.user.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +43,7 @@ public class UserController {
             return jsonResult;
         }catch (Exception e){
             log.error("用户注册出现异常：", e);
-            return new JsonResult().setCode(500).setSuccess(false).setMassage("服务器异常");
+            return new JsonResult().setCode(ResultCode.ERROR_CODE).setSuccess(false).setMassage("服务器异常");
         }
     }
 
