@@ -15,6 +15,8 @@ public class ResultCode {
     public static final int BAD_REQUEST_CODE = 400;
     // 禁止的请求
     public static final int FORBIDDEN_CODE = 403;
+    // 参数错误
+    public static final int UNPROCESSABLE_ENTITY = 422;
 
 
     /**

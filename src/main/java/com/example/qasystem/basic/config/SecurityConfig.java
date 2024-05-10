@@ -4,7 +4,6 @@ import com.example.qasystem.user.security.filter.CaptchaFilter;
 import com.example.qasystem.user.security.filter.JsonAuthenticationFilter;
 import com.example.qasystem.user.security.filter.JwtAuthenticationFilter;
 import com.example.qasystem.user.security.handler.*;
-import com.example.qasystem.user.service.impl.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -14,7 +13,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -39,9 +37,6 @@ public class SecurityConfig {
 
     @Autowired
     private JwtAccessDeniedHandler jwtAccessDeniedHandler;
-
-    @Autowired
-    private UserDetailsServiceImpl userDetailsManager;
 
     @Autowired
     private LogoutHandler logoutHandler;
@@ -107,15 +102,6 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        return http.
-                getSharedObject(AuthenticationManagerBuilder.class)
-                .userDetailsService(userDetailsService())
-                .and()
-                .build();
-    }
-
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return userDetailsManager;
+        return http.getSharedObject(AuthenticationManagerBuilder.class).build();
     }
 }

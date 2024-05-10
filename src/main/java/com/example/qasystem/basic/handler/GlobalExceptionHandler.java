@@ -7,17 +7,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindException;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestControllerAdvice(basePackages = "com.example.qasystem.org.controller")
+@ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
 
@@ -45,7 +42,7 @@ public class GlobalExceptionHandler {
      * @return 返回封装后的响应结果
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ResponseBody
     public JsonResult handleValidationException(MethodArgumentNotValidException e, HttpServletRequest request) {
         String requestUrl = request.getRequestURL().toString();
@@ -56,7 +53,7 @@ public class GlobalExceptionHandler {
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
             errorMap.put(fieldError.getField(), fieldError.getDefaultMessage());
         }
-        return new JsonResult().setCode(ResultCode.BAD_REQUEST_CODE).setSuccess(false).setMassage("参数校验失败").setData(errorMap);
+        return new JsonResult().setCode(ResultCode.UNPROCESSABLE_ENTITY).setSuccess(false).setMassage("参数校验失败").setData(errorMap);
     }
 
     /**
