@@ -17,4 +17,7 @@ public class UserRegistration {
     private String phone;
     private String email;
     private Date createdDate;
+
+    // 邮箱验证码
+    private String emailCode;
 }

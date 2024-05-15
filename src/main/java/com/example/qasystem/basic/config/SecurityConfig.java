@@ -4,8 +4,10 @@ import com.example.qasystem.user.security.filter.CaptchaFilter;
 import com.example.qasystem.user.security.filter.JsonAuthenticationFilter;
 import com.example.qasystem.user.security.filter.JwtAuthenticationFilter;
 import com.example.qasystem.user.security.handler.*;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,8 +18,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+
 @Configuration
 @EnableWebSecurity
+@Data
+@ConfigurationProperties(prefix = "jwt")
 public class SecurityConfig {
 
     @Autowired
@@ -41,9 +46,8 @@ public class SecurityConfig {
     @Autowired
     private LogoutHandler logoutHandler;
 
-
-    @Value("${jwt.ignore-paths}")
-    private final String[] URL_WHITELIST = new String[]{"/login", "/logout", "/register"};
+    // 允许访问的地址，由yml中配置
+    private String[] ignorePaths;
 
     @Value("${api.prefix}")
     private String apiPrefix;
@@ -58,7 +62,7 @@ public class SecurityConfig {
 
                 //注销配置
                 .logout()
-                .logoutUrl(apiPrefix + "/logout") // 设置注销 URL
+                .logoutUrl(apiPrefix + "/user/logout") // 设置注销 URL
                 .logoutSuccessHandler(logoutHandler)
 
                 //禁用session
@@ -69,7 +73,7 @@ public class SecurityConfig {
                 //配置拦截规则
                 .and()
                 .authorizeRequests()
-                .antMatchers(URL_WHITELIST).permitAll()
+                .antMatchers(ignorePaths).permitAll()
                 .anyRequest()
                 .authenticated()
 
@@ -95,7 +99,7 @@ public class SecurityConfig {
         filter.setAuthenticationSuccessHandler(loginSuccessHandler);
         filter.setAuthenticationFailureHandler(loginFailureHandler);
         // 可自定义登录接口请求路径
-        filter.setFilterProcessesUrl(apiPrefix + "/login");
+        filter.setFilterProcessesUrl(apiPrefix + "/user/login");
         filter.setAuthenticationManager(authenticationManager(http));
         return filter;
     }

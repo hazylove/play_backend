@@ -6,13 +6,10 @@ import lombok.Data;
 public class JsonResult {
     private Boolean success=true;
     private String message="操作成功";
-    private Integer code =200;
+    private Integer code =ResultCode.SUCCESS_CODE;
     private Object data;
     private Object resultObj;
 
-//    public static JsonResult me(){
-//        return new JsonResult();
-//    }
 
     public static JsonResult success(Object data){
         return new JsonResult().setData(data);
