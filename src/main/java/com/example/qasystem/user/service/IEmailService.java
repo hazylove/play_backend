@@ -1,5 +1,6 @@
 package com.example.qasystem.user.service;
 
+import com.example.qasystem.basic.utils.result.JsonResult;
 import com.example.qasystem.user.domain.dto.EmailDto;
 
 public interface IEmailService {
@@ -10,5 +11,5 @@ public interface IEmailService {
      */
     void sendEmail(EmailDto emailDto);
 
-    int sendEmailCode(String email);
+    JsonResult sendEmailCode(String email);
 }

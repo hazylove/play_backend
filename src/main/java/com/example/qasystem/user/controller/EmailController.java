@@ -2,7 +2,6 @@ package com.example.qasystem.user.controller;
 
 
 import com.example.qasystem.basic.utils.result.JsonResult;
-import com.example.qasystem.basic.utils.result.ResultCode;
 import com.example.qasystem.user.service.IEmailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +20,6 @@ public class EmailController {
 
     @PostMapping("/sendCode")
     public JsonResult sendEmailCode(@RequestParam String email) {
-        int result = emailService.sendEmailCode(email);
-        if (result == 1) {
-            return new JsonResult();
-        } else {
-            return new JsonResult().setCode(ResultCode.EMAIL_EXISTING).setSuccess(false).setMassage("该邮箱已注册");
-        }
-
+        return emailService.sendEmailCode(email);
     }
 }

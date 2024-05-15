@@ -26,21 +26,7 @@ public class UserController {
     @PostMapping("/register")
     public JsonResult userRegister(@RequestBody UserRegistration userRegistration){
         try {
-            int result = iUserService.register(userRegistration);
-            JsonResult jsonResult = new JsonResult();
-            if (result == -2){
-                jsonResult.setSuccess(false).setMassage("用户名、密码格式不正确");
-            }
-            else if (result == 0){
-                jsonResult.setSuccess(false).setMassage("两次输入密码不一致");
-            }
-            else if (result == -1){
-                jsonResult.setSuccess(false).setCode(ResultCode.USERNAME_EXISTING).setMassage("用户名已存在");
-            }
-            else {
-                jsonResult.setMassage("注册成功");
-            }
-            return jsonResult;
+            return iUserService.register(userRegistration);
         }catch (Exception e){
             log.error("用户注册出现异常：", e);
             return new JsonResult().setCode(ResultCode.ERROR_CODE).setSuccess(false).setMassage("服务器异常");

@@ -1,4 +1,4 @@
-package com.example.qasystem.user.security.utils;
+package com.example.qasystem.user.utils;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;

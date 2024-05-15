@@ -2,11 +2,14 @@ package com.example.qasystem.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.qasystem.basic.utils.result.JsonResult;
+import com.example.qasystem.basic.utils.result.ResultCode;
 import com.example.qasystem.user.domain.dto.UserRegistration;
 import com.example.qasystem.user.domain.entity.User;
 import com.example.qasystem.user.mapper.UserMapper;
-import com.example.qasystem.user.security.utils.PasswordEncoder;
+import com.example.qasystem.user.utils.PasswordEncoder;
 import com.example.qasystem.user.service.IUserService;
+import com.example.qasystem.user.utils.UserCheckUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -18,37 +21,52 @@ import java.util.Objects;
 @Service
 @Transactional(propagation = Propagation.SUPPORTS)
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
-
     @Autowired
     private UserMapper userMapper;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private UserCheckUtil userCheckUtil;
+
     @Override
     @Transactional
-    public int register(UserRegistration userRegistration) {
+    public JsonResult register(UserRegistration userRegistration) {
+        JsonResult jsonResult = new JsonResult();
         // 校验输入格式
-        if (isInvalidUsername(userRegistration.getUsername()) || isInvalidPassword(userRegistration.getPassword1())) {
-            return -2;
+        if (userCheckUtil.isInvalidUsername(userRegistration.getUsername()) || userCheckUtil.isInvalidPassword(userRegistration.getPassword1())) {
+            return jsonResult.setSuccess(false).setCode(ResultCode.USERNAME_PASSWORD_FORMAT_ERROR).setMassage("用户名、密码格式不正确");
         }
         // 检查两次输入密码
         if (!Objects.equals(userRegistration.getPassword1(), userRegistration.getPassword2())){
-            return 0;
+            return jsonResult.setSuccess(false).setCode(ResultCode.TWICE_PASSWORD_INCONSISTENT).setMassage("两次输入密码不一致");
         }
         // 检查用户名是否存在
-        Long userId =userMapper.getUserIdByUsername(userRegistration.getUsername());
-        if (userId != null){
-            return -1;
+        if (registerUsernameExist(userRegistration.getUsername())){
+            return jsonResult.setSuccess(false).setCode(ResultCode.USERNAME_EXISTING).setMassage("用户名已存在");
+        }
+        // 检查邮箱是否已注册
+        if (registerEmailExist(userRegistration.getEmail())) {
+            return new JsonResult().setCode(ResultCode.EMAIL_EXISTING).setSuccess(false).setMassage("该邮箱已注册");
+        }
+        // 校验邮箱验证码
+        if (!userCheckUtil.isInvalidEmailCode(userRegistration.getEmail(), userRegistration.getEmailCode())) {
+            return jsonResult.setSuccess(false).setCode(ResultCode.EMAIL_CODE_ERROR).setMassage("邮箱验证码错误");
         }
 
-        // 注册
-        userRegistration.setCreatedDate(Calendar.getInstance().getTime());
-        // 加密密码
-        String hashedPassword = passwordEncoder.encode(userRegistration.getPassword1());
-        userRegistration.setPassword1(hashedPassword);
-        userMapper.insert(userRegistration);
-        return 1;
+        // 创建用户
+        User user = new User(
+                null, // 自增id
+                userRegistration.getUsername(), //用户名
+                passwordEncoder.encode(userRegistration.getPassword1()), // 加密后的密码
+                userRegistration.getEmail(), // 邮箱
+                userRegistration.getPhone(), // 电话
+                Calendar.getInstance().getTime() // 注册时间
+        );
+        userMapper.insert(user);
+
+        return jsonResult.setMassage("注册成功");
     }
 
     @Override
@@ -65,15 +83,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         return userMapper.selectOne(queryWrapper) != null;
     }
 
-    // 用户名为空检查
-    private boolean isInvalidUsername(String username) {
-        return username == null || username.isEmpty();
+    @Override
+    public boolean registerUsernameExist(String username) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(User::getUsername, username);
+        return userMapper.selectOne(queryWrapper) != null;
     }
 
-    // 密码格式检查
-    private boolean isInvalidPassword(String password) {
-        final int MIN_PASSWORD_LENGTH = 6;
-        final int MAX_PASSWORD_LENGTH = 18;
-        return password == null || password.length() < MIN_PASSWORD_LENGTH || password.length() > MAX_PASSWORD_LENGTH;
-    }
 }

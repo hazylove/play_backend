@@ -9,6 +9,8 @@ import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
 import com.example.qasystem.basic.utils.RedisUtil;
+import com.example.qasystem.basic.utils.result.JsonResult;
+import com.example.qasystem.basic.utils.result.ResultCode;
 import com.example.qasystem.user.domain.dto.EmailDto;
 import com.example.qasystem.user.service.IEmailService;
 import com.example.qasystem.user.service.IUserService;
@@ -91,10 +93,11 @@ public class EmailServiceImpl implements IEmailService {
     }
 
     @Override
-    public int sendEmailCode(String email) {
+    public JsonResult sendEmailCode(String email) {
+        JsonResult jsonResult = new JsonResult();
         // 校验邮箱是否已注册
         if (userService.registerEmailExist(email)) {
-            return 0;
+            return jsonResult.setCode(ResultCode.EMAIL_EXISTING).setSuccess(false).setMassage("该邮箱已注册");
         }
 
         // 从redis缓存中尝试获取验证码
@@ -113,6 +116,6 @@ public class EmailServiceImpl implements IEmailService {
         // 发送验证码
         sendEmail(new EmailDto(Collections.singletonList(email), "play-注册验证码", template.render(Dict.create().set("code", code))));
 
-        return 1;
+        return jsonResult;
     }
 }

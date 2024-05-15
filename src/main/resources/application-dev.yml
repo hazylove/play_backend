@@ -56,11 +56,11 @@ spring:
     static-path-pattern: /${file.image-pattern-path}/**
   # 邮箱配置
   mail:
-    email: bu824993599@163.com
-    host: smtp.163.com
+    email: j70028333@126.com
+    host: smtp.126.com
     port: 465
-    username: bu824993599@163.com
-    password: ZAOAVSVVHPVTIXOD
+    username: j70028333@126.com
+    password: WEXYEPBWMKUYWTUS
     # 邮箱验证码有效时间
     code:
       expiration: 300
