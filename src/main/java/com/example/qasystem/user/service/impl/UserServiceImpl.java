@@ -59,12 +59,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public User getUserInfoById(Long id) {
+    public boolean registerEmailExist(String email) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.select("id", "username");
-        queryWrapper.eq("id", id);
-
-        return userMapper.getUserInfoById(id);
+        queryWrapper.lambda().eq(User::getEmail, email);
+        return userMapper.selectOne(queryWrapper) != null;
     }
 
     // 用户名为空检查

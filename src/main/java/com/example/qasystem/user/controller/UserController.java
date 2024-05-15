@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("${api.prefix}")
+@RequestMapping("${api.prefix}/user")
 @Slf4j
 public class UserController {
     @Autowired
@@ -35,7 +35,7 @@ public class UserController {
                 jsonResult.setSuccess(false).setMassage("两次输入密码不一致");
             }
             else if (result == -1){
-                jsonResult.setSuccess(false).setMassage("用户名已存在");
+                jsonResult.setSuccess(false).setCode(ResultCode.USERNAME_EXISTING).setMassage("用户名已存在");
             }
             else {
                 jsonResult.setMassage("注册成功");

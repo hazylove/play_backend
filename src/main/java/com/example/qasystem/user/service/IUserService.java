@@ -9,5 +9,5 @@ public interface IUserService extends IService<User> {
 
     User getUserByUsername(String username);
 
-    User getUserInfoById(Long id);
+    boolean registerEmailExist(String email);
 }

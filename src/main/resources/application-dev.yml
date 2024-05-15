@@ -54,6 +54,16 @@ spring:
   mvc:
     # 资源访问的前缀
     static-path-pattern: /${file.image-pattern-path}/**
+  # 邮箱配置
+  mail:
+    email: bu824993599@163.com
+    host: smtp.163.com
+    port: 465
+    username: bu824993599@163.com
+    password: ZAOAVSVVHPVTIXOD
+    # 邮箱验证码有效时间
+    code:
+      expiration: 300
   # 扫描的资源路径
   web:
     resources:
@@ -73,7 +83,17 @@ jwt:
   header: Authorization
   secret: 2bbbd6fbdd4274ac5c5713bdb5666fefdc8a9773567d4b53eda59bf83289c4d7  # 加密秘钥
   expiration: 12000  # token有效期
-  ignore-paths: ${api.prefix}/post/hello,${api.prefix}/login,${api.prefix}/register,${api.prefix}/logout,${api.prefix}/captcha/create
+  ignore-paths:
+    # 测试
+    - ${api.prefix}/post/hello
+    # 登录
+    - ${api.prefix}/user/login
+    # 注册
+    - ${api.prefix}/user/register
+    # 图片验证码
+    - ${api.prefix}/captcha/create
+    # 邮箱验证码
+    - ${api.prefix}/email/sendCode
 
 api:
   prefix: /api

@@ -18,6 +18,10 @@ public class ResultCode {
     // 参数错误
     public static final int UNPROCESSABLE_ENTITY = 422;
 
+    // 注册用户名已存在
+    public static final int USERNAME_EXISTING = 1101;
+    // 注册邮箱已存在
+    public static final int EMAIL_EXISTING = 1102;
 
     /**
      * 富文本图片上传返回码
