@@ -11,5 +11,10 @@ public interface IEmailService {
      */
     void sendEmail(EmailDto emailDto);
 
+    /**
+     * 发送邮箱验证码
+     * @param email 邮箱
+     * @return JsonResult
+     */
     JsonResult sendEmailCode(String email);
 }

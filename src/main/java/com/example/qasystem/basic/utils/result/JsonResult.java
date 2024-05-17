@@ -20,7 +20,7 @@ public class JsonResult {
         return this;
     }
 
-    public  JsonResult setMassage(String message){
+    public JsonResult setMassage(String message){
         this.message=message;
         return this;
     }

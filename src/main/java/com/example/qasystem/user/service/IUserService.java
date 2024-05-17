@@ -21,6 +21,13 @@ public interface IUserService extends IService<User> {
     User getUserByUsername(String username);
 
     /**
+     * 根据用户名或邮箱查询用户
+     * @param Account 账号：用户名或邮箱
+     * @return 用户
+     */
+    User getUserByUsernameOrEmail(String Account);
+
+    /**
      * 检查邮箱是否已注册
      * @param email 用户名
      * @return 是否注册
