@@ -30,14 +30,19 @@ public class ResultCode {
      */
     // 注册用户名已存在
     public static final int USERNAME_EXISTING = 1101;
-    // 注册邮箱已存在
-    public static final int EMAIL_EXISTING = 1102;
     // 两次输入密码不一致
-    public static final int TWICE_PASSWORD_INCONSISTENT = 1103;
+    public static final int TWICE_PASSWORD_INCONSISTENT = 1102;
     // 用户名、密码格式不正确
-    public static final int USERNAME_PASSWORD_FORMAT_ERROR = 1104;
+    public static final int USERNAME_PASSWORD_FORMAT_ERROR = 1103;
     // 邮箱验证码错误
-    public static final int EMAIL_CODE_ERROR = 1105;
+    public static final int EMAIL_CODE_ERROR = 1104;
+    // 邮箱格式错误
+    public static final int EMAIL_FORMAT_ERROR = 1110;
+    // 注册邮箱已存在
+    public static final int EMAIL_EXISTING = 1111;
+    // 手机号格式错误
+    public static final int PHONE_FORMAT_ERROR = 1120;
+
 
     /**
      * 富文本图片上传返回码

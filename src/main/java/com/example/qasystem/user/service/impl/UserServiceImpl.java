@@ -2,6 +2,7 @@ package com.example.qasystem.user.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.example.qasystem.basic.utils.FormatCheckUtil;
 import com.example.qasystem.basic.utils.result.JsonResult;
 import com.example.qasystem.basic.utils.result.ResultCode;
 import com.example.qasystem.user.domain.dto.UserRegistration;
@@ -30,13 +31,21 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Autowired
     private UserCheckUtil userCheckUtil;
 
+    @Autowired
+    private FormatCheckUtil formatCheckUtil;
+
+
     @Override
     @Transactional
     public JsonResult register(UserRegistration userRegistration) {
         JsonResult jsonResult = new JsonResult();
-        // 校验输入格式
-        if (userCheckUtil.isInvalidUsername(userRegistration.getUsername()) || userCheckUtil.isInvalidPassword(userRegistration.getPassword1())) {
-            return jsonResult.setSuccess(false).setCode(ResultCode.USERNAME_PASSWORD_FORMAT_ERROR).setMassage("用户名、密码格式不正确");
+        // 校验用户名格式
+        if (userCheckUtil.isInvalidUsername(userRegistration.getUsername()) && formatCheckUtil.validateEmail(userRegistration.getUsername())) {
+            return jsonResult.setSuccess(false).setCode(ResultCode.USERNAME_PASSWORD_FORMAT_ERROR).setMassage("用户名格式不正确");
+        }
+        // 校验手机号格式
+        if (userRegistration.getPhone() !=  null && !userRegistration.getPhone().isEmpty() && !formatCheckUtil.validatePhone(userRegistration.getPhone())) {
+            return jsonResult.setSuccess(false).setCode(ResultCode.PHONE_FORMAT_ERROR).setMassage("手机号格式不正确");
         }
         // 检查两次输入密码
         if (!Objects.equals(userRegistration.getPassword1(), userRegistration.getPassword2())){
@@ -73,6 +82,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public User getUserByUsername(String username) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq("username", username);
+        return userMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public User getUserByUsernameOrEmail(String Account) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("username", Account).or().eq("email", Account);
         return userMapper.selectOne(queryWrapper);
     }
 

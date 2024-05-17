@@ -11,19 +11,21 @@ public class UserCheckUtil {
     @Autowired
     private RedisUtil redisUtil;
 
-    // 用户名为空检查
+    /**
+     * 用户名为空检查
+     * @param username 用户名
+     * @return 是否为空
+     */
     public boolean isInvalidUsername(String username) {
         return username == null || username.isEmpty();
     }
 
-    // 密码格式检查
-    public boolean isInvalidPassword(String password) {
-        final int MIN_PASSWORD_LENGTH = 6;
-        final int MAX_PASSWORD_LENGTH = 18;
-        return password == null || password.length() < MIN_PASSWORD_LENGTH || password.length() > MAX_PASSWORD_LENGTH;
-    }
-
-    // 邮箱验证码检查
+    /**
+     * 邮箱验证码校验
+     * @param email 邮箱
+     * @param emailCode 邮箱验证码
+     * @return 是否验证成功
+     */
     public boolean isInvalidEmailCode(String email, String emailCode) {
         String redisEmailCode = redisUtil.get(email);
         return Objects.equals(redisEmailCode, emailCode);
