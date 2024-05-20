@@ -24,10 +24,10 @@ public class UserCheckUtil {
      * 邮箱验证码校验
      * @param email 邮箱
      * @param emailCode 邮箱验证码
-     * @return 是否验证成功
+     * @return 成功返回false，失败返回true
      */
     public boolean isInvalidEmailCode(String email, String emailCode) {
         String redisEmailCode = redisUtil.get(email);
-        return Objects.equals(redisEmailCode, emailCode);
+        return !Objects.equals(redisEmailCode, emailCode);
     }
 }

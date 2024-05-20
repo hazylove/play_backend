@@ -18,30 +18,31 @@ public class ResultCode {
     public static final int UNPROCESSABLE_ENTITY = 422;
 
     /**
-     * 登录
+     * 用户
      */
     // 验证码错误
     public static final int VERIFICATION_CODE_ERROR_CODE = 1001;
     // 用户名密码错误
     public static final int INCORRECT_USERNAME_AND_PASSWORD_CODE = 1002;
 
-    /**
-     * 注册
-     */
     // 注册用户名已存在
-    public static final int USERNAME_EXISTING = 1101;
+    public static final int USERNAME_EXISTING = 1010;
     // 两次输入密码不一致
-    public static final int TWICE_PASSWORD_INCONSISTENT = 1102;
+    public static final int TWICE_PASSWORD_INCONSISTENT = 1011;
     // 用户名、密码格式不正确
-    public static final int USERNAME_PASSWORD_FORMAT_ERROR = 1103;
+    public static final int USERNAME_PASSWORD_FORMAT_ERROR = 1012;
+
     // 邮箱验证码错误
-    public static final int EMAIL_CODE_ERROR = 1104;
+    public static final int EMAIL_CODE_ERROR = 1020;
     // 邮箱格式错误
-    public static final int EMAIL_FORMAT_ERROR = 1110;
+    public static final int EMAIL_FORMAT_ERROR = 1021;
     // 注册邮箱已存在
-    public static final int EMAIL_EXISTING = 1111;
+    public static final int EMAIL_EXISTING = 1022;
+    // 修改密码邮箱验证失败
+    public static final int EMAIL_CHECK_FAILED = 1023;
+
     // 手机号格式错误
-    public static final int PHONE_FORMAT_ERROR = 1120;
+    public static final int PHONE_FORMAT_ERROR = 1030;
 
 
     /**

@@ -57,13 +57,13 @@ public class CaptchaFilter extends OncePerRequestFilter {
             throw new CaptchaException("验证码错误");
         }
 
-        if (!code.equals(redisUtil.hget(AuthConstant.CAPTCHA_KEY, key))) {
+        if (!code.equals(redisUtil.hget(AuthConstant.CAPTCHA_REDIS_KEY, key))) {
             throw new CaptchaException("验证码错误");
         }
 
         // 若验证码正确，执行以下语句
         // 一次性使用
-        redisUtil.hdel(AuthConstant.CAPTCHA_KEY, key);
+        redisUtil.hdel(AuthConstant.CAPTCHA_REDIS_KEY, key);
     }
 }
 
