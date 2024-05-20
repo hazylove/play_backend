@@ -16,5 +16,7 @@ public interface IEmailService {
      * @param email 邮箱
      * @return JsonResult
      */
-    JsonResult sendEmailCode(String email);
+    JsonResult sendRegisterCode(String email);
+
+    JsonResult sendChangeCode(Long userId, String email);
 }

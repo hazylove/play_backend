@@ -11,7 +11,7 @@
     </parent>
 
     <groupId>com.example</groupId>
-    <artifactId>QA_backed</artifactId>
+    <artifactId>play_backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>QASystem</name>
     <description>QASystem</description>

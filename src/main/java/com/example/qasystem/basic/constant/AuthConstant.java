@@ -1,7 +1,10 @@
 package com.example.qasystem.basic.constant;
 
 public class AuthConstant {
+    // token请求头 前缀
     public static final String TOKEN_PREFIX = "Bearer ";
-    public static final String CAPTCHA_KEY = "captcha";
-    public static final String TOKEN_KEY_PREFIX = "TOKEN_";
+    // 图片验证码在redis中存储的key
+    public static final String CAPTCHA_REDIS_KEY = "captcha";
+    // token在redis中存储的前缀
+    public static final String TOKEN_REDIS_PREFIX = "TOKEN_";
 }

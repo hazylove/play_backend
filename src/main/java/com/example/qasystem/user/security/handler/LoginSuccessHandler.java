@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.example.qasystem.basic.constant.AuthConstant.TOKEN_KEY_PREFIX;
+import static com.example.qasystem.basic.constant.AuthConstant.TOKEN_REDIS_PREFIX;
 
 @Component
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
@@ -31,7 +31,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         JsonResult result = new JsonResult().setData(token).setMassage("登录成功");
 
         // 将token存入redis，并设置过期时间
-        redisUtil.set(TOKEN_KEY_PREFIX + authentication.getName(), token, jwtUtil.getExpiration());
+        redisUtil.set(TOKEN_REDIS_PREFIX + authentication.getName(), token, jwtUtil.getExpiration());
 
         response.setContentType("application/json;charset=UTF-8");
         response.getWriter().println(JSON.toJSON(result));

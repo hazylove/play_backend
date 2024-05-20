@@ -18,7 +18,7 @@ import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import static com.example.qasystem.basic.constant.AuthConstant.TOKEN_KEY_PREFIX;
+import static com.example.qasystem.basic.constant.AuthConstant.TOKEN_REDIS_PREFIX;
 import static com.example.qasystem.basic.constant.AuthConstant.TOKEN_PREFIX;
 
 
@@ -54,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String username = claim.getSubject();
 
-        Object tokenInRedis = redisUtil.get(TOKEN_KEY_PREFIX + username);
+        Object tokenInRedis = redisUtil.get(TOKEN_REDIS_PREFIX + username);
         if (tokenInRedis == null || !tokenInRedis.equals(cleanedToken)) {
             throw new JwtException("token 异常");
         }
@@ -66,7 +66,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getId(), null, userDetailsService.getUserAuthority(user.getId()));
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-        chain.doFilter(request, response);
+        // 刷新token过期时间
+        redisUtil.expire(TOKEN_REDIS_PREFIX + username, jwtUtil.getExpiration());
 
+        chain.doFilter(request, response);
     }
 }

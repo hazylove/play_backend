@@ -13,6 +13,7 @@ import com.example.qasystem.basic.utils.RedisUtil;
 import com.example.qasystem.basic.utils.result.JsonResult;
 import com.example.qasystem.basic.utils.result.ResultCode;
 import com.example.qasystem.user.domain.dto.EmailDto;
+import com.example.qasystem.user.domain.entity.User;
 import com.example.qasystem.user.service.IEmailService;
 import com.example.qasystem.user.service.IUserService;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +23,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-//import javax.annotation.Resource;
 import java.util.Collections;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -94,7 +95,7 @@ public class EmailServiceImpl implements IEmailService {
     }
 
     @Override
-    public JsonResult sendEmailCode(String email) {
+    public JsonResult sendRegisterCode(String email) {
         JsonResult jsonResult = new JsonResult();
         // 校验邮箱格式
         if (!formatCheckUtil.validateEmail(email)) {
@@ -105,6 +106,43 @@ public class EmailServiceImpl implements IEmailService {
             return jsonResult.setCode(ResultCode.EMAIL_EXISTING).setSuccess(false).setMassage("该邮箱已注册");
         }
 
+        // 邮箱验证码
+        Object code = generateAndSaveEmailCode(email);
+        // 获取发送邮箱验证码的HTML模板
+        TemplateEngine engine = TemplateUtil.createEngine(new TemplateConfig("template", TemplateConfig.ResourceMode.CLASSPATH));
+        Template template = engine.getTemplate("register-email-code.ftl");
+        // 发送验证码
+        sendEmail(new EmailDto(Collections.singletonList(email), "play-注册验证码", template.render(Dict.create().set("code", code))));
+
+        return jsonResult;
+    }
+
+    @Override
+    public JsonResult sendChangeCode(Long userId, String email) {
+        JsonResult jsonResult = new JsonResult();
+        Object userEmail = userService.getOneFieldValueByUserId(userId, User::getEmail);
+        // 验证邮箱
+        if (!Objects.equals(userEmail, email)){
+            return jsonResult.setSuccess(false).setCode(ResultCode.EMAIL_CHECK_FAILED).setMassage("邮箱验证失败");
+        }
+
+        // 邮箱验证码
+        Object code = generateAndSaveEmailCode(email);
+        // 获取发送邮箱验证码的HTML模板
+        TemplateEngine engine = TemplateUtil.createEngine(new TemplateConfig("template", TemplateConfig.ResourceMode.CLASSPATH));
+        Template template = engine.getTemplate("change-email-code.ftl");
+        // 发送验证码
+        sendEmail(new EmailDto(Collections.singletonList(email), "play-修改密码验证码", template.render(Dict.create().set("code", code))));
+
+        return jsonResult;
+    }
+
+    /**
+     * 生成并在redis中存储邮箱验证码
+     * @param email 邮箱
+     * @return 验证码
+     */
+    private Object generateAndSaveEmailCode(String email) {
         // 从redis缓存中尝试获取验证码
         Object code = redisUtil.get(email);
         if (code == null) {
@@ -114,13 +152,6 @@ public class EmailServiceImpl implements IEmailService {
                 throw new RuntimeException("后台缓存服务异常");
             }
         }
-
-        // 获取发送邮箱验证码的HTML模板
-        TemplateEngine engine = TemplateUtil.createEngine(new TemplateConfig("template", TemplateConfig.ResourceMode.CLASSPATH));
-        Template template = engine.getTemplate("email-code.ftl");
-        // 发送验证码
-        sendEmail(new EmailDto(Collections.singletonList(email), "play-注册验证码", template.render(Dict.create().set("code", code))));
-
-        return jsonResult;
+        return code;
     }
 }

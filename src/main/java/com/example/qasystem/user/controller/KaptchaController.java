@@ -44,7 +44,7 @@ public class KaptchaController {
 
         String base64Img = str + encoder.encodeToString(outputStream.toByteArray());
 
-        redisUtil.hset(AuthConstant.CAPTCHA_KEY, key, code, 120);
+        redisUtil.hset(AuthConstant.CAPTCHA_REDIS_KEY, key, code, 120);
 
         return JsonResult.success(MapUtil.builder()
                 .put("userKey", key)
