@@ -1,7 +1,7 @@
 package com.example.qasystem.user.security.filter;
 
 import cn.hutool.core.util.StrUtil;
-import com.example.qasystem.basic.utils.RedisUtil;
+import com.example.qasystem.basic.utils.tool.RedisUtil;
 import com.example.qasystem.user.service.impl.UserDetailsServiceImpl;
 import com.example.qasystem.basic.utils.JWT.JwtUtil;
 import com.example.qasystem.user.domain.entity.User;

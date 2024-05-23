@@ -8,8 +8,8 @@ import cn.hutool.extra.template.Template;
 import cn.hutool.extra.template.TemplateConfig;
 import cn.hutool.extra.template.TemplateEngine;
 import cn.hutool.extra.template.TemplateUtil;
-import com.example.qasystem.basic.utils.FormatCheckUtil;
-import com.example.qasystem.basic.utils.RedisUtil;
+import com.example.qasystem.basic.utils.tool.FormatCheckUtil;
+import com.example.qasystem.basic.utils.tool.RedisUtil;
 import com.example.qasystem.basic.utils.result.JsonResult;
 import com.example.qasystem.basic.utils.result.ResultCode;
 import com.example.qasystem.user.domain.dto.EmailDto;
@@ -30,8 +30,6 @@ import java.util.Objects;
 @Service
 @Transactional(propagation = Propagation.SUPPORTS)
 public class EmailServiceImpl implements IEmailService {
-    @Autowired
-    private FormatCheckUtil formatCheckUtil;
 
     @Autowired
     private IUserService userService;
@@ -98,7 +96,7 @@ public class EmailServiceImpl implements IEmailService {
     public JsonResult sendRegisterCode(String email) {
         JsonResult jsonResult = new JsonResult();
         // 校验邮箱格式
-        if (!formatCheckUtil.validateEmail(email)) {
+        if (!FormatCheckUtil.validateEmail(email)) {
             return jsonResult.setCode(ResultCode.EMAIL_FORMAT_ERROR).setSuccess(false).setMassage("邮箱格式不正确");
         }
         // 校验邮箱是否已注册

@@ -1,6 +1,10 @@
 package com.example.qasystem.basic.constant;
 
 public class AuthConstant {
+    // 头像文件存储相对目录
+    public static final String AVATAR_PATH = "avatar/";
+
+
     // token请求头 前缀
     public static final String TOKEN_PREFIX = "Bearer ";
     // 图片验证码在redis中存储的key

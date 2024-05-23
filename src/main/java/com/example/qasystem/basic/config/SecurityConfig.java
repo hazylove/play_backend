@@ -76,6 +76,7 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers(ignorePaths).permitAll()
+                //.antMatchers("/files/*").anonymous()
                 .anyRequest()
                 .authenticated()
 

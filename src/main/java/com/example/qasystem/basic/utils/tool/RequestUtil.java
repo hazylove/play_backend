@@ -1,4 +1,4 @@
-package com.example.qasystem.basic.utils;
+package com.example.qasystem.basic.utils.tool;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +8,6 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
-
 
 @Slf4j
 public class RequestUtil {
