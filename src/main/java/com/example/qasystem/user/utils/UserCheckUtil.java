@@ -1,6 +1,6 @@
 package com.example.qasystem.user.utils;
 
-import com.example.qasystem.basic.utils.RedisUtil;
+import com.example.qasystem.basic.utils.tool.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -3,7 +3,7 @@ package com.example.qasystem.user.controller;
 
 import cn.hutool.core.map.MapUtil;
 import com.example.qasystem.basic.constant.AuthConstant;
-import com.example.qasystem.basic.utils.RedisUtil;
+import com.example.qasystem.basic.utils.tool.RedisUtil;
 import com.example.qasystem.basic.utils.result.JsonResult;
 import com.google.code.kaptcha.Producer;
 import lombok.extern.slf4j.Slf4j;

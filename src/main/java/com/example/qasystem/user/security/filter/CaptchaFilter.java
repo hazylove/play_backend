@@ -1,10 +1,10 @@
 package com.example.qasystem.user.security.filter;
 
 import com.example.qasystem.basic.exception.CaptchaException;
-import com.example.qasystem.basic.utils.RequestUtil;
+import com.example.qasystem.basic.utils.tool.RequestUtil;
 import com.example.qasystem.user.security.handler.LoginFailureHandler;
 import com.example.qasystem.basic.constant.AuthConstant;
-import com.example.qasystem.basic.utils.RedisUtil;
+import com.example.qasystem.basic.utils.tool.RedisUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

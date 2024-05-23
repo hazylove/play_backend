@@ -1,14 +1,18 @@
 package com.example.qasystem.user.service.impl;
 
+import cn.hutool.core.io.FileUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.support.SFunction;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.qasystem.basic.constant.AuthConstant;
-import com.example.qasystem.basic.utils.FormatCheckUtil;
-import com.example.qasystem.basic.utils.RedisUtil;
+import com.example.qasystem.basic.utils.tool.FormatCheckUtil;
+import com.example.qasystem.basic.utils.tool.MyFileUtil;
+import com.example.qasystem.basic.utils.tool.RedisUtil;
 import com.example.qasystem.basic.utils.result.JsonResult;
 import com.example.qasystem.basic.utils.result.ResultCode;
+import com.example.qasystem.file.domain.entity.UploadFile;
+import com.example.qasystem.file.service.IUploadFileService;
 import com.example.qasystem.user.domain.dto.ChangePasswordDto;
 import com.example.qasystem.user.domain.dto.UserRegistrationDto;
 import com.example.qasystem.user.domain.entity.User;
@@ -16,16 +20,22 @@ import com.example.qasystem.user.mapper.UserMapper;
 import com.example.qasystem.user.utils.PasswordEncoder;
 import com.example.qasystem.user.service.IUserService;
 import com.example.qasystem.user.utils.UserCheckUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Objects;
 
+@Slf4j
 @Service
-@Transactional(propagation = Propagation.SUPPORTS)
+@Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
     @Autowired
     private UserMapper userMapper;
@@ -37,22 +47,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private UserCheckUtil userCheckUtil;
 
     @Autowired
-    private FormatCheckUtil formatCheckUtil;
+    private RedisUtil redisUtil;
 
     @Autowired
-    private RedisUtil redisUtil;
+    private IUploadFileService fileService;
+
+    @Value("${file.avatar.max-size}")
+    private long avatarMaxSize;
+
+    // 默认头像
+    private final String DEFAULT_AVATAR = AuthConstant.AVATAR_PATH + "default.png";
 
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public JsonResult register(UserRegistrationDto userRegistrationDto) {
         JsonResult jsonResult = new JsonResult();
         // 校验用户名格式
-        if (userCheckUtil.isInvalidUsername(userRegistrationDto.getUsername()) && formatCheckUtil.validateEmail(userRegistrationDto.getUsername())) {
+        if (userCheckUtil.isInvalidUsername(userRegistrationDto.getUsername()) && FormatCheckUtil.validateEmail(userRegistrationDto.getUsername())) {
             return jsonResult.setSuccess(false).setCode(ResultCode.USERNAME_PASSWORD_FORMAT_ERROR).setMassage("用户名格式不正确");
         }
         // 校验手机号格式
-        if (userRegistrationDto.getPhone() !=  null && !userRegistrationDto.getPhone().isEmpty() && !formatCheckUtil.validatePhone(userRegistrationDto.getPhone())) {
+        if (userRegistrationDto.getPhone() !=  null && !userRegistrationDto.getPhone().isEmpty() && !FormatCheckUtil.validatePhone(userRegistrationDto.getPhone())) {
             return jsonResult.setSuccess(false).setCode(ResultCode.PHONE_FORMAT_ERROR).setMassage("手机号格式不正确");
         }
         // 检查两次输入密码
@@ -71,12 +87,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         if (userCheckUtil.isInvalidEmailCode(userRegistrationDto.getEmail(), userRegistrationDto.getEmailCode())) {
             return jsonResult.setSuccess(false).setCode(ResultCode.EMAIL_CODE_ERROR).setMassage("邮箱验证码错误");
         }
-
         // 创建用户
         User user = new User(
                 null, // 自增id
                 userRegistrationDto.getUsername(), //用户名
                 passwordEncoder.encode(userRegistrationDto.getPassword1()), // 加密后的密码
+                userRegistrationDto.getNickname(), // 昵称
+                DEFAULT_AVATAR, // 默认头像
                 userRegistrationDto.getEmail(), // 邮箱
                 userRegistrationDto.getPhone(), // 电话
                 Calendar.getInstance().getTime() // 注册时间
@@ -87,7 +104,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public JsonResult changePassword(ChangePasswordDto changePasswordDto) {
         JsonResult jsonResult = new JsonResult();
         String email = (String) getOneFieldValueByUserId(changePasswordDto.getId(), User::getEmail);
@@ -153,5 +170,43 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().select(fieldExtractor).eq(User::getId, userId);
         return userMapper.selectObjs(queryWrapper).stream().findFirst().orElse(null);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public JsonResult changeAvatar(Long userId, MultipartFile avatarImage) throws IOException {
+        JsonResult jsonResult = new JsonResult();
+
+        // 检查文件大小
+        if (avatarImage.getSize() > avatarMaxSize) {
+            return jsonResult.setSuccess(false).setCode(ResultCode.AVATAR_SIZE_TOO_LARGE).setMassage("头像大小超出限制：" + avatarMaxSize / 1024 + "KB");
+        }
+        //根据文件扩展名得到文件类型
+        String fileType = MyFileUtil.getFileType(FileUtil.extName(avatarImage.getOriginalFilename()));
+        // 判断文件类型
+        if (!fileType.equals("image")) {
+            return jsonResult.setSuccess(false).setCode(ResultCode.AVATAR_TYPE_ERROR).setMassage("文件类型错误");
+        }
+        // 删除原头像数据及文件
+        String oldAvatarUrl = (String) getOneFieldValueByUserId(userId, User::getAvatar);
+        if (!oldAvatarUrl.equals(DEFAULT_AVATAR)){
+            UploadFile oldAvatar = fileService.getUploadFileByUrl(oldAvatarUrl);
+            File file = new File(oldAvatar.getPath());
+            if (file.delete()) {
+                fileService.deleteById(oldAvatar.getId());
+            } else {
+                log.error("头像文件删除失败：{}", oldAvatarUrl);
+            }
+        }
+        // 保存新头像图片
+        UploadFile uploadFile = fileService.uploadFile(userId, avatarImage, AuthConstant.AVATAR_PATH);
+        // 修改头像
+        UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
+        updateWrapper.lambda()
+                .set(User::getAvatar, uploadFile.getUrl())
+                .eq(User::getId, userId);
+        userMapper.update(null, updateWrapper);
+
+        return jsonResult;
     }
 }

@@ -6,6 +6,9 @@ import com.example.qasystem.basic.utils.result.JsonResult;
 import com.example.qasystem.user.domain.dto.ChangePasswordDto;
 import com.example.qasystem.user.domain.dto.UserRegistrationDto;
 import com.example.qasystem.user.domain.entity.User;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 public interface IUserService extends IService<User> {
     /**
@@ -64,4 +67,6 @@ public interface IUserService extends IService<User> {
      * @return 值
      */
     Object getOneFieldValueByUserId(Long userId, SFunction<User, String> fieldExtractor);
+
+    JsonResult changeAvatar(Long userId, MultipartFile avatarImage) throws IOException;
 }

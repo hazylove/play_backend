@@ -2,7 +2,7 @@ package com.example.qasystem.user.security.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.example.qasystem.basic.utils.JWT.JwtUtil;
-import com.example.qasystem.basic.utils.RedisUtil;
+import com.example.qasystem.basic.utils.tool.RedisUtil;
 import com.example.qasystem.basic.utils.result.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;

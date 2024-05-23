@@ -9,10 +9,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Slf4j
 @RestController
@@ -31,6 +31,17 @@ public class UserController {
         return iUserService.register(userRegistrationDto);
     }
 
+    @PostMapping("/changeAvatar")
+    public JsonResult changeAvatar(@RequestParam MultipartFile avatarImage) throws IOException {
+        // 获取当前用户
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            Long userId = Long.valueOf(authentication.getName());
+            return iUserService.changeAvatar(userId, avatarImage);
+        }
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+    }
+
     /**
      * 修改密码
      * @param changePasswordDto 密码信息
@@ -41,7 +52,6 @@ public class UserController {
         // 获取当前用户
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
-            // 用户id
             Long userId = Long.valueOf(authentication.getName());
             changePasswordDto.setId(userId);
             // 修改密码
