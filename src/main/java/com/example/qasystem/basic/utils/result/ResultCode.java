@@ -44,6 +44,10 @@ public class ResultCode {
     // 手机号格式错误
     public static final int PHONE_FORMAT_ERROR = 1030;
 
+    // 头像大小超出限制
+    public static final int AVATAR_SIZE_TOO_LARGE = 1040;
+    // 头像文件类型错误
+    public static final int AVATAR_TYPE_ERROR = 1041;
 
     /**
      * 富文本图片上传返回码

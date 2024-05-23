@@ -1,6 +1,6 @@
 package com.example.qasystem.user.security.filter;
 
-import com.example.qasystem.basic.utils.RequestUtil;
+import com.example.qasystem.basic.utils.tool.RequestUtil;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

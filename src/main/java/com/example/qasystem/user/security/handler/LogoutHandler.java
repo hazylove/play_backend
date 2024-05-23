@@ -4,7 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.example.qasystem.basic.constant.AuthConstant;
 import com.example.qasystem.basic.utils.JWT.JwtUtil;
-import com.example.qasystem.basic.utils.RedisUtil;
+import com.example.qasystem.basic.utils.tool.RedisUtil;
 import com.example.qasystem.basic.utils.result.JsonResult;
 import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;

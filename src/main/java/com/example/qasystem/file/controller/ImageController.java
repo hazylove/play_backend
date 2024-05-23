@@ -21,10 +21,10 @@ public class ImageController {
     private IImageService iImageService;
 
     @PostMapping("/upload")
-    public ImgResult uploadImage(@RequestParam MultipartFile imageFile) {
+    public ImgResult uploadImageResource(@RequestParam MultipartFile imageFile) {
         ImageData imageData;
         try {
-            imageData = iImageService.uploadImage(imageFile);
+            imageData = iImageService.uploadImageResource(imageFile);
         } catch (Exception e) {
             log.error("文件上传出现异常：", e);
             return new ImgResult().setErrno(ResultCode.IMAGE_ERROR_CODE).setMessage("文件上传失败");

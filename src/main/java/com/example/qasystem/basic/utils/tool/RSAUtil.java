@@ -1,4 +1,4 @@
-package com.example.qasystem.basic.utils;
+package com.example.qasystem.basic.utils.tool;
 
 import javax.crypto.Cipher;
 import java.io.ByteArrayOutputStream;
@@ -77,7 +77,7 @@ public class RSAUtil {
      * 获取Base64编码的公钥字符串
      */
     public static String getPublicKey(Map<String, Object> map) {
-        String str = "";
+        String str;
         Key key = (Key) map.get(KEY_RSA_PUBLIC_KEY);
         str = encryptBase64(key.getEncoded());
         return str;
@@ -87,7 +87,7 @@ public class RSAUtil {
      * 获取Base64编码的私钥字符串
      */
     public static String getPrivateKey(Map<String, Object> map) {
-        String str = "";
+        String str;
         Key key = (Key) map.get(KEY_RSA_PRIVATE_KEY);
         str = encryptBase64(key.getEncoded());
         return str;

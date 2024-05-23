@@ -53,7 +53,7 @@ spring:
       max-file-size: 10MB
   mvc:
     # 资源访问的前缀
-    static-path-pattern: /${file.image-pattern-path}/**
+    static-path-pattern: ${file.pattern-path}/**
   # 邮箱配置
   mail:
     email: j70028333@126.com
@@ -67,7 +67,7 @@ spring:
   # 扫描的资源路径
   web:
     resources:
-      static-locations: classpath:/resources/,classpath:/static/,file:${file.image-upload-path}
+      static-locations: classpath:/resources/,classpath:/static/,file:${file.upload-path}
 
 mybatis-plus:
   configuration:
@@ -75,8 +75,11 @@ mybatis-plus:
 
 # 静态资源映射配置
 file:
-  image-pattern-path: files
-  image-upload-path: D:/workspace/QASystem/QA_backed/uploads/images/
+  upload-path: D:/WorkSpace/play/uploads/
+  pattern-path: /files
+  avatar:
+    # 头像文件大小 200KB
+    max-size: 204800
 
 # jwt配置
 jwt:
@@ -92,8 +95,10 @@ jwt:
     - ${api.prefix}/user/register
     # 图片验证码
     - ${api.prefix}/captcha/create
-    # 邮箱验证码
-    - ${api.prefix}/email/sendCode
+    # 注册邮箱验证码
+    - ${api.prefix}/email/sendRegisterCode
+    # 静态资源
+    - /files/**
 
 # 接口前缀
 api:
