@@ -1,6 +1,5 @@
 package com.play.playsystem.user.controller;
 
-
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.user.service.IKaptchaService;
 import lombok.extern.slf4j.Slf4j;
