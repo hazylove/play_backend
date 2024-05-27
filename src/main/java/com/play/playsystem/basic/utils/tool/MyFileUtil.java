@@ -28,4 +28,8 @@ public class MyFileUtil {
             return "other";
         }
     }
+
+    public static String reSetFileUrl(String url) {
+        return "http://" + SysUtil.getServerIpAddress() + ":" + SysUtil.port + SysUtil.patternPath + "/" + url;
+    }
 }

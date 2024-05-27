@@ -19,25 +19,29 @@ import java.io.IOException;
 @RequestMapping("${api.prefix}/user")
 public class UserController {
     @Autowired
-    private IUserService iUserService;
+    private IUserService userService;
 
     /**
      * 用户注册
      * @param userRegistrationDto 注册信息
-     * @return JsonResult
      */
     @PostMapping("/register")
     public JsonResult userRegister(@RequestBody UserRegistrationDto userRegistrationDto){
-        return iUserService.register(userRegistrationDto);
+        return userService.register(userRegistrationDto);
     }
 
+    /**
+     * 修改头像
+     * @param avatarImage 头像文件
+     * @throws IOException 异常
+     */
     @PostMapping("/changeAvatar")
     public JsonResult changeAvatar(@RequestParam MultipartFile avatarImage) throws IOException {
         // 获取当前用户
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
             Long userId = Long.valueOf(authentication.getName());
-            return iUserService.changeAvatar(userId, avatarImage);
+            return userService.changeAvatar(userId, avatarImage);
         }
         return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
     }
@@ -55,7 +59,18 @@ public class UserController {
             Long userId = Long.valueOf(authentication.getName());
             changePasswordDto.setId(userId);
             // 修改密码
-            return iUserService.changePassword(changePasswordDto);
+            return userService.changePassword(changePasswordDto);
+        }
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+    }
+
+    @GetMapping("/details")
+    public JsonResult getUserDetails(){
+        JsonResult jsonResult = new JsonResult();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            Long userId = Long.valueOf(authentication.getName());
+            return jsonResult.setData(userService.getUserDetails(userId));
         }
         return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
     }

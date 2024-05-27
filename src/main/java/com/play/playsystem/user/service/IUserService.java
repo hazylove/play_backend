@@ -26,11 +26,20 @@ public interface IUserService extends IService<User> {
     JsonResult changePassword(ChangePasswordDto changePasswordDto);
 
     /**
-     * 根据id查用户
-     * @param id 用户id
+     * 修改头像
+     * @param userId 用户id
+     * @param avatarImage 头像文件
+     */
+    JsonResult changeAvatar(Long userId, MultipartFile avatarImage) throws IOException;
+
+    /**
+     * 获取用户详情
+     * @param userId 用户id
      * @return 用户
      */
-    User getUserById(Long id);
+    User getUserDetails(Long userId);
+
+    User getUserInfo(Long userId);
 
     /**
      * 根据用户名查询用户
@@ -68,5 +77,4 @@ public interface IUserService extends IService<User> {
      */
     Object getOneFieldValueByUserId(Long userId, SFunction<User, String> fieldExtractor);
 
-    JsonResult changeAvatar(Long userId, MultipartFile avatarImage) throws IOException;
 }
