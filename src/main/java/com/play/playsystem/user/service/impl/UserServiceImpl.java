@@ -131,13 +131,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public User getUserById(Long id) {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(User::getId, id);
-        return userMapper.selectOne(queryWrapper);
-    }
-
-    @Override
     public User getUserByUsername(String username) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(User::getUsername, username);
@@ -208,5 +201,34 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         userMapper.update(null, updateWrapper);
 
         return jsonResult;
+    }
+
+    @Override
+    public User getUserDetails(Long userId) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda()
+                .select(
+                        User::getId,
+                        User::getNickname,
+                        User::getAvatar,
+                        User::getUsername,
+                        User::getEmail,
+                        User::getPhone
+                )
+                .eq(User::getId, userId);
+        return userMapper.selectOne(queryWrapper);
+    }
+
+    @Override
+    public User getUserInfo(Long userId) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda()
+                .select(
+                        User::getId,
+                        User::getNickname,
+                        User::getAvatar
+                )
+                .eq(User::getId, userId);
+        return userMapper.selectOne(queryWrapper);
     }
 }
