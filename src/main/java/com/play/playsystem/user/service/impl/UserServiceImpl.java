@@ -11,7 +11,6 @@ import com.play.playsystem.basic.utils.tool.MyFileUtil;
 import com.play.playsystem.basic.utils.tool.RedisUtil;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.basic.utils.result.ResultCode;
-import com.play.playsystem.basic.utils.tool.SysUtil;
 import com.play.playsystem.file.domain.entity.UploadFile;
 import com.play.playsystem.file.service.IUploadFileService;
 import com.play.playsystem.user.service.IUserService;
@@ -219,7 +218,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 .eq(User::getId, userId);
         User user = userMapper.selectOne(queryWrapper);
         // 重新设置用户头像地址
-        user.setAvatar(reBuildAvatarUrl(user.getAvatar()));
+        user.setAvatar(MyFileUtil.reSetFileUrl(user.getAvatar()));
         return user;
     }
 
@@ -234,9 +233,5 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 )
                 .eq(User::getId, userId);
         return userMapper.selectOne(queryWrapper);
-    }
-
-    private String reBuildAvatarUrl(String avatarUrl) {
-        return "http://" + SysUtil.getServerIpAddress() + ":" + SysUtil.port + SysUtil.patternPath + "/" + avatarUrl;
     }
 }
