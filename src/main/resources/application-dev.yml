@@ -19,10 +19,11 @@ logging:
       max-file-size: 10MB
 
 spring:
+  # mysql数据库配置
   datasource:
     username: root
     password: 'Aa123456'
-    url: jdbc:mysql://123.57.83.114:3306/forum?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    url: jdbc:mysql://123.57.83.114:3306/forum?useUnicode=true&characterEncoding=UTF-8
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource #指定使用druid的连接池
     druid:
@@ -38,6 +39,7 @@ spring:
       test-on-return: false
       pool-prepared-statements: true
       max-open-prepared-statements: 20
+  # redis数据库配置
   redis:
     host: 123.57.83.114
     port: 6379
@@ -48,9 +50,11 @@ spring:
         max-idle: 8
         min-idle: 0
         max-wait: 1000ms
+  # 上传文件最大大小
   servlet:
     multipart:
       max-file-size: 10MB
+  # 静态资源映射
   mvc:
     # 资源访问的前缀
     static-path-pattern: ${file.pattern-path}/**
@@ -68,6 +72,10 @@ spring:
   web:
     resources:
       static-locations: classpath:/resources/,classpath:/static/,file:${file.upload-path}
+  # JSON构造格式
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
 
 mybatis-plus:
   configuration:

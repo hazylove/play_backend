@@ -10,11 +10,11 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <groupId>com.example</groupId>
+    <groupId>com.play</groupId>
     <artifactId>play_backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>QASystem</name>
-    <description>QASystem</description>
+    <name>PlaySystem</name>
+    <description>PlaySystem</description>
 
     <!--  外部依赖版本统一管理  -->
     <properties>
