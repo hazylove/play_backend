@@ -3,7 +3,7 @@ package com.play.playsystem.user.security.filter;
 import cn.hutool.core.util.StrUtil;
 import com.play.playsystem.basic.utils.tool.RedisUtil;
 import com.play.playsystem.user.service.impl.UserDetailsServiceImpl;
-import com.play.playsystem.basic.utils.JWT.JwtUtil;
+import com.play.playsystem.user.utils.JwtUtil;
 import com.play.playsystem.user.domain.entity.User;
 import com.play.playsystem.user.service.IUserService;
 import io.jsonwebtoken.Claims;

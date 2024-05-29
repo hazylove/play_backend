@@ -1,7 +1,9 @@
 package com.play.playsystem.user.security.filter;
 
 import com.play.playsystem.basic.utils.tool.RequestUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -16,6 +18,13 @@ public class JsonAuthenticationFilter extends UsernamePasswordAuthenticationFilt
     private static final String APPLICATION_JSON_UTF8_VALUE = "application/json;charset=UTF-8";
     private static final String USERNAME = "username";
     private static final String PASSWORD = "password";
+
+
+    @Autowired
+    @Override
+    public void setAuthenticationManager(AuthenticationManager authenticationManager) {
+        super.setAuthenticationManager(authenticationManager);
+    }
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
