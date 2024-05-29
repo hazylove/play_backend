@@ -44,4 +44,13 @@ public class EmailController {
         }
         return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
     }
+
+    /**
+     * 发送登录邮箱验证码
+     * @param email 邮箱
+     */
+    @PostMapping("/sendLoginCode")
+    public JsonResult sendLoginCode(@RequestParam String email) {
+        return emailService.sendLoginCode(email);
+    }
 }
