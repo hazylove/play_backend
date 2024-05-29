@@ -19,4 +19,6 @@ public interface IEmailService {
     JsonResult sendRegisterCode(String email);
 
     JsonResult sendChangeCode(Long userId, String email);
+
+    JsonResult sendLoginCode(String email);
 }

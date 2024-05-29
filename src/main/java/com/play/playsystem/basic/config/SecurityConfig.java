@@ -1,9 +1,13 @@
 package com.play.playsystem.basic.config;
 
+import com.play.playsystem.user.security.email.EmailCodeAuthenticationFilter;
+import com.play.playsystem.user.security.email.EmailCodeAuthenticationProvider;
 import com.play.playsystem.user.security.filter.CaptchaFilter;
 import com.play.playsystem.user.security.filter.JsonAuthenticationFilter;
 import com.play.playsystem.user.security.filter.JwtAuthenticationFilter;
 import com.play.playsystem.user.security.handler.*;
+import com.play.playsystem.user.service.impl.UserDetailsServiceImpl;
+import com.play.playsystem.user.utils.PasswordEncoder;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,11 +15,14 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.authentication.ProviderManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import java.util.Arrays;
 
 //                .csrf().disable().authorizeRequests()
 //                .and().authorizeRequests().anyRequest().permitAll()
@@ -48,6 +55,15 @@ public class SecurityConfig {
     @Autowired
     private LogoutHandler logoutHandler;
 
+    @Autowired
+    private EmailCodeAuthenticationProvider emailCodeAuthenticationProvider;
+
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     // 允许访问的地址，由yml中配置
     private String[] ignorePaths;
 
@@ -58,17 +74,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
                 .cors().and().csrf().disable()
-                //登录配置
-                //配置自定义登录拦截及配置 jsonAuthenticationFilter 替换 UsernamePasswordAuthenticationFilter
-                .addFilterAt(jsonAuthenticationFilter(http), UsernamePasswordAuthenticationFilter.class)
-
-                //注销配置
-                .logout()
-                .logoutUrl(apiPrefix + "/user/logout") // 设置注销 URL
-                .logoutSuccessHandler(logoutHandler)
 
                 //禁用session
-                .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
@@ -76,7 +83,6 @@ public class SecurityConfig {
                 .and()
                 .authorizeRequests()
                 .antMatchers(ignorePaths).permitAll()
-                //.antMatchers("/files/*").anonymous()
                 .anyRequest()
                 .authenticated()
 
@@ -86,8 +92,21 @@ public class SecurityConfig {
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 .accessDeniedHandler(jwtAccessDeniedHandler)
 
-                //配置jwt过滤器
+                //注销配置
                 .and()
+                .logout()
+                .logoutUrl(apiPrefix + "/user/logout") // 设置注销 URL
+                .logoutSuccessHandler(logoutHandler)
+
+                //配置自定义登录拦截及配置 jsonAuthenticationFilter 替换 UsernamePasswordAuthenticationFilter
+                .and()
+                .addFilterAt(jsonAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+
+                // 邮箱验证码登录过滤器
+                .authenticationProvider(emailCodeAuthenticationProvider)
+                .addFilterBefore(emailCodeAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+
+                //配置jwt过滤器
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 
                 //验证码过滤器
@@ -95,20 +114,48 @@ public class SecurityConfig {
                 .build();
     }
 
-
     @Bean
-    public JsonAuthenticationFilter jsonAuthenticationFilter(HttpSecurity http) throws Exception {
-        JsonAuthenticationFilter filter = new JsonAuthenticationFilter();
-        filter.setAuthenticationSuccessHandler(loginSuccessHandler);
-        filter.setAuthenticationFailureHandler(loginFailureHandler);
-        // 可自定义登录接口请求路径
-        filter.setFilterProcessesUrl(apiPrefix + "/user/login");
-        filter.setAuthenticationManager(authenticationManager(http));
-        return filter;
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder);
+        return authProvider;
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
-        return http.getSharedObject(AuthenticationManagerBuilder.class).build();
+    protected AuthenticationManager authenticationManager() {
+        ProviderManager authenticationManager = new ProviderManager(Arrays.asList(emailCodeAuthenticationProvider,daoAuthenticationProvider()));
+        authenticationManager.setEraseCredentialsAfterAuthentication(false);
+        return authenticationManager;
+    }
+
+
+    /**
+     * 邮箱验证码登录过滤器
+     * @return 过滤器
+     */
+    @Bean
+    public EmailCodeAuthenticationFilter emailCodeAuthenticationFilter() {
+        EmailCodeAuthenticationFilter filter = new EmailCodeAuthenticationFilter();
+        filter.setAuthenticationSuccessHandler(loginSuccessHandler);
+        filter.setAuthenticationFailureHandler(loginFailureHandler);
+        // 自定义邮箱登录验证地址
+        filter.setFilterProcessesUrl(apiPrefix + "/user/emailLogin");
+        return filter;
+    }
+
+    /**
+     * json账号密码登录过滤器
+     * @return 过滤器
+     */
+    @Bean
+    public JsonAuthenticationFilter jsonAuthenticationFilter() {
+        JsonAuthenticationFilter filter = new JsonAuthenticationFilter();
+        filter.setAuthenticationSuccessHandler(loginSuccessHandler);
+        filter.setAuthenticationFailureHandler(loginFailureHandler);
+        // 自定义登录接口请求路径
+        filter.setFilterProcessesUrl(apiPrefix + "/user/login");
+        filter.setPostOnly(true);
+        return filter;
     }
 }

@@ -22,7 +22,7 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
         if (exception.getCause() instanceof CaptchaException) {
             result.setCode(ResultCode.VERIFICATION_CODE_ERROR_CODE).setMassage("验证码错误");
         } else {
-            result.setCode(ResultCode.INCORRECT_USERNAME_AND_PASSWORD_CODE).setMassage(exception.getLocalizedMessage());
+            result.setCode(ResultCode.LOGIN_FAILED).setMassage(exception.getLocalizedMessage());
         }
 
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);

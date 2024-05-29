@@ -166,6 +166,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
+    public User getUserByEmail(String email) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(User::getEmail, email);
+        return userMapper.selectOne(queryWrapper);
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public JsonResult changeAvatar(Long userId, MultipartFile avatarImage) throws IOException {
         JsonResult jsonResult = new JsonResult();

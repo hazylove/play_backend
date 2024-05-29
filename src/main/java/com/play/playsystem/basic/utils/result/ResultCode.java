@@ -22,8 +22,8 @@ public class ResultCode {
      */
     // 验证码错误
     public static final int VERIFICATION_CODE_ERROR_CODE = 1001;
-    // 用户名密码错误
-    public static final int INCORRECT_USERNAME_AND_PASSWORD_CODE = 1002;
+    // 登录信息验证失败
+    public static final int LOGIN_FAILED = 1002;
 
     // 注册用户名已存在
     public static final int USERNAME_EXISTING = 1010;
@@ -40,6 +40,8 @@ public class ResultCode {
     public static final int EMAIL_EXISTING = 1022;
     // 修改密码邮箱验证失败
     public static final int EMAIL_CHECK_FAILED = 1023;
+    // 邮箱未注册
+    public static final int EMAIL_NOT_REGISTER = 1024;
 
     // 手机号格式错误
     public static final int PHONE_FORMAT_ERROR = 1030;

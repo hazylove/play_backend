@@ -1,4 +1,4 @@
-package com.play.playsystem.basic.utils.JWT;
+package com.play.playsystem.user.utils;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

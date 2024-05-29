@@ -95,18 +95,23 @@ jwt:
   secret: 2bbbd6fbdd4274ac5c5713bdb5666fefdc8a9773567d4b53eda59bf83289c4d7  # 加密秘钥
   expiration: 7200  # token有效期
   ignore-paths:
+    # 静态资源
+    - /files/**
     # 测试
     - ${api.prefix}/post/hello
-    # 登录
+    # 账号密码登录
     - ${api.prefix}/user/login
+    # 账号密码登录
+    - ${api.prefix}/user/emailLogin
     # 注册
     - ${api.prefix}/user/register
     # 图片验证码
     - ${api.prefix}/captcha/create
     # 注册邮箱验证码
     - ${api.prefix}/email/sendRegisterCode
-    # 静态资源
-    - /files/**
+    # 登录邮箱验证码
+    - ${api.prefix}/email/sendLoginCode
+
 
 # 接口前缀
 api:

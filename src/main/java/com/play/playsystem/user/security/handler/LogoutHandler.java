@@ -3,7 +3,7 @@ package com.play.playsystem.user.security.handler;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.play.playsystem.basic.constant.AuthConstant;
-import com.play.playsystem.basic.utils.JWT.JwtUtil;
+import com.play.playsystem.user.utils.JwtUtil;
 import com.play.playsystem.basic.utils.tool.RedisUtil;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import io.jsonwebtoken.Claims;

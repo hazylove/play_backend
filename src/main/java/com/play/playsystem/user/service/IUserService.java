@@ -77,4 +77,10 @@ public interface IUserService extends IService<User> {
      */
     Object getOneFieldValueByUserId(Long userId, SFunction<User, String> fieldExtractor);
 
+    /**
+     * 根据邮箱查询用户
+     * @param email 邮箱
+     * @return 用户
+     */
+    User getUserByEmail(String email);
 }
