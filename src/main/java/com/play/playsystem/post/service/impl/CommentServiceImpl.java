@@ -1,10 +1,15 @@
 package com.play.playsystem.post.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.play.playsystem.basic.utils.dto.PageList;
+import com.play.playsystem.basic.utils.result.JsonResult;
+import com.play.playsystem.basic.utils.result.ResultCode;
 import com.play.playsystem.post.domain.entity.Comment;
+import com.play.playsystem.post.domain.entity.UserCommentLikes;
 import com.play.playsystem.post.domain.query.CommentQuery;
 import com.play.playsystem.post.mapper.CommentMapper;
+import com.play.playsystem.post.mapper.UserCommentLikesMapper;
 import com.play.playsystem.post.service.ICommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,11 +20,13 @@ import java.util.Calendar;
 import java.util.List;
 
 @Service
-@Transactional(propagation = Propagation.SUPPORTS)
+@Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
 public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> implements ICommentService {
-
     @Autowired
     private CommentMapper commentMapper;
+
+    @Autowired
+    private UserCommentLikesMapper userCommentLikesMapper;
 
     @Override
     public PageList<Comment> getMainCommentList(CommentQuery commentQuery) {
@@ -47,6 +54,45 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         List<Comment> comments = commentMapper.getSubCommentList(commentQuery);
 
         return new PageList<>(total, comments);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public JsonResult likeComment(Long commentId, Long userId) {
+        JsonResult jsonResult = new JsonResult();
+        if (commentId == null || !commentExists(commentId)) {
+            return jsonResult.setCode(ResultCode.COMMENT_NOT_EXIST).setSuccess(false).setMassage("评论不存在");
+        }
+        // 查询是否已点赞
+        QueryWrapper<UserCommentLikes> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(UserCommentLikes::getCommentId, commentId).eq(UserCommentLikes::getUserId, userId);
+        if (userCommentLikesMapper.selectOne(queryWrapper) == null) {
+            // 未点赞
+            UserCommentLikes userCommentLikes = new UserCommentLikes(commentId, userId);
+            if (userCommentLikesMapper.insert(userCommentLikes) > 0) {
+                // 更新评论点赞数
+                if (lambdaUpdate().eq(Comment::getId, commentId).setSql("comment_likes_num = comment_likes_num + 1").update()) {
+                    return jsonResult;
+                }
+            }
+            throw new RuntimeException("评论点赞操作数据异常");
+        } else {
+            // 已点赞
+            if (userCommentLikesMapper.delete(queryWrapper) > 0) {
+                // 更新评论点赞数
+                if (lambdaUpdate().eq(Comment::getId, commentId).gt(Comment::getCommentLikesNum, 0).setSql("comment_likes_num = comment_likes_num - 1").update()) {
+                    return jsonResult;
+                }
+            }
+            throw new RuntimeException("评论取消点赞操作数据异常");
+        }
+    }
+
+    @Override
+    public boolean commentExists(Long commentId) {
+        QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(Comment::getId, commentId);
+        return commentMapper.selectOne(queryWrapper) != null;
     }
 
 }

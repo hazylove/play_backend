@@ -88,16 +88,16 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
                     return jsonResult;
                 }
             }
-            throw new RuntimeException("点赞操作数据异常");
+            throw new RuntimeException("帖子点赞操作数据异常");
         } else {
             // 已点赞
-            if (userPostLikesMapper.delete(queryWrapper) > 0){
+            if (userPostLikesMapper.delete(queryWrapper) > 0) {
                 // 更新帖子点赞数
                 if (lambdaUpdate().eq(Post::getId, postId).gt(Post::getPostLikesNum, 0).setSql("post_likes_num = post_likes_num - 1").update()) {
                     return jsonResult;
                 }
             }
-            throw new RuntimeException("取消点赞操作数据异常");
+            throw new RuntimeException("帖子取消点赞操作数据异常");
         }
     }
 
