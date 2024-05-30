@@ -11,7 +11,8 @@
             p.post_title,
             p.post_content,
             p.post_created_date,
-            (select count(c.id) from t_comment c where c.comment_post_id = p.id) as comment_count
+            (select count(c.id) from t_comment c where c.comment_post_id = p.id) as comment_count,
+            p.post_created_id
         from t_post p
         <include refid="query"/>
         <include refid="orderSql"/>
@@ -23,7 +24,8 @@
             p.post_title,
             p.post_content,
             p.post_created_date,
-            (select count(c.id) from t_comment c where c.comment_post_id = p.id) as answer_count
+            (select count(c.id) from t_comment c where c.comment_post_id = p.id) as comment_count,
+            p.post_created_id
         from t_post p
         where p.id = #{id}
     </select>
@@ -53,7 +55,7 @@
         <result property="postCreatedDate" column="post_created_date"/>
         <result property="postCommentNum" column="comment_count"/>
         <association property="postCreatedBy" javaType="com.play.playsystem.user.domain.entity.User" column="post_created_id" select="com.play.playsystem.user.mapper.UserMapper.getUserInfoById">
-            <id property="id" column="comment_created_id"/>
+            <id property="id" column="post_created_id"/>
         </association>
     </resultMap>
 
