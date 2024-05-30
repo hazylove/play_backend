@@ -5,19 +5,24 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.play.playsystem.basic.utils.dto.PageList;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.basic.utils.result.ResultCode;
+import com.play.playsystem.basic.utils.tool.MyFileUtil;
 import com.play.playsystem.post.domain.entity.Comment;
 import com.play.playsystem.post.domain.entity.UserCommentLikes;
 import com.play.playsystem.post.domain.query.CommentQuery;
 import com.play.playsystem.post.mapper.CommentMapper;
 import com.play.playsystem.post.mapper.UserCommentLikesMapper;
 import com.play.playsystem.post.service.ICommentService;
+import com.play.playsystem.user.domain.entity.User;
+import com.play.playsystem.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
@@ -28,16 +33,8 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     @Autowired
     private UserCommentLikesMapper userCommentLikesMapper;
 
-    @Override
-    public PageList<Comment> getMainCommentList(CommentQuery commentQuery) {
-        //条数
-        Long total = commentMapper.count(commentQuery);
-        //分页数据
-        List<Comment> comments = commentMapper.getMainCommentList(commentQuery);
-
-        return new PageList<>(total, comments);
-
-    }
+    @Autowired
+    private IUserService userService;
 
     @Override
     @Transactional
@@ -47,13 +44,23 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     }
 
     @Override
+    public PageList<Comment> getMainCommentList(CommentQuery commentQuery) {
+        // 条数
+        Long total = commentMapper.count(commentQuery);
+        // 分页数据
+        List<Comment> comments = commentMapper.getMainCommentList(commentQuery);
+        // 设置创建人
+        return reSetCommentCreatedUserAvatar(total, comments);
+    }
+
+    @Override
     public PageList<Comment> getSubCommentList(CommentQuery commentQuery) {
         //条数
         Long total = commentMapper.count(commentQuery);
         //分页数据
         List<Comment> comments = commentMapper.getSubCommentList(commentQuery);
-
-        return new PageList<>(total, comments);
+        // 设置创建人
+        return reSetCommentCreatedUserAvatar(total, comments);
     }
 
     @Override
@@ -93,6 +100,21 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(Comment::getId, commentId);
         return commentMapper.selectOne(queryWrapper) != null;
+    }
+
+    private PageList<Comment> reSetCommentCreatedUserAvatar(Long total, List<Comment> comments) {
+        Map<Long, User> userMap = new HashMap<>();
+        for (Comment comment : comments) {
+            Long userId = comment.getCommentCreatedId();
+            if (!userMap.containsKey(userId)) {
+                User user = userService.getUserInfo(userId);
+                // 设置用户头像
+                user.setAvatar(MyFileUtil.reSetFileUrl(user.getAvatar()));
+                userMap.put(userId, user);
+            }
+            comment.setCommentCreatedBy(userMap.get(userId));
+        }
+        return new PageList<>(total, comments);
     }
 
 }

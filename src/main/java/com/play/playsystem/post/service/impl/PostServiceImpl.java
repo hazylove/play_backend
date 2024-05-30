@@ -43,9 +43,9 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         Map<Long, User> userMap = new HashMap<>();
         for (Post post : posts) {
             Long userId = post.getPostCreatedId();
-            if (!userMap.containsKey(post.getPostCreatedId())) {
+            if (!userMap.containsKey(userId)) {
                 User user = userService.getUserInfo(userId);
-                // 重置用户头像
+                // 设置用户头像
                 user.setAvatar(MyFileUtil.reSetFileUrl(user.getAvatar()));
                 userMap.put(userId, user);
             }
