@@ -25,6 +25,7 @@ public class PostQuery extends PageQuery {
      * 排序方式
      */
     private String sortOrder = "desc";
+
     /**
      * 当前用户id
      */

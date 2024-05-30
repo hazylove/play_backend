@@ -23,7 +23,7 @@ public class PostController {
     @PostMapping("/list")
     public JsonResult getPostPage(@RequestBody PostQuery postQuery){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
+        if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
             postQuery.setUserId(Long.valueOf(authentication.getName()));
         }
         PageList<Post> pageList = postService.getPostList(postQuery);
@@ -34,7 +34,7 @@ public class PostController {
     @PostMapping("/save")
     public JsonResult addPost(@RequestBody Post post){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
+        if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
             Long userId = Long.valueOf(authentication.getName());
             if (post.getId() == null) {
                 post.setPostCreatedId(userId);

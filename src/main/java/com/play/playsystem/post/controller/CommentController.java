@@ -28,8 +28,14 @@ public class CommentController {
      */
     @PostMapping("/mainList")
     public JsonResult getMainCommentList(@RequestBody CommentQuery commentQuery){
-        PageList<Comment> pageList = commentService.getMainCommentList(commentQuery);
-        return new JsonResult().setData(pageList);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
+            commentQuery.setUserId(Long.valueOf(authentication.getName()));
+            PageList<Comment> pageList = commentService.getMainCommentList(commentQuery);
+            return new JsonResult().setData(pageList);
+        } else {
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+        }
     }
 
     /**
@@ -39,8 +45,14 @@ public class CommentController {
      */
     @PostMapping("/subList")
     public JsonResult getSubCommentList(@RequestBody CommentQuery commentQuery){
-        PageList<Comment> pageList = commentService.getSubCommentList(commentQuery);
-        return new JsonResult().setData(pageList);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
+            commentQuery.setUserId(Long.valueOf(authentication.getName()));
+            PageList<Comment> pageList = commentService.getSubCommentList(commentQuery);
+            return new JsonResult().setData(pageList);
+        } else {
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+        }
     }
 
     /**
@@ -48,9 +60,9 @@ public class CommentController {
      * @param comment 评论
      */
     @PostMapping("/save")
-    public JsonResult addQuestion(@RequestBody Comment comment){
+    public JsonResult addComment(@RequestBody Comment comment){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
+        if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
             Long userId = Long.valueOf(authentication.getName());
             if (comment.getId() == null) {
                 comment.setCommentCreatedId(userId);
@@ -68,7 +80,7 @@ public class CommentController {
     @PostMapping("/like/{commentId}")
     public JsonResult likePost(@PathVariable Long commentId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
+        if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
             Long userId = Long.valueOf(authentication.getName());
             synchronized (String.valueOf(userId).intern()) {
                 return commentService.likeComment(commentId, userId);
