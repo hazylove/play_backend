@@ -16,22 +16,57 @@ import java.util.Date;
 @NoArgsConstructor
 @TableName("t_post")
 public class Post {
+    /**
+     * id
+     */
     @TableId(value = "id", type = IdType.AUTO)
-    private Long id; // id
+    private Long id;
 
-    private String postTitle; // 标题
+    /**
+     * i标题
+     */
+    private String postTitle;
 
-    private String postContent; // 内容
+    /**
+     * 内容
+     */
+    private String postContent;
 
-    private String postTag; // 标签
+    /**
+     * 标签
+     */
+    private String postTag;
 
-    private Long postCreatedId; // 创建人id
+    /**
+     * 点赞数
+     */
+    private int postLikesNum;
 
+    /**
+     * 创建人id
+     */
+    private Long postCreatedId;
+
+    /**
+     * 创建人
+     */
     @TableField(exist = false)
-    private User postCreatedBy; // 创建人
+    private User postCreatedBy;
 
-    private Date postCreatedDate; // 创建时间
+    /**
+     * 创建时间
+     */
+    private Date postCreatedDate;
 
+    /**
+     * 评论数量
+     */
     @TableField(exist = false)
-    private int postCommentNum; // 评论数量
+    private int postCommentNum;
+
+    /**
+     * 当前用户是否点赞
+     */
+    @TableField(exist = false)
+    private boolean userLiked;
 }

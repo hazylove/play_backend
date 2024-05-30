@@ -14,5 +14,5 @@ public interface PostMapper extends BaseMapper<Post> {
 
     List<Post> getPostList(PostQuery postQuery);
 
-    Post selectById(Long id);
+    Post selectById(Long id, Long userId);
 }

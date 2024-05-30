@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.play.playsystem.post.mapper.PostMapper">
     <select id="count" resultType="java.lang.Long">
-        select count(id) from t_post p
+        select count(*) from t_post p
         <include refid="query"/>
     </select>
     <select id="getPostList" resultMap="postMap">
@@ -10,8 +10,11 @@
             p.id,
             p.post_title,
             p.post_content,
-            p.post_created_date,
-            (select count(c.id) from t_comment c where c.comment_post_id = p.id) as comment_count
+            p.post_likes_num,
+            (select count(*) from t_comment c where c.comment_post_id = p.id) as comment_count,
+            (select count(*) from user_post_likes upl where upl.post_id = p.id and upl.user_id = #{userId}) as user_liked,
+            p.post_created_id,
+            p.post_created_date
         from t_post p
         <include refid="query"/>
         <include refid="orderSql"/>
@@ -22,8 +25,11 @@
             p.id,
             p.post_title,
             p.post_content,
-            p.post_created_date,
-            (select count(c.id) from t_comment c where c.comment_post_id = p.id) as answer_count
+            p.post_likes_num,
+            (select count(*) from t_comment c where c.comment_post_id = p.id) as comment_count,
+            (select count(*) from user_post_likes upl where upl.post_id = p.id and upl.user_id = #{userId}) as user_liked,
+            p.post_created_id,
+            p.post_created_date
         from t_post p
         where p.id = #{id}
     </select>
@@ -48,12 +54,14 @@
         <id property="id" column="id"/>
         <result property="postTitle" column="post_title"/>
         <result property="postContent" column="post_content"/>
+        <result property="postLikesNum" column="post_likes_num"/>
+        <result property="userLiked" column="user_liked"/>
         <result property="postTag" column="post_tag"/>
         <result property="postCreatedId" column="post_created_id"/>
         <result property="postCreatedDate" column="post_created_date"/>
         <result property="postCommentNum" column="comment_count"/>
         <association property="postCreatedBy" javaType="com.play.playsystem.user.domain.entity.User" column="post_created_id" select="com.play.playsystem.user.mapper.UserMapper.getUserInfoById">
-            <id property="id" column="comment_created_id"/>
+            <id property="id" column="post_created_id"/>
         </association>
     </resultMap>
 
