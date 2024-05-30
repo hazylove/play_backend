@@ -97,8 +97,8 @@ jwt:
   ignore-paths:
     # 静态资源
     - /files/**
-    # 测试
-    - ${api.prefix}/post/hello
+    # 帖子列表
+    - ${api.prefix}/post/list
     # 账号密码登录
     - ${api.prefix}/user/login
     # 账号密码登录

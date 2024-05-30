@@ -57,6 +57,9 @@ public class ResultCode {
     // 帖子不存在
     public static final int POST_NOT_EXIST = 1101;
 
+    // 评论不存在
+    public static final int COMMENT_NOT_EXIST = 1151;
+
     /**
      * 富文本图片上传返回码
      */

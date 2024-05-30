@@ -43,9 +43,9 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         Map<Long, User> userMap = new HashMap<>();
         for (Post post : posts) {
             Long userId = post.getPostCreatedId();
-            if (!userMap.containsKey(post.getPostCreatedId())) {
+            if (!userMap.containsKey(userId)) {
                 User user = userService.getUserInfo(userId);
-                // 重置用户头像
+                // 设置用户头像
                 user.setAvatar(MyFileUtil.reSetFileUrl(user.getAvatar()));
                 userMap.put(userId, user);
             }
@@ -88,16 +88,16 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
                     return jsonResult;
                 }
             }
-            throw new RuntimeException("点赞操作数据异常");
+            throw new RuntimeException("帖子点赞操作数据异常");
         } else {
             // 已点赞
-            if (userPostLikesMapper.delete(queryWrapper) > 0){
+            if (userPostLikesMapper.delete(queryWrapper) > 0) {
                 // 更新帖子点赞数
                 if (lambdaUpdate().eq(Post::getId, postId).gt(Post::getPostLikesNum, 0).setSql("post_likes_num = post_likes_num - 1").update()) {
                     return jsonResult;
                 }
             }
-            throw new RuntimeException("取消点赞操作数据异常");
+            throw new RuntimeException("帖子取消点赞操作数据异常");
         }
     }
 

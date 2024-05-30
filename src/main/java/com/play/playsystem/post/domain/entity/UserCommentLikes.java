@@ -8,12 +8,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName("user_post_likes")
-public class UserPostLikes {
+@TableName("user_comment_likes")
+public class UserCommentLikes {
     /**
-     * 帖子id
+     * 评论id
      */
-    private Long postId;
+    private Long commentId;
 
     /**
      * 用户id

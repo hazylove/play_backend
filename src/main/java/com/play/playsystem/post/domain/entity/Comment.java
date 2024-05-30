@@ -13,29 +13,67 @@ import java.util.Date;
 @NoArgsConstructor
 @TableName("t_comment")
 public class Comment {
-
+    /**
+     * id
+     */
     @TableId(value = "id", type = IdType.AUTO)
-    private Long id; // id
+    private Long id;
 
-    private String commentContent; // 评论内容
+    /**
+     * 评论内容
+     */
+    private String commentContent;
 
-    private Long commentPostId; // 帖子id
+    /**
+     * 帖子id
+     */
+    private Long commentPostId;
 
-    private Long commentMainId; // 主评论id
+    /**
+     * 主评论id
+     */
+    private Long commentMainId;
 
-    private Long commentReplyId; // 回复评论id
+    /**
+     * 回复评论id
+     */
+    private Long commentReplyId;
 
-    private Integer commentLikesNum; // 点赞数
+    /**
+     * 点赞数
+     */
+    private Integer commentLikesNum;
 
-    private Integer commentBlackNum; // 拉黑数
+    /**
+     * 拉黑数
+     */
+    private Integer commentBlackNum;
 
-    private Long commentCreatedId; // 创建人id
+    /**
+     * 创建人id
+     */
+    private Long commentCreatedId;
 
+    /**
+     * 创建人
+     */
     @TableField(exist = false)
-    private User commentCreatedBy; // 创建人
+    private User commentCreatedBy;
 
-    private Date commentCreatedDate; // 创建时间
+    /**
+     * 创建时间
+     */
+    private Date commentCreatedDate;
 
+    /**
+     * 子评论数量
+     */
     @TableField(exist = false)
-    private Integer commentSubCount; // 子评论数量
+    private Integer commentSubCount;
+
+    /**
+     * 当前用户是否点赞
+     */
+    @TableField(exist = false)
+    private boolean userLiked = false;
 }
