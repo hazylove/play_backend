@@ -16,16 +16,36 @@ import java.util.Date;
 @NoArgsConstructor
 @TableName("t_post")
 public class Post {
+    /**
+     * id
+     */
     @TableId(value = "id", type = IdType.AUTO)
-    private Long id; // id
+    private Long id;
 
-    private String postTitle; // 标题
+    /**
+     * i标题
+     */
+    private String postTitle;
 
-    private String postContent; // 内容
+    /**
+     * 内容
+     */
+    private String postContent;
 
-    private String postTag; // 标签
+    /**
+     * 标签
+     */
+    private String postTag;
 
-    private Long postCreatedId; // 创建人id
+    /**
+     * 点赞数
+     */
+    private int postLikesNum;
+
+    /**
+     * 创建人id
+     */
+    private Long postCreatedId;
 
     @TableField(exist = false)
     private User postCreatedBy; // 创建人

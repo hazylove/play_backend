@@ -18,11 +18,11 @@ import org.springframework.web.bind.annotation.*;
 public class PostController {
 
     @Autowired
-    private IPostService iPostService;
+    private IPostService postService;
 
     @PostMapping("/list")
     public JsonResult getPostPage(@RequestBody PostQuery postQuery){
-        PageList<Post> pageList = iPostService.getPostList(postQuery);
+        PageList<Post> pageList = postService.getPostList(postQuery);
         return new JsonResult().setData(pageList);
     }
 
@@ -34,7 +34,7 @@ public class PostController {
             Long userId = Long.valueOf(authentication.getName());
             if (post.getId() == null) {
                 post.setPostCreatedId(userId);
-                iPostService.insert(post);
+                postService.insert(post);
                 return new JsonResult().setMassage("添加成功！");
             } else {
 //          iPostService.update(post);
@@ -48,8 +48,21 @@ public class PostController {
     // 根据id获取详情
     @GetMapping("/{id}")
     public JsonResult selectOne(@PathVariable Long id){
-        Post post = iPostService.selectById(id);
-        return new  JsonResult().setData(post);
+        Post post = postService.selectById(id);
+        return new JsonResult().setData(post);
+    }
+
+    @PostMapping("/like/{postId}")
+    public JsonResult likePost(@PathVariable Long postId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            Long userId = Long.valueOf(authentication.getName());
+            synchronized (String.valueOf(userId).intern()) {
+                return postService.likePost(postId, userId);
+            }
+        }else {
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+        }
     }
 
     @GetMapping("/hello")

@@ -52,6 +52,12 @@ public class ResultCode {
     public static final int AVATAR_TYPE_ERROR = 1041;
 
     /**
+     * 帖子相关返回码
+     */
+    // 帖子不存在
+    public static final int POST_NOT_EXIST = 1101;
+
+    /**
      * 富文本图片上传返回码
      */
     // 成功
