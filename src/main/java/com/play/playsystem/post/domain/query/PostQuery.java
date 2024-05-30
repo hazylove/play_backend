@@ -11,7 +11,22 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostQuery extends PageQuery {
+    /**
+     * 模糊搜索关键字
+     */
     private String keywords;
+
+    /**
+     * 排序字段
+     */
     private String sortField = "post_created_date";
+
+    /**
+     * 排序方式
+     */
     private String sortOrder = "desc";
+    /**
+     * 当前用户id
+     */
+    private Long userId;
 }

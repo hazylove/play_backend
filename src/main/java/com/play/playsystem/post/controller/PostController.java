@@ -22,6 +22,10 @@ public class PostController {
 
     @PostMapping("/list")
     public JsonResult getPostPage(@RequestBody PostQuery postQuery){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            postQuery.setUserId(Long.valueOf(authentication.getName()));
+        }
         PageList<Post> pageList = postService.getPostList(postQuery);
         return new JsonResult().setData(pageList);
     }

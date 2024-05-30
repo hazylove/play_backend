@@ -47,11 +47,26 @@ public class Post {
      */
     private Long postCreatedId;
 
+    /**
+     * 创建人
+     */
     @TableField(exist = false)
-    private User postCreatedBy; // 创建人
+    private User postCreatedBy;
 
-    private Date postCreatedDate; // 创建时间
+    /**
+     * 创建时间
+     */
+    private Date postCreatedDate;
 
+    /**
+     * 评论数量
+     */
     @TableField(exist = false)
-    private int postCommentNum; // 评论数量
+    private int postCommentNum;
+
+    /**
+     * 当前用户是否点赞
+     */
+    @TableField(exist = false)
+    private boolean userIsLike;
 }
