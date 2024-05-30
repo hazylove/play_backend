@@ -25,7 +25,7 @@ public interface IPostService extends IService<Post> {
      * @param id 帖子id
      * @return 帖子
      */
-    Post selectById(Long id);
+    Post selectById(Long id, Long userId);
 
     /**
      * 点赞/取消点赞

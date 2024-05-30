@@ -68,5 +68,5 @@ public class Post {
      * 当前用户是否点赞
      */
     @TableField(exist = false)
-    private boolean userIsLike;
+    private boolean userLiked;
 }

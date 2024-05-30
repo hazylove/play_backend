@@ -12,7 +12,7 @@
             p.post_content,
             p.post_likes_num,
             (select count(*) from t_comment c where c.comment_post_id = p.id) as comment_count,
-            (select count(*) from user_post_likes upl where upl.post_id = p.id and upl.user_id = #{userId}) as is_like,
+            (select count(*) from user_post_likes upl where upl.post_id = p.id and upl.user_id = #{userId}) as user_liked,
             p.post_created_id,
             p.post_created_date
         from t_post p
@@ -26,7 +26,8 @@
             p.post_title,
             p.post_content,
             p.post_likes_num,
-            (select count(c.id) from t_comment c where c.comment_post_id = p.id) as comment_count,
+            (select count(*) from t_comment c where c.comment_post_id = p.id) as comment_count,
+            (select count(*) from user_post_likes upl where upl.post_id = p.id and upl.user_id = #{userId}) as user_liked,
             p.post_created_id,
             p.post_created_date
         from t_post p
@@ -54,7 +55,7 @@
         <result property="postTitle" column="post_title"/>
         <result property="postContent" column="post_content"/>
         <result property="postLikesNum" column="post_likes_num"/>
-        <result property="userIsLike" column="is_like"/>
+        <result property="userLiked" column="user_liked"/>
         <result property="postTag" column="post_tag"/>
         <result property="postCreatedId" column="post_created_id"/>
         <result property="postCreatedDate" column="post_created_date"/>

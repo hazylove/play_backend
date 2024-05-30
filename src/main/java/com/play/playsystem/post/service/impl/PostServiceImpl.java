@@ -45,8 +45,8 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     }
 
     @Override
-    public Post selectById(Long id) {
-        return postMapper.selectById(id);
+    public Post selectById(Long id, Long userId) {
+        return postMapper.selectById(id, userId);
     }
 
     @Override

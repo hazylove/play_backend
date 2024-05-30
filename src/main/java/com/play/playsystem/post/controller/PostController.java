@@ -50,10 +50,16 @@ public class PostController {
     }
 
     // 根据id获取详情
-    @GetMapping("/{id}")
-    public JsonResult selectOne(@PathVariable Long id){
-        Post post = postService.selectById(id);
-        return new JsonResult().setData(post);
+    @GetMapping("/{postId}")
+    public JsonResult selectOne(@PathVariable Long postId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            Long userId = Long.valueOf(authentication.getName());
+            Post post = postService.selectById(postId, userId);
+            return new JsonResult().setData(post);
+        }else {
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+        }
     }
 
     @PostMapping("/like/{postId}")
