@@ -5,19 +5,21 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.play.playsystem.basic.utils.dto.PageList;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.basic.utils.result.ResultCode;
+import com.play.playsystem.basic.utils.tool.MyFileUtil;
 import com.play.playsystem.post.domain.entity.Post;
 import com.play.playsystem.post.domain.entity.UserPostLikes;
 import com.play.playsystem.post.domain.query.PostQuery;
 import com.play.playsystem.post.mapper.PostMapper;
 import com.play.playsystem.post.mapper.UserPostLikesMapper;
 import com.play.playsystem.post.service.IPostService;
+import com.play.playsystem.user.domain.entity.User;
+import com.play.playsystem.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
@@ -28,12 +30,27 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     @Autowired
     private UserPostLikesMapper userPostLikesMapper;
 
+    @Autowired
+    private IUserService userService;
+
     @Override
     public PageList<Post> getPostList(PostQuery postQuery) {
-        //条数
+        // 条数
         Long total = postMapper.count(postQuery);
-        //分页数据
+        // 分页数据
         List<Post> posts = postMapper.getPostList(postQuery);
+        // 设置创建人
+        Map<Long, User> userMap = new HashMap<>();
+        for (Post post : posts) {
+            Long userId = post.getPostCreatedId();
+            if (!userMap.containsKey(post.getPostCreatedId())) {
+                User user = userService.getUserInfo(userId);
+                // 重置用户头像
+                user.setAvatar(MyFileUtil.reSetFileUrl(user.getAvatar()));
+                userMap.put(userId, user);
+            }
+            post.setPostCreatedBy(userMap.get(userId));
+        }
         return new PageList<>(total, posts);
     }
 
@@ -46,7 +63,10 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
 
     @Override
     public Post selectById(Long id, Long userId) {
-        return postMapper.selectById(id, userId);
+        Post post = postMapper.selectById(id, userId);
+        User user = userService.getUserInfo(post.getPostCreatedId());
+        post.setPostCreatedBy(user);
+        return post;
     }
 
     @Override
