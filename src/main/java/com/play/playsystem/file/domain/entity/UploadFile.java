@@ -66,6 +66,6 @@ public class UploadFile {
     /**
      * 文件上传时间
      */
-    private Date createTime; // 上传时间
+    private Date createDate; // 上传时间
 
 }
