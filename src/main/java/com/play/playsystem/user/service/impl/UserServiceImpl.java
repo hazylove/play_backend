@@ -30,7 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Calendar;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Slf4j
@@ -96,7 +96,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 DEFAULT_AVATAR, // 默认头像
                 userRegistrationDto.getEmail(), // 邮箱
                 userRegistrationDto.getPhone(), // 电话
-                Calendar.getInstance().getTime() // 注册时间
+                LocalDateTime.now(), // 注册时间
+                null,
+                null,
+                null,
+                null
         );
         userMapper.insert(user);
 
@@ -220,7 +224,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                         User::getAvatar,
                         User::getUsername,
                         User::getEmail,
-                        User::getPhone
+                        User::getPhone,
+                        User::getGender,
+                        User::getAge,
+                        User::getBirth,
+                        User::getProfile
                 )
                 .eq(User::getId, userId);
         User user = userMapper.selectOne(queryWrapper);

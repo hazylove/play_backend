@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -57,7 +58,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     @Override
     @Transactional
     public void insert(Post post) {
-        post.setPostCreatedDate(Calendar.getInstance().getTime());
+        post.setPostCreatedDate(LocalDateTime.now());
         postMapper.insert(post);
     }
 

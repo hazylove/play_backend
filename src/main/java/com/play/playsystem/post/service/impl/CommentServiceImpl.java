@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Calendar;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +39,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     @Override
     @Transactional
     public void insert(Comment comment) {
-        comment.setCommentCreatedDate(Calendar.getInstance().getTime());
+        comment.setCommentCreatedDate(LocalDateTime.now());
         commentMapper.insert(comment);
     }
 

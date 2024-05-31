@@ -74,8 +74,10 @@ spring:
       static-locations: classpath:/resources/,classpath:/static/,file:${file.upload-path}
   # JSON构造格式
   jackson:
-    time-zone: GMT+8
     date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+    serialization:
+      write-dates-as-timestamps: false
 
 mybatis-plus:
   configuration:

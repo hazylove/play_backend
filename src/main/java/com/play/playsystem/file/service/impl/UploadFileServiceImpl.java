@@ -18,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
 
 @Slf4j
 @Service
@@ -80,7 +79,7 @@ public class UploadFileServiceImpl extends ServiceImpl<UploadFileMapper, UploadF
                     fileType,
                     multipartFile.getSize(),
                     uploader,
-                    Calendar.getInstance().getTime()
+                    LocalDateTime.now()
             );
             if (uploadFileMapper.insert(uploadFile) > 0){
                 return uploadFile;
