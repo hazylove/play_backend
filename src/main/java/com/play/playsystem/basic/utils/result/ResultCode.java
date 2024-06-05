@@ -56,11 +56,12 @@ public class ResultCode {
      */
     // 帖子不存在
     public static final int POST_NOT_EXIST = 1101;
-    // 当前用户下不存在该帖子，删除失败
-    public static final int POST_DELETE_ERROR = 1110;
 
     // 评论不存在
     public static final int COMMENT_NOT_EXIST = 1151;
+
+    // 异常删除操作
+    public static final int POST_COMMENT_DELETE_ERROR = 1190;
 
     /**
      * 富文本图片上传返回码
