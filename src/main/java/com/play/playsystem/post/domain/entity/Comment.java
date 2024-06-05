@@ -41,6 +41,11 @@ public class Comment {
     private Long commentReplyId;
 
     /**
+     * 回复用户
+     */
+    private User commentReply;
+
+    /**
      * 点赞数
      */
     private Integer commentLikesNum;

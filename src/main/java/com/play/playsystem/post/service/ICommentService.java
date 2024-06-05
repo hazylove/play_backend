@@ -5,6 +5,7 @@ import com.play.playsystem.basic.utils.dto.PageList;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.post.domain.entity.Comment;
 import com.play.playsystem.post.domain.query.CommentQuery;
+import com.play.playsystem.user.domain.entity.User;
 
 public interface ICommentService extends IService<Comment> {
     /**
@@ -47,4 +48,11 @@ public interface ICommentService extends IService<Comment> {
      * @param userId 创建人id
      */
     JsonResult deleteComment(Long commentId, Long userId);
+
+    /**
+     * 根据评论id获取评论创建人信息
+     * @param commentId 评论id
+     * @return 创建人
+     */
+    User getCommentCreatedBy(Long commentId);
 }

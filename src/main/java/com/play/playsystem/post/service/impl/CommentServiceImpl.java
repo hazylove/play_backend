@@ -55,10 +55,22 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 
     @Override
     public PageList<Comment> getSubCommentList(CommentQuery commentQuery) {
-        //条数
+        // 条数
         Long total = commentMapper.count(commentQuery);
-        //分页数据
+        // 分页数据
         List<Comment> comments = commentMapper.getSubCommentList(commentQuery);
+        // 设置回复人
+        Map<Long, User> userMap = new HashMap<>();
+        for (Comment comment : comments) {
+            Long commentReplyId = comment.getCommentReplyId();
+            if (commentReplyId != null) {
+                if (!userMap.containsKey(commentReplyId)) {
+                    User user = getCommentCreatedBy(commentReplyId);
+                    userMap.put(commentReplyId, user);
+                }
+                comment.setCommentReply(userMap.get(commentReplyId));
+            }
+        }
         // 设置创建人
         return setCommentCreatedBy(total, comments);
     }
@@ -112,6 +124,11 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         } else {
             return jsonResult.setCode(ResultCode.POST_COMMENT_DELETE_ERROR).setSuccess(false).setMassage("异常删除操作");
         }
+    }
+
+    @Override
+    public User getCommentCreatedBy(Long commentId) {
+        return commentMapper.getCommentCreatedBy(commentId);
     }
 
     private PageList<Comment> setCommentCreatedBy(Long total, List<Comment> comments) {
