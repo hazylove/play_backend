@@ -24,7 +24,7 @@ public class Post {
     private Long id;
 
     /**
-     * i标题
+     * 标题
      */
     private String postTitle;
 
@@ -32,11 +32,6 @@ public class Post {
      * 内容
      */
     private String postContent;
-
-    /**
-     * 标签
-     */
-    private String postTag;
 
     /**
      * 点赞数

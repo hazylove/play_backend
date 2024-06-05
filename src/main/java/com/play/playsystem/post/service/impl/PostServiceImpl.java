@@ -82,7 +82,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         queryWrapper.lambda().eq(UserPostLikes::getPostId, postId).eq(UserPostLikes::getUserId, userId);
         if (userPostLikesMapper.selectOne(queryWrapper) == null) {
             // 未点赞
-            UserPostLikes userPostLikes = new UserPostLikes(postId, userId);
+            UserPostLikes userPostLikes = new UserPostLikes(postId, userId, LocalDateTime.now());
             if (userPostLikesMapper.insert(userPostLikes) > 0) {
                 // 更新帖子点赞数
                 if (lambdaUpdate().eq(Post::getId, postId).setSql("post_likes_num = post_likes_num + 1").update()) {
@@ -107,6 +107,18 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         QueryWrapper<Post> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(Post::getId, postId);
         return postMapper.selectOne(queryWrapper) != null;
+    }
+
+    @Override
+    public JsonResult deletePost(Long postId, Long userId) {
+        JsonResult jsonResult = new JsonResult();
+        QueryWrapper<Post> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(Post::getId, postId).eq(Post::getPostCreatedId, userId);
+        if (postMapper.delete(queryWrapper) > 0) {
+            return jsonResult;
+        } else {
+            return jsonResult.setCode(ResultCode.POST_DELETE_ERROR).setSuccess(false).setMassage("当前用户不存在该数据，删除失败");
+        }
     }
 }
 

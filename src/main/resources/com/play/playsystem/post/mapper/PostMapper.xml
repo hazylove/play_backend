@@ -56,7 +56,6 @@
         <result property="postContent" column="post_content"/>
         <result property="postLikesNum" column="post_likes_num"/>
         <result property="userLiked" column="user_liked"/>
-        <result property="postTag" column="post_tag"/>
         <result property="postCreatedId" column="post_created_id"/>
         <result property="postCreatedDate" column="post_created_date"/>
         <result property="postCommentNum" column="comment_count"/>

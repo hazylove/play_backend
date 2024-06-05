@@ -20,6 +20,10 @@ public class PostController {
     @Autowired
     private IPostService postService;
 
+    /**
+     * 列表
+     * @param postQuery 查询参数
+     */
     @PostMapping("/list")
     public JsonResult getPostPage(@RequestBody PostQuery postQuery){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -30,7 +34,10 @@ public class PostController {
         return new JsonResult().setData(pageList);
     }
 
-    // 新增
+    /**
+     * 新增
+     * @param post 帖子
+     */
     @PostMapping("/save")
     public JsonResult addPost(@RequestBody Post post){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -49,7 +56,10 @@ public class PostController {
         }
     }
 
-    // 根据id获取详情
+    /**
+     * 详情
+     * @param postId 帖子id
+     */
     @GetMapping("/{postId}")
     public JsonResult selectOne(@PathVariable Long postId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -62,10 +72,26 @@ public class PostController {
         }
     }
 
+
+    @DeleteMapping("/{postId}")
+    public JsonResult deletePost(@PathVariable Long postId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
+            Long userId = Long.valueOf(authentication.getName());
+            return postService.deletePost(postId, userId);
+        }else {
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+        }
+    }
+
+    /**
+     * 点赞
+     * @param postId 帖子id
+     */
     @PostMapping("/like/{postId}")
     public JsonResult likePost(@PathVariable Long postId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
+        if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
             Long userId = Long.valueOf(authentication.getName());
             synchronized (String.valueOf(userId).intern()) {
                 return postService.likePost(postId, userId);

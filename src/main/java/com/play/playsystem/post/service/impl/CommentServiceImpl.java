@@ -75,7 +75,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         queryWrapper.lambda().eq(UserCommentLikes::getCommentId, commentId).eq(UserCommentLikes::getUserId, userId);
         if (userCommentLikesMapper.selectOne(queryWrapper) == null) {
             // 未点赞
-            UserCommentLikes userCommentLikes = new UserCommentLikes(commentId, userId);
+            UserCommentLikes userCommentLikes = new UserCommentLikes(commentId, userId, LocalDateTime.now());
             if (userCommentLikesMapper.insert(userCommentLikes) > 0) {
                 // 更新评论点赞数
                 if (lambdaUpdate().eq(Comment::getId, commentId).setSql("comment_likes_num = comment_likes_num + 1").update()) {

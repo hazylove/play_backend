@@ -40,4 +40,6 @@ public interface IPostService extends IService<Post> {
      * @return 是否存在
      */
     boolean postExists(Long postId);
+
+    JsonResult deletePost(Long postId, Long userId);
 }

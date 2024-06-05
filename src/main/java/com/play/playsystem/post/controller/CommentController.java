@@ -20,7 +20,6 @@ public class CommentController {
     @Autowired
     private ICommentService commentService;
 
-
     /**
      * 获取主评论分页列表
      * @param commentQuery 查询参数
@@ -77,6 +76,10 @@ public class CommentController {
         }
     }
 
+    /**
+     * 点赞
+     * @param commentId 评论id
+     */
     @PostMapping("/like/{commentId}")
     public JsonResult likePost(@PathVariable Long commentId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
