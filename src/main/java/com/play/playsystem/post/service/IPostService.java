@@ -41,5 +41,10 @@ public interface IPostService extends IService<Post> {
      */
     boolean postExists(Long postId);
 
+    /**
+     * 根据创建人、帖子id删除帖子
+     * @param postId 帖子id
+     * @param userId 创建人id
+     */
     JsonResult deletePost(Long postId, Long userId);
 }

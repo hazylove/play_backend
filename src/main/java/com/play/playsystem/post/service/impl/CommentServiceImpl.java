@@ -50,7 +50,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         // 分页数据
         List<Comment> comments = commentMapper.getMainCommentList(commentQuery);
         // 设置创建人
-        return reSetCommentCreatedUserAvatar(total, comments);
+        return setCommentCreatedBy(total, comments);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         //分页数据
         List<Comment> comments = commentMapper.getSubCommentList(commentQuery);
         // 设置创建人
-        return reSetCommentCreatedUserAvatar(total, comments);
+        return setCommentCreatedBy(total, comments);
     }
 
     @Override
@@ -102,7 +102,19 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         return commentMapper.selectOne(queryWrapper) != null;
     }
 
-    private PageList<Comment> reSetCommentCreatedUserAvatar(Long total, List<Comment> comments) {
+    @Override
+    public JsonResult deleteComment(Long commentId, Long userId) {
+        JsonResult jsonResult = new JsonResult();
+        QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(Comment::getId, commentId).eq(Comment::getCommentCreatedId, userId);
+        if (commentMapper.delete(queryWrapper) > 0) {
+            return jsonResult;
+        } else {
+            return jsonResult.setCode(ResultCode.POST_COMMENT_DELETE_ERROR).setSuccess(false).setMassage("异常删除操作");
+        }
+    }
+
+    private PageList<Comment> setCommentCreatedBy(Long total, List<Comment> comments) {
         Map<Long, User> userMap = new HashMap<>();
         for (Comment comment : comments) {
             Long userId = comment.getCommentCreatedId();

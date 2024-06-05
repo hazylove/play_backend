@@ -34,5 +34,17 @@ public interface ICommentService extends IService<Comment> {
      */
     JsonResult likeComment(Long commentId, Long userId);
 
+    /**
+     * 判断评论是否存在
+     * @param commentId 评论id
+     * @return 是否存在
+     */
     boolean commentExists(Long commentId);
+
+    /**
+     * 根据评论id、创建人id删除评论
+     * @param commentId 评论id
+     * @param userId 创建人id
+     */
+    JsonResult deleteComment(Long commentId, Long userId);
 }

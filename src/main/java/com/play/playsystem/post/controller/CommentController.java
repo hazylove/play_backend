@@ -76,6 +76,17 @@ public class CommentController {
         }
     }
 
+    @DeleteMapping("/{commentId}")
+    public JsonResult deleteComment(@PathVariable Long commentId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
+            Long userId = Long.valueOf(authentication.getName());
+            return commentService.deleteComment(commentId, userId);
+        } else {
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+        }
+    }
+
     /**
      * 点赞
      * @param commentId 评论id

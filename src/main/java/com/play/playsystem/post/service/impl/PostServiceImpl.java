@@ -117,7 +117,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         if (postMapper.delete(queryWrapper) > 0) {
             return jsonResult;
         } else {
-            return jsonResult.setCode(ResultCode.POST_DELETE_ERROR).setSuccess(false).setMassage("当前用户不存在该数据，删除失败");
+            return jsonResult.setCode(ResultCode.POST_COMMENT_DELETE_ERROR).setSuccess(false).setMassage("异常删除操作");
         }
     }
 }
