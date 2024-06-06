@@ -81,7 +81,7 @@
             </otherwise>
         </choose>
     </sql>
-    <resultMap id="mainCommentMap" type="com.play.playsystem.post.domain.entity.Comment">
+    <resultMap id="mainCommentMap" type="com.play.playsystem.post.domain.vo.MainCommentVo">
         <id property="id" column="id"/>
         <result property="commentContent" column="comment_content"/>
         <result property="commentPostId" column="comment_post_id"/>
@@ -93,7 +93,7 @@
         <result property="commentSubCount" column="sub_count"/>
     </resultMap>
 
-    <resultMap id="subCommentMap" type="com.play.playsystem.post.domain.entity.Comment">
+    <resultMap id="subCommentMap" type="com.play.playsystem.post.domain.vo.SubCommentVo">
         <id property="id" column="id"/>
         <result property="commentContent" column="comment_content"/>
         <result property="commentPostId" column="comment_post_id"/>

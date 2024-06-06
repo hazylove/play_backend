@@ -6,6 +6,8 @@ import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.user.domain.dto.ChangePasswordDto;
 import com.play.playsystem.user.domain.dto.UserRegistrationDto;
 import com.play.playsystem.user.domain.entity.User;
+import com.play.playsystem.user.domain.vo.UserCreatedVo;
+import com.play.playsystem.user.domain.vo.UserDetailsVo;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -37,9 +39,14 @@ public interface IUserService extends IService<User> {
      * @param userId 用户id
      * @return 用户
      */
-    User getUserDetails(Long userId);
+    UserDetailsVo getUserDetails(Long userId);
 
-    User getUserInfo(Long userId);
+    /**
+     * 根据用户id获取UserCreatedVo对象
+     * @param userId 用户id
+     * @return UserCreatedVo
+     */
+    UserCreatedVo getUserCreatedVo(Long userId);
 
     /**
      * 根据用户名查询用户

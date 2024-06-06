@@ -9,10 +9,12 @@ import com.play.playsystem.basic.utils.tool.MyFileUtil;
 import com.play.playsystem.post.domain.entity.Comment;
 import com.play.playsystem.post.domain.entity.UserCommentLikes;
 import com.play.playsystem.post.domain.query.CommentQuery;
+import com.play.playsystem.post.domain.vo.MainCommentVo;
+import com.play.playsystem.post.domain.vo.SubCommentVo;
 import com.play.playsystem.post.mapper.CommentMapper;
 import com.play.playsystem.post.mapper.UserCommentLikesMapper;
 import com.play.playsystem.post.service.ICommentService;
-import com.play.playsystem.user.domain.entity.User;
+import com.play.playsystem.user.domain.vo.UserCreatedVo;
 import com.play.playsystem.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,35 +46,52 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     }
 
     @Override
-    public PageList<Comment> getMainCommentList(CommentQuery commentQuery) {
+    public PageList<MainCommentVo> getMainCommentList(CommentQuery commentQuery) {
         // 条数
         Long total = commentMapper.count(commentQuery);
         // 分页数据
-        List<Comment> comments = commentMapper.getMainCommentList(commentQuery);
+        List<MainCommentVo> mainCommentVoList = commentMapper.getMainCommentList(commentQuery);
         // 设置创建人
-        return setCommentCreatedBy(total, comments);
+        Map<Long, UserCreatedVo> userCreatedVoMap = new HashMap<>();
+        for (MainCommentVo mainCommentVo : mainCommentVoList) {
+            Long userId = mainCommentVo.getCommentCreatedId();
+            if (!userCreatedVoMap.containsKey(userId)) {
+                UserCreatedVo userCreatedVo = userService.getUserCreatedVo(userId);
+                userCreatedVoMap.put(userId, userCreatedVo);
+            }
+            mainCommentVo.setCommentCreatedBy(userCreatedVoMap.get(userId));
+        }
+        return new PageList<>(total, mainCommentVoList);
     }
 
     @Override
-    public PageList<Comment> getSubCommentList(CommentQuery commentQuery) {
+    public PageList<SubCommentVo> getSubCommentList(CommentQuery commentQuery) {
         // 条数
         Long total = commentMapper.count(commentQuery);
         // 分页数据
-        List<Comment> comments = commentMapper.getSubCommentList(commentQuery);
-        // 设置回复人
-        Map<Long, User> userMap = new HashMap<>();
-        for (Comment comment : comments) {
-            Long commentReplyId = comment.getCommentReplyId();
+        List<SubCommentVo> subCommentVoList = commentMapper.getSubCommentList(commentQuery);
+
+        Map<Long, UserCreatedVo> userCreatedVoMap = new HashMap<>();
+        subCommentVoList.forEach(subCommentVo -> {
+            Long commentReplyId = subCommentVo.getCommentReplyId();
+            Long commentCreatedId = subCommentVo.getCommentCreatedId();
+            // 设置回复人
             if (commentReplyId != null) {
-                if (!userMap.containsKey(commentReplyId)) {
-                    User user = getCommentCreatedBy(commentReplyId);
-                    userMap.put(commentReplyId, user);
+                if (!userCreatedVoMap.containsKey(commentReplyId)) {
+                    UserCreatedVo userCreatedVo = getCommentCreatedBy(commentReplyId);
+                    userCreatedVoMap.put(commentReplyId, userCreatedVo);
                 }
-                comment.setCommentReply(userMap.get(commentReplyId));
+                subCommentVo.setCommentReply(userCreatedVoMap.get(commentReplyId));
             }
-        }
-        // 设置创建人
-        return setCommentCreatedBy(total, comments);
+            // 设置创建人
+            if (!userCreatedVoMap.containsKey(commentCreatedId)) {
+                UserCreatedVo userCreatedVo = userService.getUserCreatedVo(commentCreatedId);
+                userCreatedVoMap.put(commentCreatedId, userCreatedVo);
+            }
+            subCommentVo.setCommentCreatedBy(userCreatedVoMap.get(commentCreatedId));
+        });
+
+        return new PageList<>(total, subCommentVoList);
     }
 
     @Override
@@ -127,23 +146,10 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     }
 
     @Override
-    public User getCommentCreatedBy(Long commentId) {
-        return commentMapper.getCommentCreatedBy(commentId);
-    }
-
-    private PageList<Comment> setCommentCreatedBy(Long total, List<Comment> comments) {
-        Map<Long, User> userMap = new HashMap<>();
-        for (Comment comment : comments) {
-            Long userId = comment.getCommentCreatedId();
-            if (!userMap.containsKey(userId)) {
-                User user = userService.getUserInfo(userId);
-                // 设置用户头像
-                user.setAvatar(MyFileUtil.reSetFileUrl(user.getAvatar()));
-                userMap.put(userId, user);
-            }
-            comment.setCommentCreatedBy(userMap.get(userId));
-        }
-        return new PageList<>(total, comments);
+    public UserCreatedVo getCommentCreatedBy(Long commentId) {
+        UserCreatedVo userCreatedVo = commentMapper.getCommentCreatedBy(commentId);
+        userCreatedVo.setAvatar(MyFileUtil.reSetFileUrl(userCreatedVo.getAvatar()));
+        return userCreatedVo;
     }
 
 }

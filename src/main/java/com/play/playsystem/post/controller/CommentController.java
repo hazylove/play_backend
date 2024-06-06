@@ -5,6 +5,8 @@ import com.play.playsystem.basic.utils.dto.PageList;
 import com.play.playsystem.basic.utils.result.ResultCode;
 import com.play.playsystem.post.domain.entity.Comment;
 import com.play.playsystem.post.domain.query.CommentQuery;
+import com.play.playsystem.post.domain.vo.MainCommentVo;
+import com.play.playsystem.post.domain.vo.SubCommentVo;
 import com.play.playsystem.post.service.ICommentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +32,7 @@ public class CommentController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
             commentQuery.setUserId(Long.valueOf(authentication.getName()));
-            PageList<Comment> pageList = commentService.getMainCommentList(commentQuery);
+            PageList<MainCommentVo> pageList = commentService.getMainCommentList(commentQuery);
             return new JsonResult().setData(pageList);
         } else {
             return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
@@ -47,7 +49,7 @@ public class CommentController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
             commentQuery.setUserId(Long.valueOf(authentication.getName()));
-            PageList<Comment> pageList = commentService.getSubCommentList(commentQuery);
+            PageList<SubCommentVo> pageList = commentService.getSubCommentList(commentQuery);
             return new JsonResult().setData(pageList);
         } else {
             return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");

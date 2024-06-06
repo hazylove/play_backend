@@ -1,27 +1,20 @@
-package com.play.playsystem.post.domain.entity;
+package com.play.playsystem.post.domain.vo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.play.playsystem.user.domain.vo.UserCreatedVo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-/**
- * 帖子实体
- */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName("t_post")
-public class Post {
+public class PostVo {
     /**
      * id
      */
-    @TableId(value = "id", type = IdType.AUTO)
     private Long id;
 
     /**
@@ -44,21 +37,24 @@ public class Post {
      */
     private Long postCreatedId;
 
+    /**
+     * 创建人
+     */
+    private UserCreatedVo postCreatedBy;
 
     /**
      * 创建时间
      */
+    @JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
     private LocalDateTime postCreatedDate;
 
     /**
      * 评论数量
      */
-    @TableField(exist = false)
     private int postCommentNum;
 
     /**
      * 当前用户是否点赞
      */
-    @TableField(exist = false)
     private boolean userLiked;
 }

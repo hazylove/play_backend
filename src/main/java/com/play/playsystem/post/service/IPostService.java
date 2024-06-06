@@ -5,6 +5,7 @@ import com.play.playsystem.basic.utils.dto.PageList;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.post.domain.entity.Post;
 import com.play.playsystem.post.domain.query.PostQuery;
+import com.play.playsystem.post.domain.vo.PostVo;
 
 public interface IPostService extends IService<Post> {
     /**
@@ -12,7 +13,7 @@ public interface IPostService extends IService<Post> {
      * @param postQuery 查询参数
      * @return 分页列表结果
      */
-    PageList<Post> getPostList(PostQuery postQuery);
+    PageList<PostVo> getPostList(PostQuery postQuery);
 
     /**
      * 新建
@@ -25,7 +26,7 @@ public interface IPostService extends IService<Post> {
      * @param id 帖子id
      * @return 帖子
      */
-    Post selectById(Long id, Long userId);
+    PostVo selectById(Long id, Long userId);
 
     /**
      * 点赞/取消点赞

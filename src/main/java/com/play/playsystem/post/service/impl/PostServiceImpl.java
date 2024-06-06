@@ -5,14 +5,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.play.playsystem.basic.utils.dto.PageList;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.basic.utils.result.ResultCode;
-import com.play.playsystem.basic.utils.tool.MyFileUtil;
 import com.play.playsystem.post.domain.entity.Post;
 import com.play.playsystem.post.domain.entity.UserPostLikes;
 import com.play.playsystem.post.domain.query.PostQuery;
+import com.play.playsystem.post.domain.vo.PostVo;
 import com.play.playsystem.post.mapper.PostMapper;
 import com.play.playsystem.post.mapper.UserPostLikesMapper;
 import com.play.playsystem.post.service.IPostService;
-import com.play.playsystem.user.domain.entity.User;
+import com.play.playsystem.user.domain.vo.UserCreatedVo;
 import com.play.playsystem.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,24 +35,22 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     private IUserService userService;
 
     @Override
-    public PageList<Post> getPostList(PostQuery postQuery) {
+    public PageList<PostVo> getPostList(PostQuery postQuery) {
         // 条数
         Long total = postMapper.count(postQuery);
         // 分页数据
-        List<Post> posts = postMapper.getPostList(postQuery);
+        List<PostVo> postVoList = postMapper.getPostList(postQuery);
         // 设置创建人
-        Map<Long, User> userMap = new HashMap<>();
-        for (Post post : posts) {
-            Long userId = post.getPostCreatedId();
-            if (!userMap.containsKey(userId)) {
-                User user = userService.getUserInfo(userId);
-                // 设置用户头像
-                user.setAvatar(MyFileUtil.reSetFileUrl(user.getAvatar()));
-                userMap.put(userId, user);
+        Map<Long, UserCreatedVo> userCreatedVoMap = new HashMap<>();
+        postVoList.forEach(postVo -> {
+            Long userId = postVo.getPostCreatedId();
+            if (!userCreatedVoMap.containsKey(userId)) {
+                UserCreatedVo userCreatedVo = userService.getUserCreatedVo(userId);
+                userCreatedVoMap.put(userId, userCreatedVo);
             }
-            post.setPostCreatedBy(userMap.get(userId));
-        }
-        return new PageList<>(total, posts);
+            postVo.setPostCreatedBy(userCreatedVoMap.get(userId));
+        });
+        return new PageList<>(total, postVoList);
     }
 
     @Override
@@ -63,11 +61,12 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     }
 
     @Override
-    public Post selectById(Long id, Long userId) {
-        Post post = postMapper.selectById(id, userId);
-        User user = userService.getUserInfo(post.getPostCreatedId());
-        post.setPostCreatedBy(user);
-        return post;
+    public PostVo selectById(Long id, Long userId) {
+        PostVo postVo = postMapper.selectById(id, userId);
+        // 设置创建人
+        UserCreatedVo userCreatedVo = userService.getUserCreatedVo(postVo.getPostCreatedId());
+        postVo.setPostCreatedBy(userCreatedVo);
+        return postVo;
     }
 
     @Override
@@ -120,6 +119,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
             return jsonResult.setCode(ResultCode.POST_COMMENT_DELETE_ERROR).setSuccess(false).setMassage("异常删除操作");
         }
     }
+
 }
 
 

@@ -13,6 +13,8 @@ import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.basic.utils.result.ResultCode;
 import com.play.playsystem.file.domain.entity.UploadFile;
 import com.play.playsystem.file.service.IUploadFileService;
+import com.play.playsystem.user.domain.vo.UserCreatedVo;
+import com.play.playsystem.user.domain.vo.UserDetailsVo;
 import com.play.playsystem.user.service.IUserService;
 import com.play.playsystem.user.domain.dto.ChangePasswordDto;
 import com.play.playsystem.user.domain.dto.UserRegistrationDto;
@@ -215,7 +217,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
-    public User getUserDetails(Long userId) {
+    public UserDetailsVo getUserDetails(Long userId) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda()
                 .select(
@@ -232,13 +234,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 )
                 .eq(User::getId, userId);
         User user = userMapper.selectOne(queryWrapper);
-        // 重新设置用户头像地址
-        user.setAvatar(MyFileUtil.reSetFileUrl(user.getAvatar()));
-        return user;
+        return new UserDetailsVo(user);
     }
 
     @Override
-    public User getUserInfo(Long userId) {
+    public UserCreatedVo getUserCreatedVo(Long userId) {
         QueryWrapper<User> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda()
                 .select(
@@ -247,6 +247,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                         User::getAvatar
                 )
                 .eq(User::getId, userId);
-        return userMapper.selectOne(queryWrapper);
+        User user = userMapper.selectOne(queryWrapper);
+        user.setAvatar(MyFileUtil.reSetFileUrl(user.getAvatar()));
+        return new UserCreatedVo(user.getId(), user.getNickname(), user.getAvatar());
     }
 }

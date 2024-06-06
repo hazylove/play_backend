@@ -5,6 +5,7 @@ import com.play.playsystem.basic.utils.dto.PageList;
 import com.play.playsystem.basic.utils.result.ResultCode;
 import com.play.playsystem.post.domain.entity.Post;
 import com.play.playsystem.post.domain.query.PostQuery;
+import com.play.playsystem.post.domain.vo.PostVo;
 import com.play.playsystem.post.service.IPostService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class PostController {
         if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
             postQuery.setUserId(Long.valueOf(authentication.getName()));
         }
-        PageList<Post> pageList = postService.getPostList(postQuery);
+        PageList<PostVo> pageList = postService.getPostList(postQuery);
         return new JsonResult().setData(pageList);
     }
 
@@ -65,8 +66,8 @@ public class PostController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
             Long userId = Long.valueOf(authentication.getName());
-            Post post = postService.selectById(postId, userId);
-            return new JsonResult().setData(post);
+            PostVo postVo = postService.selectById(postId, userId);
+            return new JsonResult().setData(postVo);
         }else {
             return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
         }

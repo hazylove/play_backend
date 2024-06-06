@@ -5,7 +5,9 @@ import com.play.playsystem.basic.utils.dto.PageList;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.post.domain.entity.Comment;
 import com.play.playsystem.post.domain.query.CommentQuery;
-import com.play.playsystem.user.domain.entity.User;
+import com.play.playsystem.post.domain.vo.MainCommentVo;
+import com.play.playsystem.post.domain.vo.SubCommentVo;
+import com.play.playsystem.user.domain.vo.UserCreatedVo;
 
 public interface ICommentService extends IService<Comment> {
     /**
@@ -13,7 +15,7 @@ public interface ICommentService extends IService<Comment> {
      * @param commentQuery 查询参数
      * @return 数据
      */
-    PageList<Comment> getMainCommentList(CommentQuery commentQuery);
+    PageList<MainCommentVo> getMainCommentList(CommentQuery commentQuery);
 
     /**
      * 新建评论
@@ -26,7 +28,7 @@ public interface ICommentService extends IService<Comment> {
      * @param commentQuery 查询参数
      * @return 数据
      */
-    PageList<Comment> getSubCommentList(CommentQuery commentQuery);
+    PageList<SubCommentVo> getSubCommentList(CommentQuery commentQuery);
 
     /**
      * 点赞/取消点赞评论
@@ -54,5 +56,5 @@ public interface ICommentService extends IService<Comment> {
      * @param commentId 评论id
      * @return 创建人
      */
-    User getCommentCreatedBy(Long commentId);
+    UserCreatedVo getCommentCreatedBy(Long commentId);
 }
