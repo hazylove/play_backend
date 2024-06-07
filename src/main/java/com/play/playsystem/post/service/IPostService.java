@@ -48,4 +48,10 @@ public interface IPostService extends IService<Post> {
      * @param userId 创建人id
      */
     JsonResult deletePost(Long postId, Long userId);
+
+    /**
+     * 获取点赞列表
+     * @param postQuery 查询参数
+     */
+    PageList<PostVo> getLikePostList(PostQuery postQuery);
 }

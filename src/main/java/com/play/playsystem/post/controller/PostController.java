@@ -7,6 +7,7 @@ import com.play.playsystem.post.domain.entity.Post;
 import com.play.playsystem.post.domain.query.PostQuery;
 import com.play.playsystem.post.domain.vo.PostVo;
 import com.play.playsystem.post.service.IPostService;
+import com.play.playsystem.user.utils.UserCheckUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -28,11 +29,27 @@ public class PostController {
     @PostMapping("/list")
     public JsonResult getPostPage(@RequestBody PostQuery postQuery){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
+        if (UserCheckUtil.checkAuth(authentication)) {
             postQuery.setUserId(Long.valueOf(authentication.getName()));
         }
         PageList<PostVo> pageList = postService.getPostList(postQuery);
         return new JsonResult().setData(pageList);
+    }
+
+    /**
+     * 获取点赞列表
+     * @param postQuery 查询参数
+     */
+    @PostMapping("/likeList")
+    public JsonResult getLikePostPage(@RequestBody PostQuery postQuery){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (UserCheckUtil.checkAuth(authentication)) {
+            postQuery.setUserId(Long.valueOf(authentication.getName()));
+            PageList<PostVo> pageList = postService.getLikePostList(postQuery);
+            return new JsonResult().setData(pageList);
+        } else {
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+    }
     }
 
     /**
@@ -42,7 +59,7 @@ public class PostController {
     @PostMapping("/save")
     public JsonResult addPost(@RequestBody Post post){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
+        if (UserCheckUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             if (post.getId() == null) {
                 post.setPostCreatedId(userId);
@@ -64,7 +81,7 @@ public class PostController {
     @GetMapping("/{postId}")
     public JsonResult selectOne(@PathVariable Long postId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
+        if (UserCheckUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             PostVo postVo = postService.selectById(postId, userId);
             return new JsonResult().setData(postVo);
@@ -77,7 +94,7 @@ public class PostController {
     @DeleteMapping("/{postId}")
     public JsonResult deletePost(@PathVariable Long postId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
+        if (UserCheckUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             return postService.deletePost(postId, userId);
         }else {
@@ -92,7 +109,7 @@ public class PostController {
     @PostMapping("/like/{postId}")
     public JsonResult likePost(@PathVariable Long postId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
+        if (UserCheckUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             synchronized (String.valueOf(userId).intern()) {
                 return postService.likePost(postId, userId);

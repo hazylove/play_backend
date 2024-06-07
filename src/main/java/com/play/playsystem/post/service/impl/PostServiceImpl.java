@@ -41,16 +41,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         // 分页数据
         List<PostVo> postVoList = postMapper.getPostList(postQuery);
         // 设置创建人
-        Map<Long, UserCreatedVo> userCreatedVoMap = new HashMap<>();
-        postVoList.forEach(postVo -> {
-            Long userId = postVo.getPostCreatedId();
-            if (!userCreatedVoMap.containsKey(userId)) {
-                UserCreatedVo userCreatedVo = userService.getUserCreatedVo(userId);
-                userCreatedVoMap.put(userId, userCreatedVo);
-            }
-            postVo.setPostCreatedBy(userCreatedVoMap.get(userId));
-        });
-        return new PageList<>(total, postVoList);
+        return setPostVoCreator(total, postVoList);
     }
 
     @Override
@@ -118,6 +109,29 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         } else {
             return jsonResult.setCode(ResultCode.POST_COMMENT_DELETE_ERROR).setSuccess(false).setMassage("异常删除操作");
         }
+    }
+
+    @Override
+    public PageList<PostVo> getLikePostList(PostQuery postQuery) {
+        // 条数
+        Long total = postMapper.countLikePost(postQuery);
+        // 分页数据
+        List<PostVo> postVoList = postMapper.getLikePostList(postQuery);
+        // 设置创建人
+        return setPostVoCreator(total, postVoList);
+    }
+
+    private PageList<PostVo> setPostVoCreator(Long total, List<PostVo> postVoList) {
+        Map<Long, UserCreatedVo> userCreatedVoMap = new HashMap<>();
+        postVoList.forEach(postVo -> {
+            Long userId = postVo.getPostCreatedId();
+            if (!userCreatedVoMap.containsKey(userId)) {
+                UserCreatedVo userCreatedVo = userService.getUserCreatedVo(userId);
+                userCreatedVoMap.put(userId, userCreatedVo);
+            }
+            postVo.setPostCreatedBy(userCreatedVoMap.get(userId));
+        });
+        return new PageList<>(total, postVoList);
     }
 
 }

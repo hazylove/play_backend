@@ -29,8 +29,8 @@ public class ResultCode {
     public static final int USERNAME_EXISTING = 1010;
     // 两次输入密码不一致
     public static final int TWICE_PASSWORD_INCONSISTENT = 1011;
-    // 用户名、密码格式不正确
-    public static final int USERNAME_PASSWORD_FORMAT_ERROR = 1012;
+    // 用户名格式不正确
+    public static final int USERNAME_FORMAT_ERROR = 1012;
 
     // 邮箱验证码错误
     public static final int EMAIL_CODE_ERROR = 1020;

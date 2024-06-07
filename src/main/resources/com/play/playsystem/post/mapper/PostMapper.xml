@@ -5,6 +5,7 @@
         select count(*) from t_post p
         <include refid="query"/>
     </select>
+
     <select id="getPostList" resultMap="postMap">
         select
             p.id,
@@ -20,6 +21,7 @@
         <include refid="orderSql"/>
         limit #{page},#{pageSize}
     </select>
+
     <select id="selectById" resultMap="postMap">
         select
             p.id,
@@ -33,13 +35,47 @@
         from t_post p
         where p.id = #{id}
     </select>
+
+    <select id="countLikePost" resultType="java.lang.Long">
+        SELECT COUNT(*) FROM t_post p
+        JOIN forum.user_post_likes upl on p.id = upl.post_id
+        <include refid="query"/>
+    </select>
+
+    <select id="getLikePostList" resultType="com.play.playsystem.post.domain.vo.PostVo">
+        select
+            p.id,
+            p.post_title,
+            p.post_content,
+            p.post_likes_num,
+            (select count(*) from t_comment c where c.comment_post_id = p.id) as comment_count,
+            1 as user_liked,
+            p.post_created_id,
+            p.post_created_date
+        from t_post p
+        JOIN forum.user_post_likes upl on p.id = upl.post_id
+        <include refid="likeQuery"/>
+        <include refid="orderSql"/>
+        limit #{page},#{pageSize}
+    </select>
+
+    <sql id="likeQuery">
+        <where>
+            <if test="keywords != null and keywords !=''">
+                and (p.post_title like concat('%',#{keywords},'%') or p.post_content like concat('%',#{keywords},'%'))
+            </if>
+            and upl.user_id = #{userId}
+        </where>
+    </sql>
+
     <sql id="query">
         <where>
             <if test="keywords != null and keywords !=''">
-                and (p.title like concat('%',#{keywords},'%') or p.content like concat('%',#{keywords},'%'))
+                and (p.post_title like concat('%',#{keywords},'%') or p.post_content like concat('%',#{keywords},'%'))
             </if>
         </where>
     </sql>
+
     <sql id="orderSql">
         <choose>
             <when test="(sortField == 'post_created_date' or sortField == 'post_title') and (sortOrder.toLowerCase() == 'asc' or sortOrder.toLowerCase() == 'desc')">
@@ -50,6 +86,7 @@
             </otherwise>
         </choose>
     </sql>
+
     <resultMap id="postMap" type="com.play.playsystem.post.domain.vo.PostVo">
         <id property="id" column="id"/>
         <result property="postTitle" column="post_title"/>

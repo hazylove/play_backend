@@ -2,6 +2,7 @@ package com.play.playsystem.user.utils;
 
 import com.play.playsystem.basic.utils.tool.RedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
@@ -16,7 +17,7 @@ public class UserCheckUtil {
      * @param username 用户名
      * @return 是否为空
      */
-    public boolean isInvalidUsername(String username) {
+    public static boolean isInvalidUsername(String username) {
         return username == null || username.isEmpty();
     }
 
@@ -29,5 +30,9 @@ public class UserCheckUtil {
     public boolean isInvalidEmailCode(String email, String emailCode) {
         String redisEmailCode = redisUtil.get(email);
         return !Objects.equals(redisEmailCode, emailCode);
+    }
+
+    public static boolean checkAuth(Authentication authentication) {
+        return authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser");
     }
 }

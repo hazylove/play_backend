@@ -16,4 +16,8 @@ public interface PostMapper extends BaseMapper<Post> {
     List<PostVo> getPostList(PostQuery postQuery);
 
     PostVo selectById(Long id, Long userId);
+
+    Long countLikePost(PostQuery postQuery);
+
+    List<PostVo> getLikePostList(PostQuery postQuery);
 }

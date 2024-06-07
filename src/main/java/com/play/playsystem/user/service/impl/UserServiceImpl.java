@@ -66,8 +66,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public JsonResult register(UserRegistrationDto userRegistrationDto) {
         JsonResult jsonResult = new JsonResult();
         // 校验用户名格式
-        if (userCheckUtil.isInvalidUsername(userRegistrationDto.getUsername()) && FormatCheckUtil.validateEmail(userRegistrationDto.getUsername())) {
-            return jsonResult.setSuccess(false).setCode(ResultCode.USERNAME_PASSWORD_FORMAT_ERROR).setMassage("用户名格式不正确");
+        if (UserCheckUtil.isInvalidUsername(userRegistrationDto.getUsername()) && FormatCheckUtil.validateEmail(userRegistrationDto.getUsername())) {
+            return jsonResult.setSuccess(false).setCode(ResultCode.USERNAME_FORMAT_ERROR).setMassage("用户名格式不正确");
         }
         // 校验手机号格式
         if (userRegistrationDto.getPhone() !=  null && !userRegistrationDto.getPhone().isEmpty() && !FormatCheckUtil.validatePhone(userRegistrationDto.getPhone())) {

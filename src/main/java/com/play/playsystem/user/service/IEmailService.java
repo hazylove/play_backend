@@ -12,13 +12,21 @@ public interface IEmailService {
     void sendEmail(EmailDto emailDto);
 
     /**
-     * 发送邮箱验证码
+     * 发送注册 邮箱验证码
      * @param email 邮箱
-     * @return JsonResult
      */
     JsonResult sendRegisterCode(String email);
 
+    /**
+     * 发送修改密码 邮箱验证吗
+     * @param userId 用户id
+     * @param email 邮箱
+     */
     JsonResult sendChangeCode(Long userId, String email);
 
+    /**
+     * 发送登录 邮箱验证码
+     * @param email 邮箱
+     */
     JsonResult sendLoginCode(String email);
 }

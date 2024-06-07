@@ -4,6 +4,7 @@ package com.play.playsystem.user.controller;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.basic.utils.result.ResultCode;
 import com.play.playsystem.user.service.IEmailService;
+import com.play.playsystem.user.utils.UserCheckUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -38,7 +39,7 @@ public class EmailController {
     public JsonResult sendChangeCode(@RequestParam String email) {
         // 获取当前用户
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated()) {
+        if (UserCheckUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             return emailService.sendChangeCode(userId, email);
         }
