@@ -102,6 +102,8 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     @Override
     public JsonResult deletePost(Long postId, Long userId) {
         JsonResult jsonResult = new JsonResult();
+
+        // 当前只有帖子发布人可以删除帖子
         QueryWrapper<Post> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(Post::getId, postId).eq(Post::getPostCreatedId, userId);
         if (postMapper.delete(queryWrapper) > 0) {

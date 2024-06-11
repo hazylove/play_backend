@@ -6,6 +6,7 @@ import com.play.playsystem.post.domain.entity.Post;
 import com.play.playsystem.post.domain.query.PostQuery;
 import com.play.playsystem.post.domain.vo.PostVo;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -20,4 +21,10 @@ public interface PostMapper extends BaseMapper<Post> {
     Long countLikePost(PostQuery postQuery);
 
     List<PostVo> getLikePostList(PostQuery postQuery);
+
+    @Select("SELECT tp.post_created_id " +
+            "FROM forum.t_post tp " +
+            "LEFT JOIN forum.t_comment tc on tc.comment_post_id = tp.id " +
+            "WHERE tc.id = #{commentId}")
+    Long getPostCratedIdByCommentId(Long commentId);
 }

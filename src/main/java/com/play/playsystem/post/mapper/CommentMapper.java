@@ -25,4 +25,7 @@ public interface CommentMapper extends BaseMapper<Comment> {
             "LEFT JOIN forum.t_comment tc on tu.id = tc.comment_created_id " +
             "WHERE tc.id = #{commentId}")
     UserCreatedVo getCommentCreatedBy(@Param("commentId") Long commentId);
+
+    @Select("SELECT comment_created_id FROM t_comment WHERE id = #{commentId}")
+    Long getCommentCreatedIdById(Long commentId);
 }

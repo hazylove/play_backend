@@ -12,6 +12,7 @@ import com.play.playsystem.post.domain.query.CommentQuery;
 import com.play.playsystem.post.domain.vo.MainCommentVo;
 import com.play.playsystem.post.domain.vo.SubCommentVo;
 import com.play.playsystem.post.mapper.CommentMapper;
+import com.play.playsystem.post.mapper.PostMapper;
 import com.play.playsystem.post.mapper.UserCommentLikesMapper;
 import com.play.playsystem.post.service.ICommentService;
 import com.play.playsystem.user.domain.vo.UserCreatedVo;
@@ -25,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
@@ -37,6 +39,8 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 
     @Autowired
     private IUserService userService;
+    @Autowired
+    private PostMapper postMapper;
 
     @Override
     @Transactional
@@ -136,9 +140,15 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     @Override
     public JsonResult deleteComment(Long commentId, Long userId) {
         JsonResult jsonResult = new JsonResult();
-        QueryWrapper<Comment> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(Comment::getId, commentId).eq(Comment::getCommentCreatedId, userId);
-        if (commentMapper.delete(queryWrapper) > 0) {
+
+        // 帖子发布人
+        Long postCreatedId = postMapper.getPostCratedIdByCommentId(commentId);
+        // 评论创建人
+        Long commentCreatedId = commentMapper.getCommentCreatedIdById(commentId);
+
+        // 只有帖子发布人和评论人可以删除评论
+        if (Objects.equals(postCreatedId, userId) || Objects.equals(commentCreatedId, userId)) {
+            commentMapper.deleteById(commentId);
             return jsonResult;
         } else {
             return jsonResult.setCode(ResultCode.POST_COMMENT_DELETE_ERROR).setSuccess(false).setMassage("异常删除操作");

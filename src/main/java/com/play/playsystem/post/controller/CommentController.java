@@ -81,6 +81,10 @@ public class CommentController {
         }
     }
 
+    /**
+     * 删除评论
+     * @param commentId 评论id
+     */
     @DeleteMapping("/{commentId}")
     public JsonResult deleteComment(@PathVariable Long commentId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
