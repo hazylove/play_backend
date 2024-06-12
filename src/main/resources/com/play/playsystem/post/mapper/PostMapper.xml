@@ -13,7 +13,7 @@
             p.post_content,
             p.post_likes_num,
             (select count(*) from t_comment c where c.comment_post_id = p.id) as comment_count,
-            (select count(*) from user_post_likes upl where upl.post_id = p.id and upl.user_id = #{userId}) as user_liked,
+            (select count(*) from user_post_like upl where upl.post_id = p.id and upl.user_id = #{userId}) as user_liked,
             p.post_created_id,
             p.post_created_date
         from t_post p
@@ -29,7 +29,7 @@
             p.post_content,
             p.post_likes_num,
             (select count(*) from t_comment c where c.comment_post_id = p.id) as comment_count,
-            (select count(*) from user_post_likes upl where upl.post_id = p.id and upl.user_id = #{userId}) as user_liked,
+            (select count(*) from user_post_like upl where upl.post_id = p.id and upl.user_id = #{userId}) as user_liked,
             p.post_created_id,
             p.post_created_date
         from t_post p
@@ -38,7 +38,7 @@
 
     <select id="countLikePost" resultType="java.lang.Long">
         SELECT COUNT(*) FROM t_post p
-        JOIN forum.user_post_likes upl on p.id = upl.post_id
+        JOIN forum.user_post_like upl on p.id = upl.post_id
         <include refid="query"/>
     </select>
 
@@ -53,7 +53,7 @@
             p.post_created_id,
             p.post_created_date
         from t_post p
-        JOIN forum.user_post_likes upl on p.id = upl.post_id
+        JOIN forum.user_post_like upl on p.id = upl.post_id
         <include refid="likeQuery"/>
         <include refid="orderSql"/>
         limit #{page},#{pageSize}

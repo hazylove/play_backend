@@ -6,11 +6,11 @@ import com.play.playsystem.basic.utils.dto.PageList;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.basic.utils.result.ResultCode;
 import com.play.playsystem.post.domain.entity.Post;
-import com.play.playsystem.post.domain.entity.UserPostLikes;
+import com.play.playsystem.post.domain.entity.UserPostLike;
 import com.play.playsystem.post.domain.query.PostQuery;
 import com.play.playsystem.post.domain.vo.PostVo;
 import com.play.playsystem.post.mapper.PostMapper;
-import com.play.playsystem.post.mapper.UserPostLikesMapper;
+import com.play.playsystem.post.mapper.UserPostLikeMapper;
 import com.play.playsystem.post.service.IPostService;
 import com.play.playsystem.user.domain.vo.UserCreatedVo;
 import com.play.playsystem.user.service.IUserService;
@@ -21,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
@@ -29,10 +32,12 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     private PostMapper postMapper;
 
     @Autowired
-    private UserPostLikesMapper userPostLikesMapper;
+    private UserPostLikeMapper userPostLikeMapper;
 
     @Autowired
     private IUserService userService;
+
+    private static final ConcurrentHashMap<String, Lock> likeLocks = new ConcurrentHashMap<>();
 
     @Override
     public PageList<PostVo> getPostList(PostQuery postQuery) {
@@ -67,28 +72,38 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         if (postId == null || !postExists(postId)) {
             return jsonResult.setCode(ResultCode.POST_NOT_EXIST).setSuccess(false).setMassage("帖子不存在");
         }
-        // 查询是否已点赞
-        QueryWrapper<UserPostLikes> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(UserPostLikes::getPostId, postId).eq(UserPostLikes::getUserId, userId);
-        if (userPostLikesMapper.selectOne(queryWrapper) == null) {
-            // 未点赞
-            UserPostLikes userPostLikes = new UserPostLikes(postId, userId, LocalDateTime.now());
-            if (userPostLikesMapper.insert(userPostLikes) > 0) {
-                // 更新帖子点赞数
-                if (lambdaUpdate().eq(Post::getId, postId).setSql("post_likes_num = post_likes_num + 1").update()) {
-                    return jsonResult;
+
+        String key = generateKey(userId, postId);
+        Lock lock = likeLocks.computeIfAbsent(key, k -> new ReentrantLock());
+
+        lock.lock();
+        try {
+            // 查询是否已点赞
+            QueryWrapper<UserPostLike> queryWrapper = new QueryWrapper<>();
+            queryWrapper.lambda().eq(UserPostLike::getPostId, postId).eq(UserPostLike::getUserId, userId);
+            if (userPostLikeMapper.selectOne(queryWrapper) == null) {
+                // 未点赞
+                UserPostLike userPostLike = new UserPostLike(postId, userId, LocalDateTime.now());
+                if (userPostLikeMapper.insert(userPostLike) > 0) {
+                    // 更新帖子点赞数
+                    if (lambdaUpdate().eq(Post::getId, postId).setSql("post_likes_num = post_likes_num + 1").update()) {
+                        return jsonResult;
+                    }
                 }
-            }
-            throw new RuntimeException("帖子点赞操作数据异常");
-        } else {
-            // 已点赞
-            if (userPostLikesMapper.delete(queryWrapper) > 0) {
-                // 更新帖子点赞数
-                if (lambdaUpdate().eq(Post::getId, postId).gt(Post::getPostLikesNum, 0).setSql("post_likes_num = post_likes_num - 1").update()) {
-                    return jsonResult;
+                throw new RuntimeException("帖子点赞操作数据异常");
+            } else {
+                // 已点赞
+                if (userPostLikeMapper.delete(queryWrapper) > 0) {
+                    // 更新帖子点赞数
+                    if (lambdaUpdate().eq(Post::getId, postId).gt(Post::getPostLikesNum, 0).setSql("post_likes_num = post_likes_num - 1").update()) {
+                        return jsonResult;
+                    }
                 }
+                throw new RuntimeException("帖子取消点赞操作数据异常");
             }
-            throw new RuntimeException("帖子取消点赞操作数据异常");
+        } finally {
+            lock.unlock();
+            likeLocks.remove(key);
         }
     }
 
@@ -123,6 +138,11 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         return setPostVoCreator(total, postVoList);
     }
 
+    @Override
+    public JsonResult blockPost(Long postId, Long userId) {
+        return null;
+    }
+
     private PageList<PostVo> setPostVoCreator(Long total, List<PostVo> postVoList) {
         Map<Long, UserCreatedVo> userCreatedVoMap = new HashMap<>();
         postVoList.forEach(postVo -> {
@@ -136,6 +156,10 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         return new PageList<>(total, postVoList);
     }
 
+    // 生成复合键
+    private static String generateKey(Long userId, Long commentId) {
+        return userId + "_" + commentId;
+    }
 }
 
 

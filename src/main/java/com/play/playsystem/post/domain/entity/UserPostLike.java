@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@TableName("user_post_likes")
-public class UserPostLikes {
+@TableName("user_post_like")
+public class UserPostLike {
     /**
      * 帖子id
      */

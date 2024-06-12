@@ -47,7 +47,7 @@ public class Comment {
     /**
      * 拉黑数
      */
-    private Integer commentBlackNum;
+    private Integer commentBlocksNum;
 
     /**
      * 创建人id

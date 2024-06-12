@@ -54,4 +54,6 @@ public interface IPostService extends IService<Post> {
      * @param postQuery 查询参数
      */
     PageList<PostVo> getLikePostList(PostQuery postQuery);
+
+    JsonResult blockPost(Long postId, Long userId);
 }

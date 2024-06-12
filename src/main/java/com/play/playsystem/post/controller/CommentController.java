@@ -105,9 +105,7 @@ public class CommentController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (UserCheckUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
-            synchronized (String.valueOf(userId).intern()) {
-                return commentService.likeComment(commentId, userId);
-            }
+            return commentService.likeComment(commentId, userId);
         }else {
             return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
         }

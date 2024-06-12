@@ -90,7 +90,10 @@ public class PostController {
         }
     }
 
-
+    /**
+     * 删除帖子
+     * @param postId 帖子id
+     */
     @DeleteMapping("/{postId}")
     public JsonResult deletePost(@PathVariable Long postId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -111,10 +114,21 @@ public class PostController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (UserCheckUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
-            synchronized (String.valueOf(userId).intern()) {
-                return postService.likePost(postId, userId);
-            }
+            return postService.likePost(postId, userId);
         }else {
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+        }
+    }
+
+    @PostMapping("/block/{postId}")
+    public JsonResult blockPost(@PathVariable Long postId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (UserCheckUtil.checkAuth(authentication)) {
+            Long userId = Long.valueOf(authentication.getName());
+            synchronized (String.valueOf(userId).intern()) {
+                return postService.blockPost(postId, userId);
+            }
+        } else {
             return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
         }
     }
