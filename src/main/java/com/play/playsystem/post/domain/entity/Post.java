@@ -40,6 +40,11 @@ public class Post {
     private int postLikesNum;
 
     /**
+     * 拉黑数
+     */
+    private int postBlocksNum;
+
+    /**
      * 创建人id
      */
     private Long postCreatedId;

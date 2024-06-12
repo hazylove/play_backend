@@ -161,7 +161,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         JsonResult jsonResult = new JsonResult();
 
         // 帖子发布人
-        Long postCreatedId = postMapper.getPostCratedIdByCommentId(commentId);
+        Long postCreatedId = postMapper.getCratedIdByCommentId(commentId);
         // 评论创建人
         Long commentCreatedId = commentMapper.getCommentCreatedIdById(commentId);
 

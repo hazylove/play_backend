@@ -26,5 +26,10 @@ public interface PostMapper extends BaseMapper<Post> {
             "FROM forum.t_post tp " +
             "LEFT JOIN forum.t_comment tc on tc.comment_post_id = tp.id " +
             "WHERE tc.id = #{commentId}")
-    Long getPostCratedIdByCommentId(Long commentId);
+    Long getCratedIdByCommentId(Long commentId);
+
+    @Select("SELECT post_created_id " +
+            "FROM t_post " +
+            "WHERE id = #{postId}")
+    Long getCreatedIdByPostId(Long postId);
 }

@@ -6,10 +6,12 @@ import com.play.playsystem.basic.utils.dto.PageList;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.basic.utils.result.ResultCode;
 import com.play.playsystem.post.domain.entity.Post;
+import com.play.playsystem.post.domain.entity.UserPostBlock;
 import com.play.playsystem.post.domain.entity.UserPostLike;
 import com.play.playsystem.post.domain.query.PostQuery;
 import com.play.playsystem.post.domain.vo.PostVo;
 import com.play.playsystem.post.mapper.PostMapper;
+import com.play.playsystem.post.mapper.UserPostBlockMapper;
 import com.play.playsystem.post.mapper.UserPostLikeMapper;
 import com.play.playsystem.post.service.IPostService;
 import com.play.playsystem.user.domain.vo.UserCreatedVo;
@@ -37,7 +39,12 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     @Autowired
     private IUserService userService;
 
+    @Autowired
+    private UserPostBlockMapper userPostBlockMapper;
+
     private static final ConcurrentHashMap<String, Lock> likeLocks = new ConcurrentHashMap<>();
+
+    private static final ConcurrentHashMap<String, Lock> blockLocks = new ConcurrentHashMap<>();
 
     @Override
     public PageList<PostVo> getPostList(PostQuery postQuery) {
@@ -76,6 +83,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         String key = generateKey(userId, postId);
         Lock lock = likeLocks.computeIfAbsent(key, k -> new ReentrantLock());
 
+        // 锁定
         lock.lock();
         try {
             // 查询是否已点赞
@@ -102,9 +110,59 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
                 throw new RuntimeException("帖子取消点赞操作数据异常");
             }
         } finally {
+            // 解锁
             lock.unlock();
             likeLocks.remove(key);
         }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public JsonResult blockPost(Long postId, Long userId) {
+        JsonResult jsonResult = new JsonResult();
+        if (postId == null || !postExists(postId)) {
+            return jsonResult.setCode(ResultCode.POST_NOT_EXIST).setSuccess(false).setMassage("帖子不存在");
+        }
+
+        Long createdId = postMapper.getCreatedIdByPostId(postId);
+        if (Objects.equals(createdId, userId)) {
+            return jsonResult.setCode(ResultCode.POST_COMMENT_BLOCK_ERROR).setSuccess(false).setMassage("拉黑操作异常");
+        }
+
+        String key = generateKey(userId, postId);
+        Lock lock = blockLocks.computeIfAbsent(key, k -> new ReentrantLock());
+
+        // 加锁
+        lock.lock();
+        try {
+            // 查询是否已拉黑
+            QueryWrapper<UserPostBlock> queryWrapper = new QueryWrapper<>();
+            queryWrapper.lambda().eq(UserPostBlock::getPostId, postId).eq(UserPostBlock::getUserId, userId);
+            if (userPostBlockMapper.selectOne(queryWrapper) == null) {
+                // 未拉黑 新增拉黑数据
+                UserPostBlock userPostBlock = new UserPostBlock(userId, postId, LocalDateTime.now());
+                if (userPostBlockMapper.insert(userPostBlock) > 0) {
+                    // 更新帖子拉黑数
+                    if (lambdaUpdate().eq(Post::getId, postId).setSql("post_blocks_num = post_blocks_num + 1").update()) {
+                        return jsonResult;
+                    }
+                    throw new RuntimeException("帖子拉黑操作数据异常");
+                }
+            } else {
+                // 已拉黑 删除拉黑数据
+                if (userPostBlockMapper.delete(queryWrapper) > 0) {
+                    // 更新帖子拉黑数
+                    if (lambdaUpdate().eq(Post::getId, postId).gt(Post::getPostLikesNum, 0).setSql("post_blocks_num = post_blocks_num - 1").update()) {
+                        return jsonResult;
+                    }
+                }
+                throw new RuntimeException("帖子取消拉黑操作数据异常");
+            }
+        } finally {
+            lock.unlock();
+            blockLocks.remove(key);
+        }
+        return null;
     }
 
     @Override
@@ -136,11 +194,6 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         List<PostVo> postVoList = postMapper.getLikePostList(postQuery);
         // 设置创建人
         return setPostVoCreator(total, postVoList);
-    }
-
-    @Override
-    public JsonResult blockPost(Long postId, Long userId) {
-        return null;
     }
 
     private PageList<PostVo> setPostVoCreator(Long total, List<PostVo> postVoList) {

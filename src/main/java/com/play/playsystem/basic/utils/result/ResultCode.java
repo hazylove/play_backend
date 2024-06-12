@@ -63,6 +63,9 @@ public class ResultCode {
     // 异常删除操作
     public static final int POST_COMMENT_DELETE_ERROR = 1190;
 
+    // 异常拉黑操作
+    public static final int POST_COMMENT_BLOCK_ERROR = 1191;
+
     /**
      * 富文本图片上传返回码
      */

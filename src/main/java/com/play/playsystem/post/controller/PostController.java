@@ -120,6 +120,10 @@ public class PostController {
         }
     }
 
+    /**
+     * 拉黑帖子
+     * @param postId 帖子id
+     */
     @PostMapping("/block/{postId}")
     public JsonResult blockPost(@PathVariable Long postId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
