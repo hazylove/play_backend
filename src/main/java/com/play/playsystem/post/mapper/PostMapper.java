@@ -32,4 +32,8 @@ public interface PostMapper extends BaseMapper<Post> {
             "FROM t_post " +
             "WHERE id = #{postId}")
     Long getCreatedIdByPostId(Long postId);
+
+    Long countBlockPost(PostQuery postQuery);
+
+    List<PostVo> getBlockPostList(PostQuery postQuery);
 }

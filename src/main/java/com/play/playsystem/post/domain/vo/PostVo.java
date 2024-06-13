@@ -33,6 +33,12 @@ public class PostVo {
     private int postLikesNum;
 
     /**
+     * 拉黑数
+     */
+    private int postBlocksNum;
+
+
+    /**
      * 创建人id
      */
     private Long postCreatedId;
@@ -57,4 +63,9 @@ public class PostVo {
      * 当前用户是否点赞
      */
     private boolean userLiked;
+
+    /**
+     * 当前用户是否拉黑
+     */
+    private boolean userBlocked;
 }

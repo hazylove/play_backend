@@ -42,9 +42,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     @Autowired
     private UserPostBlockMapper userPostBlockMapper;
 
-    private static final ConcurrentHashMap<String, Lock> likeLocks = new ConcurrentHashMap<>();
-
-    private static final ConcurrentHashMap<String, Lock> blockLocks = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, Lock> likeBlockLocks = new ConcurrentHashMap<>();
 
     @Override
     public PageList<PostVo> getPostList(PostQuery postQuery) {
@@ -81,7 +79,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         }
 
         String key = generateKey(userId, postId);
-        Lock lock = likeLocks.computeIfAbsent(key, k -> new ReentrantLock());
+        Lock lock = likeBlockLocks.computeIfAbsent(key, k -> new ReentrantLock());
 
         // 锁定
         lock.lock();
@@ -95,6 +93,15 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
                 if (userPostLikeMapper.insert(userPostLike) > 0) {
                     // 更新帖子点赞数
                     if (lambdaUpdate().eq(Post::getId, postId).setSql("post_likes_num = post_likes_num + 1").update()) {
+                        QueryWrapper<UserPostBlock> blockQueryWrapper = new QueryWrapper<>();
+                        blockQueryWrapper.lambda().eq(UserPostBlock::getPostId, postId).eq(UserPostBlock::getUserId, userId);
+                        if (userPostBlockMapper.delete(blockQueryWrapper) > 0) {
+                            // 更新拉黑总数
+                            if (lambdaUpdate().eq(Post::getId, postId).gt(Post::getPostLikesNum, 0).setSql("post_blocks_num = post_blocks_num - 1").update()) {
+                                return jsonResult;
+                            }
+                            throw new RuntimeException("帖子点赞操作数据异常");
+                        }
                         return jsonResult;
                     }
                 }
@@ -112,7 +119,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         } finally {
             // 解锁
             lock.unlock();
-            likeLocks.remove(key);
+            likeBlockLocks.remove(key);
         }
     }
 
@@ -130,7 +137,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         }
 
         String key = generateKey(userId, postId);
-        Lock lock = blockLocks.computeIfAbsent(key, k -> new ReentrantLock());
+        Lock lock = likeBlockLocks.computeIfAbsent(key, k -> new ReentrantLock());
 
         // 加锁
         lock.lock();
@@ -144,6 +151,16 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
                 if (userPostBlockMapper.insert(userPostBlock) > 0) {
                     // 更新帖子拉黑数
                     if (lambdaUpdate().eq(Post::getId, postId).setSql("post_blocks_num = post_blocks_num + 1").update()) {
+                        // 如果已点赞、同时取消点赞状态
+                        QueryWrapper<UserPostLike> likeQueryWrapper = new QueryWrapper<>();
+                        likeQueryWrapper.lambda().eq(UserPostLike::getPostId, postId).eq(UserPostLike::getUserId, userId);
+                        if (userPostLikeMapper.delete(likeQueryWrapper) > 0) {
+                            // 更新点赞总数
+                            if (lambdaUpdate().eq(Post::getId, postId).gt(Post::getPostLikesNum, 0).setSql("post_likes_num = post_likes_num - 1").update()) {
+                                return jsonResult;
+                            }
+                            throw new RuntimeException("帖子拉黑操作数据异常");
+                        }
                         return jsonResult;
                     }
                     throw new RuntimeException("帖子拉黑操作数据异常");
@@ -160,7 +177,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
             }
         } finally {
             lock.unlock();
-            blockLocks.remove(key);
+            likeBlockLocks.remove(key);
         }
         return null;
     }
@@ -173,6 +190,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public JsonResult deletePost(Long postId, Long userId) {
         JsonResult jsonResult = new JsonResult();
 
@@ -192,6 +210,16 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         Long total = postMapper.countLikePost(postQuery);
         // 分页数据
         List<PostVo> postVoList = postMapper.getLikePostList(postQuery);
+        // 设置创建人
+        return setPostVoCreator(total, postVoList);
+    }
+
+    @Override
+    public PageList<PostVo> getBlockPostList(PostQuery postQuery) {
+        // 条数
+        Long total = postMapper.countBlockPost(postQuery);
+        // 分页数据
+        List<PostVo> postVoList = postMapper.getBlockPostList(postQuery);
         // 设置创建人
         return setPostVoCreator(total, postVoList);
     }

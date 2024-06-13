@@ -56,4 +56,6 @@ public interface IPostService extends IService<Post> {
     PageList<PostVo> getLikePostList(PostQuery postQuery);
 
     JsonResult blockPost(Long postId, Long userId);
+
+    PageList<PostVo> getBlockPostList(PostQuery postQuery);
 }

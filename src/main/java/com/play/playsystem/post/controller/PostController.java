@@ -37,22 +37,6 @@ public class PostController {
     }
 
     /**
-     * 获取点赞列表
-     * @param postQuery 查询参数
-     */
-    @PostMapping("/likeList")
-    public JsonResult getLikePostPage(@RequestBody PostQuery postQuery){
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
-            postQuery.setUserId(Long.valueOf(authentication.getName()));
-            PageList<PostVo> pageList = postService.getLikePostList(postQuery);
-            return new JsonResult().setData(pageList);
-        } else {
-        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
-    }
-    }
-
-    /**
      * 新增
      * @param post 帖子
      */
@@ -121,6 +105,22 @@ public class PostController {
     }
 
     /**
+     * 获取点赞列表
+     * @param postQuery 查询参数
+     */
+    @PostMapping("/likeList")
+    public JsonResult getLikePostPage(@RequestBody PostQuery postQuery){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (UserCheckUtil.checkAuth(authentication)) {
+            postQuery.setUserId(Long.valueOf(authentication.getName()));
+            PageList<PostVo> pageList = postService.getLikePostList(postQuery);
+            return new JsonResult().setData(pageList);
+        } else {
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+        }
+    }
+
+    /**
      * 拉黑帖子
      * @param postId 帖子id
      */
@@ -137,6 +137,21 @@ public class PostController {
         }
     }
 
+    /**
+     * 拉黑列表
+     * @param postQuery 查询参数
+     */
+    @PostMapping("/blockList")
+    public JsonResult getBlockPostPage(@RequestBody PostQuery postQuery){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (UserCheckUtil.checkAuth(authentication)) {
+            postQuery.setUserId(Long.valueOf(authentication.getName()));
+            PageList<PostVo> pageList = postService.getBlockPostList(postQuery);
+            return new JsonResult().setData(pageList);
+        } else {
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+        }
+    }
     @GetMapping("/hello")
     public String hello() {
         return "Hello Word!";
