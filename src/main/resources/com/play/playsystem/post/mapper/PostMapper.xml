@@ -3,6 +3,7 @@
 <mapper namespace="com.play.playsystem.post.mapper.PostMapper">
     <select id="count" resultType="java.lang.Long">
         select count(*) from t_post p
+        left join user_post_block upb ON p.id = upb.post_id AND upb.user_id = #{userId}
         <include refid="query"/>
     </select>
 
@@ -17,6 +18,7 @@
             p.post_created_id,
             p.post_created_date
         from t_post p
+        left join user_post_block upb ON p.id = upb.post_id AND upb.user_id = #{userId}
         <include refid="query"/>
         <include refid="orderSql"/>
         limit #{page},#{pageSize}
@@ -39,7 +41,7 @@
     <select id="countLikePost" resultType="java.lang.Long">
         SELECT COUNT(*) FROM t_post p
         JOIN forum.user_post_like upl on p.id = upl.post_id
-        <include refid="query"/>
+        <include refid="likeQuery"/>
     </select>
 
     <select id="getLikePostList" resultType="com.play.playsystem.post.domain.vo.PostVo">
@@ -73,6 +75,7 @@
             <if test="keywords != null and keywords !=''">
                 and (p.post_title like concat('%',#{keywords},'%') or p.post_content like concat('%',#{keywords},'%'))
             </if>
+            and upb.post_id IS NULL
         </where>
     </sql>
 
