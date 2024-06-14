@@ -97,7 +97,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
                         blockQueryWrapper.lambda().eq(UserPostBlock::getPostId, postId).eq(UserPostBlock::getUserId, userId);
                         if (userPostBlockMapper.delete(blockQueryWrapper) > 0) {
                             // 更新拉黑总数
-                            if (lambdaUpdate().eq(Post::getId, postId).gt(Post::getPostLikesNum, 0).setSql("post_blocks_num = post_blocks_num - 1").update()) {
+                            if (lambdaUpdate().eq(Post::getId, postId).gt(Post::getPostBlocksNum, 0).setSql("post_blocks_num = post_blocks_num - 1").update()) {
                                 return jsonResult;
                             }
                             throw new RuntimeException("帖子点赞操作数据异常");
@@ -133,7 +133,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
 
         Long createdId = postMapper.getCreatedIdByPostId(postId);
         if (Objects.equals(createdId, userId)) {
-            return jsonResult.setCode(ResultCode.POST_COMMENT_BLOCK_ERROR).setSuccess(false).setMassage("拉黑操作异常");
+            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMassage("拉黑操作异常");
         }
 
         String key = generateKey(userId, postId);
@@ -169,7 +169,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
                 // 已拉黑 删除拉黑数据
                 if (userPostBlockMapper.delete(queryWrapper) > 0) {
                     // 更新帖子拉黑数
-                    if (lambdaUpdate().eq(Post::getId, postId).gt(Post::getPostLikesNum, 0).setSql("post_blocks_num = post_blocks_num - 1").update()) {
+                    if (lambdaUpdate().eq(Post::getId, postId).gt(Post::getPostBlocksNum, 0).setSql("post_blocks_num = post_blocks_num - 1").update()) {
                         return jsonResult;
                     }
                 }
@@ -200,7 +200,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         if (postMapper.delete(queryWrapper) > 0) {
             return jsonResult;
         } else {
-            return jsonResult.setCode(ResultCode.POST_COMMENT_DELETE_ERROR).setSuccess(false).setMassage("异常删除操作");
+            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMassage("异常删除操作");
         }
     }
 

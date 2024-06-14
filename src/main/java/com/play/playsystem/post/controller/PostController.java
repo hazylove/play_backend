@@ -40,20 +40,15 @@ public class PostController {
      * 新增
      * @param post 帖子
      */
-    @PostMapping("/save")
+    @PostMapping("/add")
     public JsonResult addPost(@RequestBody Post post){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (UserCheckUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
-            if (post.getId() == null) {
-                post.setPostCreatedId(userId);
-                postService.insert(post);
-                return new JsonResult().setMassage("添加成功！");
-            } else {
-//          iPostService.update(post);
-                return new JsonResult().setCode(ResultCode.ERROR_CODE).setSuccess(false).setMassage("数据错误！");
-            }
-        }else {
+            post.setPostCreatedId(userId);
+            postService.insert(post);
+            return new JsonResult();
+        } else {
             return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
         }
     }

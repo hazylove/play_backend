@@ -136,8 +136,8 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
                         QueryWrapper<UserCommentBlock> blockQueryWrapper = new QueryWrapper<>();
                         blockQueryWrapper.lambda().eq(UserCommentBlock::getCommentId, commentId).eq(UserCommentBlock::getUserId, userId);
                         if (userCommentBlockMapper.delete(blockQueryWrapper) > 0) {
-                            // 更新评论拉黑
-                            if (lambdaUpdate().eq(Comment::getId, commentId).gt(Comment::getCommentLikesNum, 0).setSql("comment_blocks_num = comment_blocks_num - 1").update()) {
+                            // 更新评论拉黑数
+                            if (lambdaUpdate().eq(Comment::getId, commentId).gt(Comment::getCommentBlocksNum, 0).setSql("comment_blocks_num = comment_blocks_num - 1").update()) {
                                 return jsonResult;
                             }
                             throw new RuntimeException("评论点赞操作数据异常");
@@ -203,8 +203,8 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
                 } else {
                     // 已拉黑
                     if (userCommentBlockMapper.delete(blockQueryWrapper) > 0) {
-                        // 更新评论拉黑
-                        if (lambdaUpdate().eq(Comment::getId, commentId).gt(Comment::getCommentLikesNum, 0).setSql("comment_blocks_num = comment_blocks_num - 1").update()) {
+                        // 更新评论拉黑数
+                        if (lambdaUpdate().eq(Comment::getId, commentId).gt(Comment::getCommentBlocksNum, 0).setSql("comment_blocks_num = comment_blocks_num - 1").update()) {
                             return jsonResult;
                         }
                     }
@@ -239,7 +239,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             commentMapper.deleteById(commentId);
             return jsonResult;
         } else {
-            return jsonResult.setCode(ResultCode.POST_COMMENT_DELETE_ERROR).setSuccess(false).setMassage("异常删除操作");
+            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMassage("异常删除操作");
         }
     }
 

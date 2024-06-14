@@ -63,7 +63,7 @@
         from t_post p
         JOIN forum.user_post_like upl on p.id = upl.post_id
         <include refid="likeQuery"/>
-        <include refid="orderSql"/>
+        ORDER BY upl.created_date DESC
         limit #{page},#{pageSize}
     </select>
 
@@ -97,7 +97,7 @@
         from t_post p
         JOIN forum.user_post_block upb on p.id = upb.post_id
         <include refid="blockQuery"/>
-        <include refid="orderSql"/>
+        ORDER BY upb.created_date DESC
         limit #{page},#{pageSize}
     </select>
 

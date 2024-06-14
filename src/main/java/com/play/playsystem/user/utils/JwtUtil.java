@@ -32,13 +32,13 @@ public class JwtUtil {
     public String generateToken(String username) {
 
         Date nowDate = new Date();
-        Date expireDate = new Date(nowDate.getTime() + 1000 * expiration);
+        //Date expireDate = new Date(nowDate.getTime() + 1000 * expiration);
 
         return Jwts.builder()
                 .setHeaderParam("typ", "JWT")
                 .setSubject(username)
                 .setIssuedAt(nowDate)
-                .setExpiration(expireDate)    // 过期时间
+                //.setExpiration(expireDate)    // 过期时间
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
     }

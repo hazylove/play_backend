@@ -63,19 +63,14 @@ public class CommentController {
      * 新建评论
      * @param comment 评论
      */
-    @PostMapping("/save")
+    @PostMapping("/add")
     public JsonResult addComment(@RequestBody Comment comment){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (UserCheckUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
-            if (comment.getId() == null) {
-                comment.setCommentCreatedId(userId);
-                commentService.insert(comment);
-                return new JsonResult().setMassage("添加成功！");
-            } else {
-//          iCommentService.update(comment);
-                return new JsonResult().setCode(ResultCode.ERROR_CODE).setSuccess(false).setMassage("数据错误！");
-            }
+            comment.setCommentCreatedId(userId);
+            commentService.insert(comment);
+            return new JsonResult();
         } else {
             return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
         }
