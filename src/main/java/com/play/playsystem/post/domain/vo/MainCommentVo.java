@@ -35,7 +35,7 @@ public class MainCommentVo {
     /**
      * 拉黑数
      */
-    private Integer commentBlackNum;
+    private Integer commentBlockNum;
 
     /**
      * 创建人id
@@ -62,4 +62,9 @@ public class MainCommentVo {
      * 当前用户是否点赞
      */
     private boolean userLiked = false;
+
+    /**
+     * 当前用户是否拉黑
+     */
+    private boolean userBlocked = false;
 }
