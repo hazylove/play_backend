@@ -38,6 +38,13 @@ public interface ICommentService extends IService<Comment> {
     JsonResult likeComment(Long commentId, Long userId);
 
     /**
+     * 拉黑/取消拉黑评论
+     * @param commentId 评论id
+     * @param userId 用户id
+     */
+    JsonResult blockComment(Long commentId, Long userId);
+
+    /**
      * 判断评论是否存在
      * @param commentId 评论id
      * @return 是否存在

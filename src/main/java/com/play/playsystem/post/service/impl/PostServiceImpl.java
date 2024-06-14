@@ -147,7 +147,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
             queryWrapper.lambda().eq(UserPostBlock::getPostId, postId).eq(UserPostBlock::getUserId, userId);
             if (userPostBlockMapper.selectOne(queryWrapper) == null) {
                 // 未拉黑 新增拉黑数据
-                UserPostBlock userPostBlock = new UserPostBlock(userId, postId, LocalDateTime.now());
+                UserPostBlock userPostBlock = new UserPostBlock(postId, userId, LocalDateTime.now());
                 if (userPostBlockMapper.insert(userPostBlock) > 0) {
                     // 更新帖子拉黑数
                     if (lambdaUpdate().eq(Post::getId, postId).setSql("post_blocks_num = post_blocks_num + 1").update()) {

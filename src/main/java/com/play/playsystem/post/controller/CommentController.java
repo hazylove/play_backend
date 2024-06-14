@@ -110,4 +110,19 @@ public class CommentController {
             return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
         }
     }
+
+    /**
+     * 拉黑
+     * @param commentId 评论id
+     */
+    @PostMapping("/block/{commentId}")
+    public JsonResult blockPost(@PathVariable Long commentId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (UserCheckUtil.checkAuth(authentication)) {
+            Long userId = Long.valueOf(authentication.getName());
+            return commentService.blockComment(commentId, userId);
+        } else {
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+        }
+    }
 }

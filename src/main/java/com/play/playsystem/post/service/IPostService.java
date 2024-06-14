@@ -55,7 +55,16 @@ public interface IPostService extends IService<Post> {
      */
     PageList<PostVo> getLikePostList(PostQuery postQuery);
 
+    /**
+     * 拉黑/取消拉黑帖子
+     * @param postId 帖子id
+     * @param userId 用户id
+     */
     JsonResult blockPost(Long postId, Long userId);
 
+    /**
+     * 拉黑列表
+     * @param postQuery 查询参数
+     */
     PageList<PostVo> getBlockPostList(PostQuery postQuery);
 }

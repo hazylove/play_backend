@@ -8,14 +8,14 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-@TableName("user_post_block")
-public class UserPostBlock {
+@AllArgsConstructor
+@TableName("user_comment_block")
+public class UserCommentBlock {
     /**
-     * 帖子id
+     * 评论id
      */
-    private Long postId;
+    private Long commentId;
 
     /**
      * 用户id
@@ -23,7 +23,7 @@ public class UserPostBlock {
     private Long userId;
 
     /**
-     * 拉黑时间
+     * 创建时间
      */
     private LocalDateTime createdDate;
 }
