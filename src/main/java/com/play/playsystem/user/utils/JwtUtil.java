@@ -32,13 +32,11 @@ public class JwtUtil {
     public String generateToken(String username) {
 
         Date nowDate = new Date();
-        Date expireDate = new Date(nowDate.getTime() + 1000 * expiration);
 
         return Jwts.builder()
                 .setHeaderParam("typ", "JWT")
                 .setSubject(username)
                 .setIssuedAt(nowDate)
-                .setExpiration(expireDate)    // 过期时间
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
     }
@@ -57,15 +55,6 @@ public class JwtUtil {
         } catch (Exception e) {
             return null;
         }
-    }
-
-    /**
-     * 判断token是否过期
-     * @param claims 认证信息
-     * @return 是否过期
-     */
-    public boolean isTokenExpired(Claims claims) {
-        return claims.getExpiration().before(new Date());
     }
 
 

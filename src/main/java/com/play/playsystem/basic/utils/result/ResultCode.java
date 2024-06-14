@@ -20,6 +20,9 @@ public class ResultCode {
     /**
      * 用户
      */
+    // 用户异常操作
+    public static final int USER_OPERATION_ERROR = 990;
+
     // 验证码错误
     public static final int VERIFICATION_CODE_ERROR_CODE = 1001;
     // 登录信息验证失败
@@ -60,11 +63,6 @@ public class ResultCode {
     // 评论不存在
     public static final int COMMENT_NOT_EXIST = 1151;
 
-    // 异常删除操作
-    public static final int POST_COMMENT_DELETE_ERROR = 1190;
-
-    // 异常拉黑操作
-    public static final int POST_COMMENT_BLOCK_ERROR = 1191;
 
     /**
      * 富文本图片上传返回码
