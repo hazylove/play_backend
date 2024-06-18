@@ -28,7 +28,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         // 根据用户名生成token
         String token = jwtUtil.generateToken(authentication.getName());
-        JsonResult result = new JsonResult().setData(token).setMassage("登录成功");
+        JsonResult result = new JsonResult().setData(token).setMessage("登录成功");
 
         // 将token存入redis，并设置过期时间
         redisUtil.set(TOKEN_REDIS_PREFIX + authentication.getName(), token, jwtUtil.getExpiration());

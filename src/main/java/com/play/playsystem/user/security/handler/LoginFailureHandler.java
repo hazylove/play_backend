@@ -20,9 +20,9 @@ public class LoginFailureHandler implements AuthenticationFailureHandler {
 
         JsonResult result = new JsonResult().setSuccess(false);
         if (exception.getCause() instanceof CaptchaException) {
-            result.setCode(ResultCode.VERIFICATION_CODE_ERROR_CODE).setMassage("验证码错误");
+            result.setCode(ResultCode.VERIFICATION_CODE_ERROR_CODE).setMessage("验证码错误");
         } else {
-            result.setCode(ResultCode.LOGIN_FAILED).setMassage(exception.getLocalizedMessage());
+            result.setCode(ResultCode.LOGIN_FAILED).setMessage(exception.getLocalizedMessage());
         }
 
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);

@@ -49,7 +49,7 @@ public class PostController {
             postService.insert(post);
             return new JsonResult();
         } else {
-            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
         }
     }
 
@@ -65,7 +65,7 @@ public class PostController {
             PostVo postVo = postService.selectById(postId, userId);
             return new JsonResult().setData(postVo);
         }else {
-            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
         }
     }
 
@@ -80,7 +80,7 @@ public class PostController {
             Long userId = Long.valueOf(authentication.getName());
             return postService.deletePost(postId, userId);
         }else {
-            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
         }
     }
 
@@ -95,7 +95,7 @@ public class PostController {
             Long userId = Long.valueOf(authentication.getName());
             return postService.likePost(postId, userId);
         }else {
-            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
         }
     }
 
@@ -111,7 +111,7 @@ public class PostController {
             PageList<PostVo> pageList = postService.getLikePostList(postQuery);
             return new JsonResult().setData(pageList);
         } else {
-            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
         }
     }
 
@@ -126,7 +126,7 @@ public class PostController {
             Long userId = Long.valueOf(authentication.getName());
             return postService.blockPost(postId, userId);
         } else {
-            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
         }
     }
 
@@ -142,7 +142,7 @@ public class PostController {
             PageList<PostVo> pageList = postService.getBlockPostList(postQuery);
             return new JsonResult().setData(pageList);
         } else {
-            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
         }
     }
 
@@ -153,7 +153,7 @@ public class PostController {
             Long userId = Long.valueOf(authentication.getName());
             return postService.collectPost(postId, favoriteId, userId);
         } else {
-            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
         }
     }
 

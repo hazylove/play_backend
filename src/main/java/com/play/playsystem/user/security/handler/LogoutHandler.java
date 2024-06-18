@@ -41,7 +41,7 @@ public class LogoutHandler implements LogoutSuccessHandler {
             }
         }
 
-        JsonResult result = new JsonResult().setMassage("退出成功");
+        JsonResult result = new JsonResult().setMessage("退出成功");
 
         response.setHeader(jwtUtil.getHeader(), "");
         response.setContentType("application/json;charset=UTF-8");

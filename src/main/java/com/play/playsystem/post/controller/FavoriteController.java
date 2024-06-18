@@ -32,7 +32,7 @@ public class FavoriteController {
             favoriteService.insert(favorite);
             return new JsonResult();
         }
-        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
 
     /**
@@ -42,7 +42,7 @@ public class FavoriteController {
     @PostMapping("/update")
     public JsonResult updateFavorite(@RequestBody Favorite favorite) {
         if (favorite.getId() == null) {
-            return new JsonResult().setCode(ResultCode.UNPROCESSABLE_ENTITY).setSuccess(false).setMassage("缺少参数：id");
+            return new JsonResult().setCode(ResultCode.UNPROCESSABLE_ENTITY).setSuccess(false).setMessage("缺少参数：id");
         }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (UserCheckUtil.checkAuth(authentication)) {
@@ -50,7 +50,7 @@ public class FavoriteController {
             favorite.setCreatedId(userId);
             return favoriteService.updateFavorite(favorite, userId);
         }
-        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
 
     /**
@@ -64,6 +64,6 @@ public class FavoriteController {
             Long userId = Long.valueOf(authentication.getName());
             return favoriteService.deleteFavorite(favoriteId, userId);
         }
-        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
 }

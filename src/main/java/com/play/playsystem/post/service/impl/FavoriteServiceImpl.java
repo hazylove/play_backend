@@ -38,7 +38,7 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite> i
         Long createdId = favoriteMapper.getCreatedIdById(favorite.getId());
         // 创建人与当前用户不同，拒绝修改
         if (!Objects.equals(createdId, userId)) {
-            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMassage("异常修改操作");
+            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("异常修改操作");
         }
         favorite.setUpdateDate(LocalDateTime.now());
         if (!updateById(favorite)) {
@@ -54,7 +54,7 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite> i
         Long createdId = favoriteMapper.getCreatedIdById(favoriteId);
         // 创建人与当前用户不同，拒绝删除
         if (!Objects.equals(createdId, userId)) {
-            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMassage("异常删除操作");
+            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("异常删除操作");
         }
         if (favoriteMapper.deleteById(favoriteId) < 0) {
             throw new RuntimeException("删除收藏夹操作异常");

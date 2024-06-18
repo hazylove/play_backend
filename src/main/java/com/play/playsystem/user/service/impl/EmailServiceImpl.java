@@ -97,11 +97,11 @@ public class EmailServiceImpl implements IEmailService {
         JsonResult jsonResult = new JsonResult();
         // 校验邮箱格式
         if (!FormatCheckUtil.validateEmail(email)) {
-            return jsonResult.setCode(ResultCode.EMAIL_FORMAT_ERROR).setSuccess(false).setMassage("邮箱格式不正确");
+            return jsonResult.setCode(ResultCode.EMAIL_FORMAT_ERROR).setSuccess(false).setMessage("邮箱格式不正确");
         }
         // 校验邮箱是否已注册
         if (userService.registerEmailExist(email)) {
-            return jsonResult.setCode(ResultCode.EMAIL_EXISTING).setSuccess(false).setMassage("该邮箱已注册");
+            return jsonResult.setCode(ResultCode.EMAIL_EXISTING).setSuccess(false).setMessage("该邮箱已注册");
         }
 
         // 生成并存储邮箱验证码
@@ -121,7 +121,7 @@ public class EmailServiceImpl implements IEmailService {
         Object userEmail = userService.getOneFieldValueByUserId(userId, User::getEmail);
         // 验证邮箱
         if (!Objects.equals(userEmail, email)){
-            return jsonResult.setSuccess(false).setCode(ResultCode.EMAIL_CHECK_FAILED).setMassage("邮箱验证失败");
+            return jsonResult.setSuccess(false).setCode(ResultCode.EMAIL_CHECK_FAILED).setMessage("邮箱验证失败");
         }
 
         // 生成并存储邮箱验证码
@@ -141,11 +141,11 @@ public class EmailServiceImpl implements IEmailService {
 
         // 校验邮箱格式
         if (!FormatCheckUtil.validateEmail(email)) {
-            return jsonResult.setCode(ResultCode.EMAIL_FORMAT_ERROR).setSuccess(false).setMassage("邮箱格式不正确");
+            return jsonResult.setCode(ResultCode.EMAIL_FORMAT_ERROR).setSuccess(false).setMessage("邮箱格式不正确");
         }
         // 校验邮箱是否已注册
         if (!userService.registerEmailExist(email)) {
-            return jsonResult.setCode(ResultCode.EMAIL_NOT_REGISTER).setSuccess(false).setMassage("该邮箱未注册");
+            return jsonResult.setCode(ResultCode.EMAIL_NOT_REGISTER).setSuccess(false).setMessage("该邮箱未注册");
         }
 
         // 生成并存储邮箱验证码

@@ -43,7 +43,7 @@ public class EmailController {
             Long userId = Long.valueOf(authentication.getName());
             return emailService.sendChangeCode(userId, email);
         }
-        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
 
     /**

@@ -37,7 +37,7 @@ public class CommentController {
             PageList<MainCommentVo> pageList = commentService.getMainCommentList(commentQuery);
             return new JsonResult().setData(pageList);
         } else {
-            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
         }
     }
 
@@ -55,7 +55,7 @@ public class CommentController {
             PageList<SubCommentVo> pageList = commentService.getSubCommentList(commentQuery);
             return new JsonResult().setData(pageList);
         } else {
-            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
         }
     }
 
@@ -72,7 +72,7 @@ public class CommentController {
             commentService.insert(comment);
             return new JsonResult();
         } else {
-            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
         }
     }
 
@@ -87,7 +87,7 @@ public class CommentController {
             Long userId = Long.valueOf(authentication.getName());
             return commentService.deleteComment(commentId, userId);
         } else {
-            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
         }
     }
 
@@ -102,7 +102,7 @@ public class CommentController {
             Long userId = Long.valueOf(authentication.getName());
             return commentService.likeComment(commentId, userId);
         }else {
-            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
         }
     }
 
@@ -117,7 +117,7 @@ public class CommentController {
             Long userId = Long.valueOf(authentication.getName());
             return commentService.blockComment(commentId, userId);
         } else {
-            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
         }
     }
 }

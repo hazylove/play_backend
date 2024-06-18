@@ -67,27 +67,27 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         JsonResult jsonResult = new JsonResult();
         // 校验用户名格式
         if (UserCheckUtil.isInvalidUsername(userRegistrationDto.getUsername()) && FormatCheckUtil.validateEmail(userRegistrationDto.getUsername())) {
-            return jsonResult.setSuccess(false).setCode(ResultCode.USERNAME_FORMAT_ERROR).setMassage("用户名格式不正确");
+            return jsonResult.setSuccess(false).setCode(ResultCode.USERNAME_FORMAT_ERROR).setMessage("用户名格式不正确");
         }
         // 校验手机号格式
         if (userRegistrationDto.getPhone() !=  null && !userRegistrationDto.getPhone().isEmpty() && !FormatCheckUtil.validatePhone(userRegistrationDto.getPhone())) {
-            return jsonResult.setSuccess(false).setCode(ResultCode.PHONE_FORMAT_ERROR).setMassage("手机号格式不正确");
+            return jsonResult.setSuccess(false).setCode(ResultCode.PHONE_FORMAT_ERROR).setMessage("手机号格式不正确");
         }
         // 检查两次输入密码
         if (!Objects.equals(userRegistrationDto.getPassword1(), userRegistrationDto.getPassword2())){
-            return jsonResult.setSuccess(false).setCode(ResultCode.TWICE_PASSWORD_INCONSISTENT).setMassage("两次输入密码不一致");
+            return jsonResult.setSuccess(false).setCode(ResultCode.TWICE_PASSWORD_INCONSISTENT).setMessage("两次输入密码不一致");
         }
         // 检查用户名是否存在
         if (registerUsernameExist(userRegistrationDto.getUsername())){
-            return jsonResult.setSuccess(false).setCode(ResultCode.USERNAME_EXISTING).setMassage("用户名已存在");
+            return jsonResult.setSuccess(false).setCode(ResultCode.USERNAME_EXISTING).setMessage("用户名已存在");
         }
         // 检查邮箱是否已注册
         if (registerEmailExist(userRegistrationDto.getEmail())) {
-            return new JsonResult().setCode(ResultCode.EMAIL_EXISTING).setSuccess(false).setMassage("该邮箱已注册");
+            return new JsonResult().setCode(ResultCode.EMAIL_EXISTING).setSuccess(false).setMessage("该邮箱已注册");
         }
         // 校验邮箱验证码
         if (userCheckUtil.isInvalidEmailCode(userRegistrationDto.getEmail(), userRegistrationDto.getEmailCode())) {
-            return jsonResult.setSuccess(false).setCode(ResultCode.EMAIL_CODE_ERROR).setMassage("邮箱验证码错误");
+            return jsonResult.setSuccess(false).setCode(ResultCode.EMAIL_CODE_ERROR).setMessage("邮箱验证码错误");
         }
         // 创建用户
         User user = new User(
@@ -106,7 +106,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         );
         userMapper.insert(user);
 
-        return jsonResult.setMassage("注册成功");
+        return jsonResult.setMessage("注册成功");
     }
 
     @Override
@@ -116,11 +116,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         String email = (String) getOneFieldValueByUserId(changePasswordDto.getId(), User::getEmail);
         // 检查两次输入密码
         if (!Objects.equals(changePasswordDto.getNewPassword1(), changePasswordDto.getNewPassword2())){
-            return jsonResult.setSuccess(false).setCode(ResultCode.TWICE_PASSWORD_INCONSISTENT).setMassage("两次输入密码不一致");
+            return jsonResult.setSuccess(false).setCode(ResultCode.TWICE_PASSWORD_INCONSISTENT).setMessage("两次输入密码不一致");
         }
         // 校验邮箱验证码
         if (userCheckUtil.isInvalidEmailCode(email, changePasswordDto.getEmailCode())) {
-            return jsonResult.setSuccess(false).setCode(ResultCode.EMAIL_CODE_ERROR).setMassage("邮箱验证码错误");
+            return jsonResult.setSuccess(false).setCode(ResultCode.EMAIL_CODE_ERROR).setMessage("邮箱验证码错误");
         }
         // 修改密码
         UpdateWrapper<User> updateWrapper = new UpdateWrapper<>();
@@ -133,7 +133,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         String username = (String) getOneFieldValueByUserId(changePasswordDto.getId(), User::getUsername);
         redisUtil.del(AuthConstant.TOKEN_REDIS_PREFIX + username, email);
 
-        return jsonResult.setMassage("修改成功");
+        return jsonResult.setMessage("修改成功");
     }
 
     @Override
@@ -185,13 +185,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         // 检查文件大小
         if (avatarImage.getSize() > avatarMaxSize) {
-            return jsonResult.setSuccess(false).setCode(ResultCode.AVATAR_SIZE_TOO_LARGE).setMassage("头像大小超出限制：" + avatarMaxSize / 1024 + "KB");
+            return jsonResult.setSuccess(false).setCode(ResultCode.AVATAR_SIZE_TOO_LARGE).setMessage("头像大小超出限制：" + avatarMaxSize / 1024 + "KB");
         }
         //根据文件扩展名得到文件类型
         String fileType = MyFileUtil.getFileType(FileUtil.extName(avatarImage.getOriginalFilename()));
         // 判断文件类型
         if (!fileType.equals("image")) {
-            return jsonResult.setSuccess(false).setCode(ResultCode.AVATAR_TYPE_ERROR).setMassage("文件类型错误");
+            return jsonResult.setSuccess(false).setCode(ResultCode.AVATAR_TYPE_ERROR).setMessage("文件类型错误");
         }
         // 删除原头像数据及文件
         String oldAvatarUrl = (String) getOneFieldValueByUserId(userId, User::getAvatar);

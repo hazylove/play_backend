@@ -114,7 +114,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     public JsonResult likeComment(Long commentId, Long userId) {
         JsonResult jsonResult = new JsonResult();
         if (commentId == null || !commentExists(commentId)) {
-            return jsonResult.setCode(ResultCode.COMMENT_NOT_EXIST).setSuccess(false).setMassage("评论不存在");
+            return jsonResult.setCode(ResultCode.COMMENT_NOT_EXIST).setSuccess(false).setMessage("评论不存在");
         }
 
         Lock lock = likeBlockLocks.computeIfAbsent(commentId, k -> new ReentrantLock());
@@ -158,8 +158,11 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         } finally {
             // 解锁
             lock.unlock();
-            // 移除锁对象
-            likeBlockLocks.remove(commentId);
+            synchronized (likeBlockLocks) {
+                if (((ReentrantLock) lock).getQueueLength() == 0) {
+                    likeBlockLocks.remove(commentId);
+                }
+            }
         }
     }
 
@@ -168,7 +171,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     public JsonResult blockComment(Long commentId, Long userId) {
         JsonResult jsonResult = new JsonResult();
         if (commentId == null || !commentExists(commentId)) {
-            return jsonResult.setCode(ResultCode.COMMENT_NOT_EXIST).setSuccess(false).setMassage("评论不存在");
+            return jsonResult.setCode(ResultCode.COMMENT_NOT_EXIST).setSuccess(false).setMessage("评论不存在");
         }
 
         Lock lock = likeBlockLocks.computeIfAbsent(commentId, k -> new ReentrantLock());
@@ -210,8 +213,13 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
                 }
             }
         } finally {
+            // 解锁
             lock.unlock();
-            likeBlockLocks.remove(commentId);
+            synchronized (likeBlockLocks) {
+                if (((ReentrantLock) lock).getQueueLength() == 0) {
+                    likeBlockLocks.remove(commentId);
+                }
+            }
         }
         return null;
     }
@@ -237,7 +245,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             commentMapper.deleteById(commentId);
             return jsonResult;
         } else {
-            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMassage("异常删除操作");
+            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("异常删除操作");
         }
     }
 

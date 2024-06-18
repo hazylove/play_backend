@@ -44,7 +44,7 @@ public class UserController {
             Long userId = Long.valueOf(authentication.getName());
             return userService.changeAvatar(userId, avatarImage);
         }
-        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
 
     /**
@@ -62,7 +62,7 @@ public class UserController {
             // 修改密码
             return userService.changePassword(changePasswordDto);
         }
-        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
 
     @GetMapping("/details")
@@ -73,6 +73,6 @@ public class UserController {
             Long userId = Long.valueOf(authentication.getName());
             return jsonResult.setData(userService.getUserDetails(userId));
         }
-        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
 }

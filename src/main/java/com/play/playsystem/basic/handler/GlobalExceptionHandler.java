@@ -31,7 +31,7 @@ public class GlobalExceptionHandler {
     public JsonResult handleException(Exception e, HttpServletRequest request) {
         String requestUrl = request.getRequestURL().toString();
         log.error("接口：{}：发生异常", requestUrl, e);
-        return new JsonResult().setCode(ResultCode.ERROR_CODE).setSuccess(false).setMassage("服务器错误：" + e.getMessage());
+        return new JsonResult().setCode(ResultCode.ERROR_CODE).setSuccess(false).setMessage("服务器错误：" + e.getMessage());
     }
 
     /**
@@ -53,7 +53,7 @@ public class GlobalExceptionHandler {
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
             errorMap.put(fieldError.getField(), fieldError.getDefaultMessage());
         }
-        return new JsonResult().setCode(ResultCode.UNPROCESSABLE_ENTITY).setSuccess(false).setMassage("参数校验失败" + e.getMessage()).setData(errorMap);
+        return new JsonResult().setCode(ResultCode.UNPROCESSABLE_ENTITY).setSuccess(false).setMessage("参数校验失败" + e.getMessage()).setData(errorMap);
     }
 
     /**
@@ -75,7 +75,7 @@ public class GlobalExceptionHandler {
         for (FieldError fieldError : bindingResult.getFieldErrors()) {
             errorMap.put(fieldError.getField(), fieldError.getDefaultMessage());
         }
-        return new JsonResult().setCode(ResultCode.BAD_REQUEST_CODE).setSuccess(false).setMassage("参数绑定失败" + e.getMessage()).setData(errorMap);
+        return new JsonResult().setCode(ResultCode.BAD_REQUEST_CODE).setSuccess(false).setMessage("参数绑定失败" + e.getMessage()).setData(errorMap);
     }
 
     /**
@@ -91,6 +91,6 @@ public class GlobalExceptionHandler {
     public JsonResult handleHttpMessageNotReadableException(HttpMessageNotReadableException e, HttpServletRequest request) {
         String requestUrl = request.getRequestURL().toString();
         log.error("接口：{}：请求体解析失败", requestUrl, e);
-        return new JsonResult().setCode(ResultCode.BAD_REQUEST_CODE).setSuccess(false).setMassage("请求体解析失败" + e.getMessage());
+        return new JsonResult().setCode(ResultCode.BAD_REQUEST_CODE).setSuccess(false).setMessage("请求体解析失败" + e.getMessage());
     }
 }

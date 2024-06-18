@@ -5,13 +5,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.play.playsystem.basic.utils.dto.PageList;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.basic.utils.result.ResultCode;
-import com.play.playsystem.post.domain.entity.Post;
-import com.play.playsystem.post.domain.entity.UserPostBlock;
-import com.play.playsystem.post.domain.entity.UserPostFavorite;
-import com.play.playsystem.post.domain.entity.UserPostLike;
+import com.play.playsystem.post.domain.entity.*;
 import com.play.playsystem.post.domain.query.PostQuery;
 import com.play.playsystem.post.domain.vo.PostVo;
 import com.play.playsystem.post.mapper.*;
+import com.play.playsystem.post.service.IFavoriteService;
 import com.play.playsystem.post.service.IPostService;
 import com.play.playsystem.user.domain.vo.UserCreatedVo;
 import com.play.playsystem.user.service.IUserService;
@@ -47,11 +45,15 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     @Autowired
     private UserPostFavoriteMapper userPostFavoriteMapper;
 
+    @Autowired
+    private IFavoriteService favoriteService;
+
     // 点赞、拉黑锁
     private static final ConcurrentHashMap<Long, Lock> likeBlockLocks = new ConcurrentHashMap<>();
 
     // 收藏锁
-    private static final ConcurrentHashMap<Long, Lock> favoriteLocks = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Long, Lock> collectPostLocks = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Long, Lock> collectFavoriteLocks = new ConcurrentHashMap<>();
 
     @Override
     public PageList<PostVo> getPostList(PostQuery postQuery) {
@@ -84,7 +86,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     public JsonResult likePost(Long postId, Long userId) {
         JsonResult jsonResult = new JsonResult();
         if (postId == null || postNotExists(postId)) {
-            return jsonResult.setCode(ResultCode.POST_NOT_EXIST).setSuccess(false).setMassage("帖子不存在");
+            return jsonResult.setCode(ResultCode.POST_NOT_EXIST).setSuccess(false).setMessage("帖子不存在");
         }
 
         Lock lock = likeBlockLocks.computeIfAbsent(postId, k -> new ReentrantLock());
@@ -127,7 +129,11 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         } finally {
             // 解锁
             lock.unlock();
-            likeBlockLocks.remove(postId);
+            synchronized (likeBlockLocks) {
+                if (((ReentrantLock) lock).getQueueLength() == 0) {
+                    likeBlockLocks.remove(postId);
+                }
+            }
         }
     }
 
@@ -136,12 +142,12 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     public JsonResult blockPost(Long postId, Long userId) {
         JsonResult jsonResult = new JsonResult();
         if (postId == null || postNotExists(postId)) {
-            return jsonResult.setCode(ResultCode.POST_NOT_EXIST).setSuccess(false).setMassage("帖子不存在");
+            return jsonResult.setCode(ResultCode.POST_NOT_EXIST).setSuccess(false).setMessage("帖子不存在");
         }
 
         Long createdId = postMapper.getCreatedIdById(postId);
         if (Objects.equals(createdId, userId)) {
-            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMassage("拉黑操作异常");
+            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("拉黑操作异常");
         }
 
         Lock lock = likeBlockLocks.computeIfAbsent(postId, k -> new ReentrantLock());
@@ -184,7 +190,11 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
             }
         } finally {
             lock.unlock();
-            likeBlockLocks.remove(postId);
+            synchronized (likeBlockLocks) {
+                if (((ReentrantLock) lock).getQueueLength() == 0) {
+                    likeBlockLocks.remove(postId);
+                }
+            }
         }
         return null;
     }
@@ -207,7 +217,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         if (postMapper.delete(queryWrapper) > 0) {
             return jsonResult;
         } else {
-            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMassage("异常删除操作");
+            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("异常删除操作");
         }
     }
 
@@ -232,21 +242,24 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public JsonResult collectPost(Long postId, Long favoriteId, Long userId) {
         JsonResult jsonResult = new JsonResult();
         if (postId == null || postNotExists(postId)) {
-            return jsonResult.setCode(ResultCode.POST_NOT_EXIST).setSuccess(false).setMassage("帖子不存在");
+            return jsonResult.setCode(ResultCode.POST_NOT_EXIST).setSuccess(false).setMessage("帖子不存在");
         }
 
         Long favoriteCreatedId = favoriteMapper.getCreatedIdById(favoriteId);
         if (!Objects.equals(favoriteCreatedId, userId)) {
-            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMassage("收藏操作异常");
+            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("收藏操作异常");
         }
 
-        Lock lock = favoriteLocks.computeIfAbsent(postId, k -> new ReentrantLock());
+        Lock collectFavoriteLock = collectFavoriteLocks.computeIfAbsent(favoriteId, k -> new ReentrantLock());
+        Lock collectPostLock = collectPostLocks.computeIfAbsent(postId, k -> new ReentrantLock());
 
         // 加锁
-        lock.lock();
+        collectFavoriteLock.lock();
+        collectPostLock.lock();
         try {
             // 查询是否已收藏
             QueryWrapper<UserPostFavorite> favoriteQueryWrapper = new QueryWrapper<>();
@@ -256,7 +269,10 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
                 UserPostFavorite userPostFavorite = new UserPostFavorite(postId, userId, favoriteId, LocalDateTime.now());
                 if (userPostFavoriteMapper.insert(userPostFavorite) > 0) {
                     // 更新帖子收藏数
-                    if (lambdaUpdate().eq(Post::getId, postId).setSql("post_favorites_num = post_favorites_num + 1").update()) {
+                    boolean updatePostFavoritesNumResult = lambdaUpdate().eq(Post::getId, postId).setSql("post_favorites_num = post_favorites_num + 1").update();
+                    // 更新收藏夹帖子数
+                    boolean updateFavoritePostNumResult = favoriteService.lambdaUpdate().eq(Favorite::getId, favoriteId).setSql("post_num = post_num + 1").update();
+                    if (updatePostFavoritesNumResult && updateFavoritePostNumResult) {
                         return jsonResult;
                     }
                 }
@@ -265,7 +281,10 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
                 // 已收藏
                 if (userPostFavoriteMapper.delete(favoriteQueryWrapper) > 0) {
                     // 更新帖子收藏数
-                    if (lambdaUpdate().eq(Post::getId, postId).gt(Post::getPostFavoritesNum, 0).setSql("post_favorites_num = post_favorites_num - 1").update()) {
+                    boolean updatePostFavoritesNumResult = lambdaUpdate().eq(Post::getId, postId).gt(Post::getPostFavoritesNum, 0).setSql("post_favorites_num = post_favorites_num - 1").update();
+                    // 更新收藏夹帖子数
+                    boolean updateFavoritePostNumResult = favoriteService.lambdaUpdate().eq(Favorite::getId, favoriteId).gt(Favorite::getPostNum, 0).setSql("post_num = post_num - 1").update();
+                    if (updatePostFavoritesNumResult && updateFavoritePostNumResult) {
                         return jsonResult;
                     }
                 }
@@ -274,8 +293,21 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
 
         }
         finally {
-            lock.unlock();
-            favoriteLocks.remove(postId);
+            try {
+                collectFavoriteLock.unlock();
+                synchronized (collectFavoriteLocks) {
+                    if (((ReentrantLock) collectFavoriteLock).getQueueLength() == 0) {
+                        collectFavoriteLocks.remove(postId);
+                    }
+                }
+            } finally {
+                collectPostLock.unlock();
+                synchronized (collectPostLocks) {
+                    if (((ReentrantLock) collectPostLock).getQueueLength() == 0) {
+                        collectPostLocks.remove(postId);
+                    }
+                }
+            }
         }
     }
 
@@ -291,7 +323,6 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         });
         return new PageList<>(total, postVoList);
     }
-
 }
 
 
