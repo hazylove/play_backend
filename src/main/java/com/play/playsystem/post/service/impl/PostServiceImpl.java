@@ -42,7 +42,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     @Autowired
     private UserPostBlockMapper userPostBlockMapper;
 
-    private static final ConcurrentHashMap<String, Lock> likeBlockLocks = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Long, Lock> likeBlockLocks = new ConcurrentHashMap<>();
 
     @Override
     public PageList<PostVo> getPostList(PostQuery postQuery) {
@@ -78,8 +78,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
             return jsonResult.setCode(ResultCode.POST_NOT_EXIST).setSuccess(false).setMassage("帖子不存在");
         }
 
-        String key = generateKey(userId, postId);
-        Lock lock = likeBlockLocks.computeIfAbsent(key, k -> new ReentrantLock());
+        Lock lock = likeBlockLocks.computeIfAbsent(postId, k -> new ReentrantLock());
 
         // 锁定
         lock.lock();
@@ -119,7 +118,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         } finally {
             // 解锁
             lock.unlock();
-            likeBlockLocks.remove(key);
+            likeBlockLocks.remove(postId);
         }
     }
 
@@ -136,8 +135,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
             return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMassage("拉黑操作异常");
         }
 
-        String key = generateKey(userId, postId);
-        Lock lock = likeBlockLocks.computeIfAbsent(key, k -> new ReentrantLock());
+        Lock lock = likeBlockLocks.computeIfAbsent(postId, k -> new ReentrantLock());
 
         // 加锁
         lock.lock();
@@ -177,7 +175,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
             }
         } finally {
             lock.unlock();
-            likeBlockLocks.remove(key);
+            likeBlockLocks.remove(postId);
         }
         return null;
     }
@@ -237,10 +235,6 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         return new PageList<>(total, postVoList);
     }
 
-    // 生成复合键
-    private static String generateKey(Long userId, Long commentId) {
-        return userId + "_" + commentId;
-    }
 }
 
 

@@ -51,7 +51,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
     @Autowired
     private PostMapper postMapper;
 
-    private static final ConcurrentHashMap<String, Lock> likeBlockLocks = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<Long, Lock> likeBlockLocks = new ConcurrentHashMap<>();
 
     @Override
     @Transactional
@@ -117,8 +117,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             return jsonResult.setCode(ResultCode.COMMENT_NOT_EXIST).setSuccess(false).setMassage("评论不存在");
         }
 
-        String key = generateKey(userId, commentId);
-        Lock lock = likeBlockLocks.computeIfAbsent(key, k -> new ReentrantLock());
+        Lock lock = likeBlockLocks.computeIfAbsent(commentId, k -> new ReentrantLock());
 
         // 锁定
         lock.lock();
@@ -160,7 +159,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             // 解锁
             lock.unlock();
             // 移除锁对象
-            likeBlockLocks.remove(key);
+            likeBlockLocks.remove(commentId);
         }
     }
 
@@ -172,8 +171,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             return jsonResult.setCode(ResultCode.COMMENT_NOT_EXIST).setSuccess(false).setMassage("评论不存在");
         }
 
-        String key = generateKey(userId, commentId);
-        Lock lock = likeBlockLocks.computeIfAbsent(key, k -> new ReentrantLock());
+        Lock lock = likeBlockLocks.computeIfAbsent(commentId, k -> new ReentrantLock());
 
         // 锁定
         lock.lock();
@@ -213,7 +211,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
             }
         } finally {
             lock.unlock();
-            likeBlockLocks.remove(key);
+            likeBlockLocks.remove(commentId);
         }
         return null;
     }
@@ -250,8 +248,4 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
         return userCreatedVo;
     }
 
-    // 生成复合键
-    private static String generateKey(Long userId, Long commentId) {
-        return userId + "_" + commentId;
-    }
 }
