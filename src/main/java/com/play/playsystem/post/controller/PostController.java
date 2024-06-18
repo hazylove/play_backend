@@ -124,9 +124,7 @@ public class PostController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (UserCheckUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
-            synchronized (String.valueOf(userId).intern()) {
-                return postService.blockPost(postId, userId);
-            }
+            return postService.blockPost(postId, userId);
         } else {
             return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
         }
@@ -147,6 +145,19 @@ public class PostController {
             return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
         }
     }
+
+    @PostMapping("/collect")
+    public JsonResult collectPost(@RequestParam Long postId, @RequestParam Long favoriteId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (UserCheckUtil.checkAuth(authentication)) {
+            Long userId = Long.valueOf(authentication.getName());
+            return postService.collectPost(postId, favoriteId, userId);
+        } else {
+            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMassage("未认证用户！");
+        }
+    }
+
+
     @GetMapping("/hello")
     public String hello() {
         return "Hello Word!";

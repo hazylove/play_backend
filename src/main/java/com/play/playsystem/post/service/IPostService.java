@@ -36,11 +36,11 @@ public interface IPostService extends IService<Post> {
     JsonResult likePost(Long postId, Long userId);
 
     /**
-     * 检查帖子是否存在
+     * 检查帖子是否不存在
      * @param postId 帖子id
-     * @return 是否存在
+     * @return 是否不存在
      */
-    boolean postExists(Long postId);
+    boolean postNotExists(Long postId);
 
     /**
      * 根据创建人、帖子id删除帖子
@@ -67,4 +67,6 @@ public interface IPostService extends IService<Post> {
      * @param postQuery 查询参数
      */
     PageList<PostVo> getBlockPostList(PostQuery postQuery);
+
+    JsonResult collectPost(Long postId, Long favoriteId, Long userId);
 }

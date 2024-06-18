@@ -7,12 +7,11 @@ import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.basic.utils.result.ResultCode;
 import com.play.playsystem.post.domain.entity.Post;
 import com.play.playsystem.post.domain.entity.UserPostBlock;
+import com.play.playsystem.post.domain.entity.UserPostFavorite;
 import com.play.playsystem.post.domain.entity.UserPostLike;
 import com.play.playsystem.post.domain.query.PostQuery;
 import com.play.playsystem.post.domain.vo.PostVo;
-import com.play.playsystem.post.mapper.PostMapper;
-import com.play.playsystem.post.mapper.UserPostBlockMapper;
-import com.play.playsystem.post.mapper.UserPostLikeMapper;
+import com.play.playsystem.post.mapper.*;
 import com.play.playsystem.post.service.IPostService;
 import com.play.playsystem.user.domain.vo.UserCreatedVo;
 import com.play.playsystem.user.service.IUserService;
@@ -42,7 +41,17 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     @Autowired
     private UserPostBlockMapper userPostBlockMapper;
 
+    @Autowired
+    private FavoriteMapper favoriteMapper;
+
+    @Autowired
+    private UserPostFavoriteMapper userPostFavoriteMapper;
+
+    // 点赞、拉黑锁
     private static final ConcurrentHashMap<Long, Lock> likeBlockLocks = new ConcurrentHashMap<>();
+
+    // 收藏锁
+    private static final ConcurrentHashMap<Long, Lock> favoriteLocks = new ConcurrentHashMap<>();
 
     @Override
     public PageList<PostVo> getPostList(PostQuery postQuery) {
@@ -74,7 +83,7 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     @Transactional(rollbackFor = Exception.class)
     public JsonResult likePost(Long postId, Long userId) {
         JsonResult jsonResult = new JsonResult();
-        if (postId == null || !postExists(postId)) {
+        if (postId == null || postNotExists(postId)) {
             return jsonResult.setCode(ResultCode.POST_NOT_EXIST).setSuccess(false).setMassage("帖子不存在");
         }
 
@@ -126,11 +135,11 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     @Transactional(rollbackFor = Exception.class)
     public JsonResult blockPost(Long postId, Long userId) {
         JsonResult jsonResult = new JsonResult();
-        if (postId == null || !postExists(postId)) {
+        if (postId == null || postNotExists(postId)) {
             return jsonResult.setCode(ResultCode.POST_NOT_EXIST).setSuccess(false).setMassage("帖子不存在");
         }
 
-        Long createdId = postMapper.getCreatedIdByPostId(postId);
+        Long createdId = postMapper.getCreatedIdById(postId);
         if (Objects.equals(createdId, userId)) {
             return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMassage("拉黑操作异常");
         }
@@ -181,10 +190,10 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     }
 
     @Override
-    public boolean postExists(Long postId) {
+    public boolean postNotExists(Long postId) {
         QueryWrapper<Post> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(Post::getId, postId);
-        return postMapper.selectOne(queryWrapper) != null;
+        return postMapper.selectOne(queryWrapper) == null;
     }
 
     @Override
@@ -220,6 +229,54 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         List<PostVo> postVoList = postMapper.getBlockPostList(postQuery);
         // 设置创建人
         return setPostVoCreator(total, postVoList);
+    }
+
+    @Override
+    public JsonResult collectPost(Long postId, Long favoriteId, Long userId) {
+        JsonResult jsonResult = new JsonResult();
+        if (postId == null || postNotExists(postId)) {
+            return jsonResult.setCode(ResultCode.POST_NOT_EXIST).setSuccess(false).setMassage("帖子不存在");
+        }
+
+        Long favoriteCreatedId = favoriteMapper.getCreatedIdById(favoriteId);
+        if (!Objects.equals(favoriteCreatedId, userId)) {
+            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMassage("收藏操作异常");
+        }
+
+        Lock lock = favoriteLocks.computeIfAbsent(postId, k -> new ReentrantLock());
+
+        // 加锁
+        lock.lock();
+        try {
+            // 查询是否已收藏
+            QueryWrapper<UserPostFavorite> favoriteQueryWrapper = new QueryWrapper<>();
+            favoriteQueryWrapper.lambda().eq(UserPostFavorite::getPostId, postId).eq(UserPostFavorite::getFavoriteId, favoriteId);
+            if (userPostFavoriteMapper.selectOne(favoriteQueryWrapper) == null) {
+                // 未收藏
+                UserPostFavorite userPostFavorite = new UserPostFavorite(postId, userId, favoriteId, LocalDateTime.now());
+                if (userPostFavoriteMapper.insert(userPostFavorite) > 0) {
+                    // 更新帖子收藏数
+                    if (lambdaUpdate().eq(Post::getId, postId).setSql("post_favorites_num = post_favorites_num + 1").update()) {
+                        return jsonResult;
+                    }
+                }
+                throw new RuntimeException("帖子收藏操作数据异常");
+            } else {
+                // 已收藏
+                if (userPostFavoriteMapper.delete(favoriteQueryWrapper) > 0) {
+                    // 更新帖子收藏数
+                    if (lambdaUpdate().eq(Post::getId, postId).gt(Post::getPostFavoritesNum, 0).setSql("post_favorites_num = post_favorites_num - 1").update()) {
+                        return jsonResult;
+                    }
+                }
+                throw new RuntimeException("帖子取消收藏操作数据异常");
+            }
+
+        }
+        finally {
+            lock.unlock();
+            favoriteLocks.remove(postId);
+        }
     }
 
     private PageList<PostVo> setPostVoCreator(Long total, List<PostVo> postVoList) {

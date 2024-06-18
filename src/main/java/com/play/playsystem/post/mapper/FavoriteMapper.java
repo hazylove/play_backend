@@ -7,8 +7,6 @@ import org.apache.ibatis.annotations.Select;
 
 @Mapper
 public interface FavoriteMapper extends BaseMapper<Favorite> {
-    @Select("SELECT created_id " +
-            "FROM t_favorite " +
-            "WHERE id = #{favoriteId}")
-    Long getCreatedIdByFavoriteId(Long favoriteId);
+    @Select("SELECT created_id FROM t_favorite WHERE id = #{favoriteId}")
+    Long getCreatedIdById(Long favoriteId);
 }

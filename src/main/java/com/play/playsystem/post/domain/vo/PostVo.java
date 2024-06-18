@@ -37,6 +37,10 @@ public class PostVo {
      */
     private int postBlocksNum;
 
+    /**
+     * 收藏数
+     */
+    private int postFavoritesNum;
 
     /**
      * 创建人id
@@ -68,4 +72,9 @@ public class PostVo {
      * 当前用户是否拉黑
      */
     private boolean userBlocked;
+
+    /**
+     * 当前用户是否收藏
+     */
+    private boolean userFavorited;
 }

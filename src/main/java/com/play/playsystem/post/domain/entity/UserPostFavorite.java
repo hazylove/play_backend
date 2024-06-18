@@ -15,17 +15,17 @@ public class UserPostFavorite {
     /**
      * 帖子id
      */
-    private Long post_id;
+    private Long postId;
 
     /**
      * 用户id
      */
-    private Long user_id;
+    private Long userId;
 
     /**
      * 收藏夹id
      */
-    private Long favorite_id;
+    private Long favoriteId;
 
     /**
      * 收藏时间

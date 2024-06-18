@@ -35,7 +35,7 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite> i
     public JsonResult updateFavorite(Favorite favorite, Long userId) {
         JsonResult jsonResult = new JsonResult();
         // 查询创建人
-        Long createdId = favoriteMapper.getCreatedIdByFavoriteId(favorite.getId());
+        Long createdId = favoriteMapper.getCreatedIdById(favorite.getId());
         // 创建人与当前用户不同，拒绝修改
         if (!Objects.equals(createdId, userId)) {
             return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMassage("异常修改操作");
@@ -51,7 +51,7 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite> i
     public JsonResult deleteFavorite(Long favoriteId, Long userId) {
         JsonResult jsonResult = new JsonResult();
         // 查询创建人
-        Long createdId = favoriteMapper.getCreatedIdByFavoriteId(favoriteId);
+        Long createdId = favoriteMapper.getCreatedIdById(favoriteId);
         // 创建人与当前用户不同，拒绝删除
         if (!Objects.equals(createdId, userId)) {
             return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMassage("异常删除操作");

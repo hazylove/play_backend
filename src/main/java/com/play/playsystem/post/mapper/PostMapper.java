@@ -28,10 +28,8 @@ public interface PostMapper extends BaseMapper<Post> {
             "WHERE tc.id = #{commentId}")
     Long getCratedIdByCommentId(Long commentId);
 
-    @Select("SELECT post_created_id " +
-            "FROM t_post " +
-            "WHERE id = #{postId}")
-    Long getCreatedIdByPostId(Long postId);
+    @Select("SELECT post_created_id FROM t_post WHERE id = #{postId}")
+    Long getCreatedIdById(Long postId);
 
     Long countBlockPost(PostQuery postQuery);
 

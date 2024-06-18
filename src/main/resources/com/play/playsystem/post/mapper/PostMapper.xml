@@ -14,9 +14,11 @@
             p.post_content,
             p.post_likes_num,
             p.post_blocks_num,
+            p.post_favorites_num,
             (select count(*) from t_comment c where c.comment_post_id = p.id) as comment_count,
             (select count(*) from user_post_like upl where upl.post_id = p.id and upl.user_id = #{userId}) as user_liked,
             0 as user_blocked,
+            (select count(*) from user_post_favorite upf where upf.post_id = p.id and upf.user_id = #{userId}) as user_favorited,
             p.post_created_id,
             p.post_created_date
         from t_post p
@@ -33,9 +35,11 @@
             p.post_content,
             p.post_likes_num,
             p.post_blocks_num,
+            p.post_favorites_num,
             (select count(*) from t_comment c where c.comment_post_id = p.id) as comment_count,
             (select count(*) from user_post_like upl where upl.post_id = p.id and upl.user_id = #{userId}) as user_liked,
             (select count(*) from user_post_block upb where upb.post_id = p.id and upb.user_id = #{userId}) as user_blocked,
+            (select count(*) from user_post_favorite upf where upf.post_id = p.id and upf.user_id = #{userId}) as user_favorited,
             p.post_created_id,
             p.post_created_date
         from t_post p
@@ -55,9 +59,11 @@
             p.post_content,
             p.post_likes_num,
             p.post_blocks_num,
+            p.post_favorites_num,
             (select count(*) from t_comment c where c.comment_post_id = p.id) as comment_count,
             1 as user_liked,
             0 as user_blocked,
+            (select count(*) from user_post_favorite upf where upf.post_id = p.id and upf.user_id = #{userId}) as user_favorited,
             p.post_created_id,
             p.post_created_date
         from t_post p
@@ -89,9 +95,11 @@
             p.post_content,
             p.post_likes_num,
             p.post_blocks_num,
+            p.post_favorites_num,
             (select count(*) from t_comment c where c.comment_post_id = p.id) as comment_count,
             0 as user_liked,
             1 as user_blocked,
+            (select count(*) from user_post_favorite upf where upf.post_id = p.id and upf.user_id = #{userId}) as user_favorited,
             p.post_created_id,
             p.post_created_date
         from t_post p
@@ -136,8 +144,10 @@
         <result property="postContent" column="post_content"/>
         <result property="postLikesNum" column="post_likes_num"/>
         <result property="postBlocksNum" column="post_blocks_num"/>
+        <result property="postFavoritesNum" column="post_favorites_num"/>
         <result property="userLiked" column="user_liked"/>
         <result property="userBlocked" column="user_blocked"/>
+        <result property="userFavorited" column="user_favorited"/>
         <result property="postCreatedId" column="post_created_id"/>
         <result property="postCreatedDate" column="post_created_date"/>
         <result property="postCommentNum" column="comment_count"/>

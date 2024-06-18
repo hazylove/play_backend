@@ -243,7 +243,7 @@ public class CommentServiceImpl extends ServiceImpl<CommentMapper, Comment> impl
 
     @Override
     public UserCreatedVo getCommentCreatedBy(Long commentId) {
-        UserCreatedVo userCreatedVo = commentMapper.getCommentCreatedBy(commentId);
+        UserCreatedVo userCreatedVo = commentMapper.getCommentCreatorById(commentId);
         userCreatedVo.setAvatar(MyFileUtil.reSetFileUrl(userCreatedVo.getAvatar()));
         return userCreatedVo;
     }

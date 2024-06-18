@@ -45,6 +45,11 @@ public class Post {
     private int postBlocksNum;
 
     /**
+     * 拉黑数
+     */
+    private int postFavoritesNum;
+
+    /**
      * 创建人id
      */
     private Long postCreatedId;
@@ -54,16 +59,4 @@ public class Post {
      * 创建时间
      */
     private LocalDateTime postCreatedDate;
-
-    /**
-     * 评论数量
-     */
-    @TableField(exist = false)
-    private int postCommentNum;
-
-    /**
-     * 当前用户是否点赞
-     */
-    @TableField(exist = false)
-    private boolean userLiked;
 }
