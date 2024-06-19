@@ -1,5 +1,6 @@
 package com.play.playsystem.post.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.basic.utils.result.ResultCode;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -60,5 +62,12 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite> i
             throw new RuntimeException("删除收藏夹操作异常");
         }
         return jsonResult;
+    }
+
+    @Override
+    public List<Favorite> getFavoritesByUserId(Long userId) {
+        QueryWrapper<Favorite> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(Favorite::getCreatedId, userId);
+        return favoriteMapper.selectList(queryWrapper);
     }
 }
