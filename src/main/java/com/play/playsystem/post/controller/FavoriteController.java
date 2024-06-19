@@ -72,7 +72,7 @@ public class FavoriteController {
     /**
      * 获取用户收藏夹
      */
-    @GetMapping("/list")
+    @GetMapping("/personalList")
     public JsonResult getFavorites() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (UserCheckUtil.checkAuth(authentication)) {
