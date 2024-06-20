@@ -33,4 +33,19 @@ public interface IFavoriteService extends IService<Favorite> {
      * @return 收藏夹列表
      */
     List<Favorite> getFavoritesByUserId(Long userId);
+
+    /**
+     * 获取收藏夹详情
+     * @param favoriteId 收藏夹id
+     * @param userId 用户id
+     */
+    JsonResult getFavoriteDetails(Long favoriteId, Long userId);
+
+    /**
+     * 检查当前用户是否有该收藏夹权限
+     * @param favoriteId 收藏夹id
+     * @param userId 用户id
+     * @return 是否有权限
+     */
+    Boolean checkFavorite(Long favoriteId, Long userId);
 }

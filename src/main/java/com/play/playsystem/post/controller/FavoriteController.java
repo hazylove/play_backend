@@ -70,15 +70,29 @@ public class FavoriteController {
     }
 
     /**
-     * 获取用户收藏夹
+     * 获取本人用户收藏夹
      */
     @GetMapping("/personalList")
-    public JsonResult getFavorites() {
+    public JsonResult getPersonalFavorites() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (UserCheckUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             List<Favorite> favorites = favoriteService.getFavoritesByUserId(userId);
             return new JsonResult().setData(favorites);
+        }
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
+    }
+
+    /**
+     * 获取收藏夹详情
+     * @param favoriteId 收藏夹id
+     */
+    @GetMapping("/details/{favoriteId}")
+    public JsonResult getFavorite(@PathVariable Long favoriteId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (UserCheckUtil.checkAuth(authentication)) {
+            Long userId = Long.valueOf(authentication.getName());
+            return favoriteService.getFavoriteDetails(favoriteId, userId);
         }
         return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }

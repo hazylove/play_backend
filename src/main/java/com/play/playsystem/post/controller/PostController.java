@@ -48,9 +48,8 @@ public class PostController {
             post.setPostCreatedId(userId);
             postService.insert(post);
             return new JsonResult();
-        } else {
-            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
         }
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
 
     /**
@@ -64,9 +63,8 @@ public class PostController {
             Long userId = Long.valueOf(authentication.getName());
             PostVo postVo = postService.selectById(postId, userId);
             return new JsonResult().setData(postVo);
-        }else {
-            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
         }
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
 
     /**
@@ -79,9 +77,8 @@ public class PostController {
         if (UserCheckUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             return postService.deletePost(postId, userId);
-        }else {
-            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
         }
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
 
     /**
@@ -94,9 +91,8 @@ public class PostController {
         if (UserCheckUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             return postService.likePost(postId, userId);
-        }else {
-            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
         }
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
 
     /**
@@ -110,9 +106,8 @@ public class PostController {
             postQuery.setUserId(Long.valueOf(authentication.getName()));
             PageList<PostVo> pageList = postService.getLikePostList(postQuery);
             return new JsonResult().setData(pageList);
-        } else {
-            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
         }
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
 
     /**
@@ -125,9 +120,8 @@ public class PostController {
         if (UserCheckUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             return postService.blockPost(postId, userId);
-        } else {
-            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
         }
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
 
     /**
@@ -146,17 +140,30 @@ public class PostController {
         }
     }
 
+    /**
+     * 收藏
+     * @param postId 帖子id
+     * @param favoriteId 收藏夹id
+     */
     @PostMapping("/collect")
     public JsonResult collectPost(@RequestParam Long postId, @RequestParam Long favoriteId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (UserCheckUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             return postService.collectPost(postId, favoriteId, userId);
-        } else {
-            return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
         }
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
 
+    @PostMapping("/collectList")
+    public JsonResult getCollectPostPage(@RequestBody PostQuery postQuery){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (UserCheckUtil.checkAuth(authentication)) {
+            postQuery.setUserId(Long.valueOf(authentication.getName()));
+
+        }
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
+    }
 
     @GetMapping("/hello")
     public String hello() {

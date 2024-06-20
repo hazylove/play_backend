@@ -68,5 +68,11 @@ public interface IPostService extends IService<Post> {
      */
     PageList<PostVo> getBlockPostList(PostQuery postQuery);
 
+    /**
+     * 收藏
+     * @param postId 帖子id
+     * @param favoriteId 收藏夹id
+     * @param userId 当前用户id
+     */
     JsonResult collectPost(Long postId, Long favoriteId, Long userId);
 }

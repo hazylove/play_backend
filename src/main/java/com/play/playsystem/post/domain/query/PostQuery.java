@@ -30,4 +30,9 @@ public class PostQuery extends PageQuery {
      * 当前用户id
      */
     private Long userId;
+
+    /**
+     * 收藏夹id
+     */
+    private Long favoriteId;
 }

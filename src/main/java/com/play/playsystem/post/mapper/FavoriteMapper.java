@@ -9,4 +9,7 @@ import org.apache.ibatis.annotations.Select;
 public interface FavoriteMapper extends BaseMapper<Favorite> {
     @Select("SELECT created_id FROM t_favorite WHERE id = #{favoriteId}")
     Long getCreatedIdById(Long favoriteId);
+
+    @Select("SELECT opened FROM t_favorite WHERE id = #{favoriteId}")
+    Boolean getOpenedById(Long favoriteId);
 }

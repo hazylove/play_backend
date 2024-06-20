@@ -70,4 +70,23 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite> i
         queryWrapper.lambda().eq(Favorite::getCreatedId, userId);
         return favoriteMapper.selectList(queryWrapper);
     }
+
+    @Override
+    public JsonResult getFavoriteDetails(Long favoriteId, Long userId) {
+        JsonResult jsonResult = new JsonResult();
+        if (!checkFavorite(favoriteId, userId)) {
+            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("用户异常操作");
+        }
+        Favorite favorite = favoriteMapper.selectById(favoriteId);
+        return jsonResult.setData(favorite);
+    }
+
+    @Override
+    public Boolean checkFavorite(Long favoriteId, Long userId) {
+        Long favoriteCreatedId = favoriteMapper.getCreatedIdById(favoriteId);
+        if (!Objects.equals(favoriteCreatedId, userId)) {
+            return favoriteMapper.getOpenedById(favoriteId);
+        }
+        return true;
+    }
 }
