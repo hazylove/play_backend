@@ -11,8 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("${api.prefix}/favorite")
 @Slf4j
@@ -73,12 +71,24 @@ public class FavoriteController {
      * 获取本人用户收藏夹
      */
     @GetMapping("/personalList")
-    public JsonResult getPersonalFavorites() {
+    public JsonResult getFavorites() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (UserCheckUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
-            List<Favorite> favorites = favoriteService.getFavoritesByUserId(userId);
-            return new JsonResult().setData(favorites);
+            return new JsonResult().setData(favoriteService.getFavoritesByUserId(userId));
+        }
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
+    }
+
+    /**
+     * 获取他人收藏夹列表
+     * @param userId 用户id
+     */
+    @GetMapping("/otherList/{userId}")
+    public JsonResult getFavorites(@PathVariable Long userId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (UserCheckUtil.checkAuth(authentication)) {
+            return new JsonResult().setData(favoriteService.getOpenedFavoritesByUserId(userId));
         }
         return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }

@@ -43,7 +43,7 @@ public class Favorite {
     /**
      * 是否公开
      */
-    private boolean opened;
+    private boolean opened = true;
 
     /**
      * 最新更新时间

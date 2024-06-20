@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.basic.utils.result.ResultCode;
 import com.play.playsystem.post.domain.entity.Favorite;
+import com.play.playsystem.post.domain.vo.FavoriteVo;
 import com.play.playsystem.post.mapper.FavoriteMapper;
 import com.play.playsystem.post.service.IFavoriteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
@@ -65,10 +67,10 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite> i
     }
 
     @Override
-    public List<Favorite> getFavoritesByUserId(Long userId) {
+    public List<FavoriteVo> getFavoritesByUserId(Long userId) {
         QueryWrapper<Favorite> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(Favorite::getCreatedId, userId);
-        return favoriteMapper.selectList(queryWrapper);
+        return toFavoriteVoList(favoriteMapper.selectList(queryWrapper));
     }
 
     @Override
@@ -89,5 +91,22 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite> i
             return result != null && result;
         }
         return true;
+    }
+
+    @Override
+    public List<FavoriteVo> getOpenedFavoritesByUserId(Long userId) {
+        QueryWrapper<Favorite> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(Favorite::getCreatedId, userId).eq(Favorite::isOpened, 1);
+        return toFavoriteVoList(favoriteMapper.selectList(queryWrapper));
+    }
+
+    @Override
+    public List<FavoriteVo> toFavoriteVoList(List<Favorite> favorites) {
+        if (favorites == null) {
+            return null;
+        }
+        return favorites.stream()
+                .map(FavoriteVo::new)
+                .collect(Collectors.toList());
     }
 }

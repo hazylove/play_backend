@@ -75,16 +75,18 @@ public class UserDetailsVo {
      * @param user 用户实体
      */
     public UserDetailsVo(final User user) {
-        this.id = user.getId();
-        this.username = user.getUsername();
-        this.nickname = user.getNickname();
-        this.avatar = MyFileUtil.reSetFileUrl(user.getAvatar());
-        this.email = user.getEmail();
-        this.phone = user.getPhone();
-        this.createdDate = user.getCreatedDate();
-        this.gender = user.getGender();
-        this.age = user.getAge();
-        this.birth = user.getBirth();
-        this.profile = user.getProfile();
+        if (user != null) {
+            this.id = user.getId();
+            this.username = user.getUsername();
+            this.nickname = user.getNickname();
+            this.avatar = MyFileUtil.reSetFileUrl(user.getAvatar());
+            this.email = user.getEmail();
+            this.phone = user.getPhone();
+            this.createdDate = user.getCreatedDate();
+            this.gender = user.getGender();
+            this.age = user.getAge();
+            this.birth = user.getBirth();
+            this.profile = user.getProfile();
+        }
     }
 }
