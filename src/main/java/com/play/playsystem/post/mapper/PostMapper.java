@@ -34,4 +34,8 @@ public interface PostMapper extends BaseMapper<Post> {
     Long countBlockPost(PostQuery postQuery);
 
     List<PostVo> getBlockPostList(PostQuery postQuery);
+
+    List<PostVo> getCollectPostList(PostQuery postQuery);
+
+    Long countCollectPost(PostQuery postQuery);
 }

@@ -75,4 +75,10 @@ public interface IPostService extends IService<Post> {
      * @param userId 当前用户id
      */
     JsonResult collectPost(Long postId, Long favoriteId, Long userId);
+
+    /**
+     * 收藏夹帖子列表
+     * @param postQuery 查询参数
+     */
+    JsonResult getCollectPostPageList(PostQuery postQuery);
 }

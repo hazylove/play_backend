@@ -44,7 +44,7 @@ public class FavoriteController {
     @PostMapping("/update")
     public JsonResult updateFavorite(@RequestBody Favorite favorite) {
         if (favorite.getId() == null) {
-            return new JsonResult().setCode(ResultCode.UNPROCESSABLE_ENTITY).setSuccess(false).setMessage("缺少参数：id");
+            return new JsonResult().setCode(ResultCode.UNPROCESSABLE_ENTITY).setSuccess(false).setMessage("缺少必要的参数：id");
         }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (UserCheckUtil.checkAuth(authentication)) {

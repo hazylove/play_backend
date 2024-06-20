@@ -160,7 +160,7 @@ public class PostController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (UserCheckUtil.checkAuth(authentication)) {
             postQuery.setUserId(Long.valueOf(authentication.getName()));
-
+            return postService.getCollectPostPageList(postQuery);
         }
         return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }

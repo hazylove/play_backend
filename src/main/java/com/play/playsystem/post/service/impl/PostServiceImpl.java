@@ -311,6 +311,24 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         }
     }
 
+    @Override
+    public JsonResult getCollectPostPageList(PostQuery postQuery) {
+        JsonResult jsonResult = new JsonResult();
+        // 参数校验
+        if (postQuery.getFavoriteId() == null) {
+            return jsonResult.setCode(ResultCode.UNPROCESSABLE_ENTITY).setSuccess(false).setMessage("缺少必要的参数：favoriteId");
+        }
+        // 操作权限校验
+        if (!favoriteService.checkFavorite(postQuery.getFavoriteId(), postQuery.getUserId())) {
+            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("用户异常操作");
+        }
+        // 条数
+        Long total = postMapper.countCollectPost(postQuery);
+        // 分页数据
+        List<PostVo> postVoList = postMapper.getCollectPostList(postQuery);
+        return jsonResult.setData(setPostVoCreator(total, postVoList));
+    }
+
     private PageList<PostVo> setPostVoCreator(Long total, List<PostVo> postVoList) {
         Map<Long, UserCreatedVo> userCreatedVoMap = new HashMap<>();
         postVoList.forEach(postVo -> {
@@ -324,7 +342,4 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
         return new PageList<>(total, postVoList);
     }
 }
-
-
-
 

@@ -85,7 +85,8 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite> i
     public Boolean checkFavorite(Long favoriteId, Long userId) {
         Long favoriteCreatedId = favoriteMapper.getCreatedIdById(favoriteId);
         if (!Objects.equals(favoriteCreatedId, userId)) {
-            return favoriteMapper.getOpenedById(favoriteId);
+            Boolean result = favoriteMapper.getOpenedById(favoriteId);
+            return result != null && result;
         }
         return true;
     }
