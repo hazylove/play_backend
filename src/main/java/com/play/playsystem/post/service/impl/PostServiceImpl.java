@@ -11,6 +11,7 @@ import com.play.playsystem.post.domain.vo.PostVo;
 import com.play.playsystem.post.mapper.*;
 import com.play.playsystem.post.service.IFavoriteService;
 import com.play.playsystem.post.service.IPostService;
+import com.play.playsystem.user.domain.entity.User;
 import com.play.playsystem.user.domain.vo.UserCreatedVo;
 import com.play.playsystem.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,6 +56,9 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     private static final ConcurrentHashMap<Long, Lock> collectPostLocks = new ConcurrentHashMap<>();
     private static final ConcurrentHashMap<Long, Lock> collectFavoriteLocks = new ConcurrentHashMap<>();
 
+    // 发帖数量锁
+    private static final ConcurrentHashMap<Long, Lock> postNumLocks = new ConcurrentHashMap<>();
+
     @Override
     public PageList<PostVo> getPostList(PostQuery postQuery) {
         // 条数
@@ -69,7 +73,27 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     @Transactional
     public void insert(Post post) {
         post.setPostCreatedDate(LocalDateTime.now());
-        postMapper.insert(post);
+
+        Lock lock = postNumLocks.computeIfAbsent(post.getPostCreatedId(), k -> new ReentrantLock());
+
+        // 锁定
+        lock.lock();
+        try {
+            if (postMapper.insert(post) > 0) {
+                if (!userService.lambdaUpdate().eq(User::getId, post.getPostCreatedId()).setSql("post_num = post_num + 1").update()) {
+                    throw new RuntimeException("发布帖子数据异常");
+                }
+            }
+        } finally {
+            // 解锁
+            lock.unlock();
+            synchronized (postNumLocks) {
+                if (((ReentrantLock) lock).getQueueLength() == 0) {
+                    postNumLocks.remove(post.getPostCreatedId());
+                }
+            }
+        }
+
     }
 
     @Override
@@ -211,13 +235,30 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     public JsonResult deletePost(Long postId, Long userId) {
         JsonResult jsonResult = new JsonResult();
 
-        // 当前只有帖子发布人可以删除帖子
-        QueryWrapper<Post> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(Post::getId, postId).eq(Post::getPostCreatedId, userId);
-        if (postMapper.delete(queryWrapper) > 0) {
-            return jsonResult;
-        } else {
-            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("异常删除操作");
+        Lock lock = postNumLocks.computeIfAbsent(userId, k -> new ReentrantLock());
+
+        // 锁定
+        lock.lock();
+        try {
+            // 当前只有帖子发布人可以删除帖子
+            QueryWrapper<Post> queryWrapper = new QueryWrapper<>();
+            queryWrapper.lambda().eq(Post::getId, postId).eq(Post::getPostCreatedId, userId);
+            if (postMapper.delete(queryWrapper) > 0) {
+                if (userService.lambdaUpdate().eq(User::getId, userId).gt(User::getPostNum, 0).setSql("post_num = post_num - 1").update()) {
+                    return jsonResult;
+                }
+                throw new RuntimeException("帖子删除数据异常");
+            } else {
+                return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("用户异常删除操作");
+            }
+        } finally {
+            // 解锁
+            lock.unlock();
+            synchronized (postNumLocks) {
+                if (((ReentrantLock) lock).getQueueLength() == 0) {
+                    postNumLocks.remove(userId);
+                }
+            }
         }
     }
 

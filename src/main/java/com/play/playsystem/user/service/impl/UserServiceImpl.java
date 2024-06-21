@@ -98,11 +98,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 DEFAULT_AVATAR, // 默认头像
                 userRegistrationDto.getEmail(), // 邮箱
                 userRegistrationDto.getPhone(), // 电话
-                LocalDateTime.now(), // 注册时间
-                null,
-                null,
-                null,
-                null
+                LocalDateTime.now() // 注册时间
         );
         userMapper.insert(user);
 
@@ -179,6 +175,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
+    public JsonResult followUser(Long userId, Long fansId) {
+        return null;
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public JsonResult changeAvatar(Long userId, MultipartFile avatarImage) throws IOException {
         JsonResult jsonResult = new JsonResult();
@@ -230,7 +231,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                         User::getGender,
                         User::getAge,
                         User::getBirth,
-                        User::getProfile
+                        User::getProfile,
+                        User::getPostNum,
+                        User::getFollowNum,
+                        User::getFansNum
                 )
                 .eq(User::getId, userId);
         User user = userMapper.selectOne(queryWrapper);

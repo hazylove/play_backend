@@ -65,6 +65,9 @@ public class UserController {
         return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
 
+    /**
+     * 个人信息
+     */
     @GetMapping("/details")
     public JsonResult getUserDetails(){
         JsonResult jsonResult = new JsonResult();
@@ -72,6 +75,20 @@ public class UserController {
         if (UserCheckUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             return jsonResult.setData(userService.getUserDetails(userId));
+        }
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
+    }
+
+    /**
+     * 关注用户
+     * @param userId 被关注用户id
+     */
+    @PostMapping("/follow/{userId}")
+    public JsonResult followUser(@PathVariable Long userId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (UserCheckUtil.checkAuth(authentication)) {
+            Long fansId = Long.valueOf(authentication.getName());
+            return userService.followUser(userId, fansId);
         }
         return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
