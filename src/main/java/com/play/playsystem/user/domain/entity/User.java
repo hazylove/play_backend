@@ -51,6 +51,12 @@ public class User {
     private String phone;
 
     /**
+     * 创建时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdDate;
+
+    /**
      * 性别
      */
     private Integer gender;
@@ -69,36 +75,4 @@ public class User {
      * 出生日期
      */
     private LocalDate birth;
-
-    /**
-     * 发帖数量
-     */
-    private int postNum;
-
-    /**
-     * 关注数量
-     */
-    private int followNum;
-
-    /**
-     * 粉丝数量
-     */
-    private int fansNum;
-
-    /**
-     * 创建时间
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdDate;
-
-    public User(Long id, String username, String password, String nickname, String avatar, String email, String phone, LocalDateTime createdDate) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.nickname = nickname;
-        this.avatar = avatar;
-        this.email = email;
-        this.phone = phone;
-        this.createdDate = createdDate;
-    }
 }

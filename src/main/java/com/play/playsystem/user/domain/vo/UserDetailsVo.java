@@ -45,6 +45,12 @@ public class UserDetailsVo {
     private String phone;
 
     /**
+     * 创建时间
+     */
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createdDate;
+
+    /**
      * 性别
      */
     private Integer gender;
@@ -65,27 +71,6 @@ public class UserDetailsVo {
     private LocalDate birth;
 
     /**
-     * 发帖数量
-     */
-    private int postNum;
-
-    /**
-     * 关注数量
-     */
-    private int followNum;
-
-    /**
-     * 粉丝数量
-     */
-    private int fansNum;
-
-    /**
-     * 创建时间
-     */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdDate;
-
-    /**
      * 根据User实体构造UserDetailsVo
      * @param user 用户实体
      */
@@ -97,14 +82,11 @@ public class UserDetailsVo {
             this.avatar = MyFileUtil.reSetFileUrl(user.getAvatar());
             this.email = user.getEmail();
             this.phone = user.getPhone();
+            this.createdDate = user.getCreatedDate();
             this.gender = user.getGender();
             this.age = user.getAge();
             this.birth = user.getBirth();
             this.profile = user.getProfile();
-            this.postNum = user.getPostNum();
-            this.followNum = user.getFollowNum();
-            this.fansNum = user.getFansNum();
-            this.createdDate = user.getCreatedDate();
         }
     }
 }

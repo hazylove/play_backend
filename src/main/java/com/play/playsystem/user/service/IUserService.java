@@ -90,13 +90,4 @@ public interface IUserService extends IService<User> {
      * @return 用户
      */
     User getUserByEmail(String email);
-
-    /**
-     * 关注用户
-     * @param userId 被关注用户id
-     * @param fansId 当前用户id
-     */
-    JsonResult followUser(Long userId, Long fansId);
-
-
 }
