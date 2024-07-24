@@ -36,11 +36,6 @@ public class Favorite {
     private String introduction;
 
     /**
-     * 帖子数量
-     */
-    private int postNum;
-
-    /**
      * 是否公开
      */
     private boolean opened = true;

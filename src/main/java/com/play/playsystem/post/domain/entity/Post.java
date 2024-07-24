@@ -44,11 +44,6 @@ public class Post {
     private int postBlocksNum;
 
     /**
-     * 拉黑数
-     */
-    private int postFavoritesNum;
-
-    /**
      * 创建人id
      */
     private Long postCreatedId;

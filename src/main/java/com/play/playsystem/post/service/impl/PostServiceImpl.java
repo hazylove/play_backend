@@ -51,10 +51,6 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
     // 点赞、拉黑锁
     private static final ConcurrentHashMap<Long, Lock> likeBlockLocks = new ConcurrentHashMap<>();
 
-    // 收藏锁
-    private static final ConcurrentHashMap<Long, Lock> collectPostLocks = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<Long, Lock> collectFavoriteLocks = new ConcurrentHashMap<>();
-
     @Override
     public PageList<PostVo> getPostList(PostQuery postQuery) {
         // 条数
@@ -254,60 +250,22 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
             return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("收藏操作异常");
         }
 
-        Lock collectFavoriteLock = collectFavoriteLocks.computeIfAbsent(favoriteId, k -> new ReentrantLock());
-        Lock collectPostLock = collectPostLocks.computeIfAbsent(postId, k -> new ReentrantLock());
-
-        // 加锁
-        collectFavoriteLock.lock();
-        collectPostLock.lock();
-        try {
-            // 查询是否已收藏
-            QueryWrapper<UserPostFavorite> favoriteQueryWrapper = new QueryWrapper<>();
-            favoriteQueryWrapper.lambda().eq(UserPostFavorite::getPostId, postId).eq(UserPostFavorite::getFavoriteId, favoriteId);
-            if (userPostFavoriteMapper.selectOne(favoriteQueryWrapper) == null) {
-                // 未收藏
-                UserPostFavorite userPostFavorite = new UserPostFavorite(postId, userId, favoriteId, LocalDateTime.now());
-                if (userPostFavoriteMapper.insert(userPostFavorite) > 0) {
-                    // 更新帖子收藏数
-                    boolean updatePostFavoritesNumResult = lambdaUpdate().eq(Post::getId, postId).setSql("post_favorites_num = post_favorites_num + 1").update();
-                    // 更新收藏夹帖子数
-                    boolean updateFavoritePostNumResult = favoriteService.lambdaUpdate().eq(Favorite::getId, favoriteId).setSql("post_num = post_num + 1").update();
-                    if (updatePostFavoritesNumResult && updateFavoritePostNumResult) {
-                        return jsonResult;
-                    }
-                }
-                throw new RuntimeException("帖子收藏操作数据异常");
-            } else {
-                // 已收藏
-                if (userPostFavoriteMapper.delete(favoriteQueryWrapper) > 0) {
-                    // 更新帖子收藏数
-                    boolean updatePostFavoritesNumResult = lambdaUpdate().eq(Post::getId, postId).gt(Post::getPostFavoritesNum, 0).setSql("post_favorites_num = post_favorites_num - 1").update();
-                    // 更新收藏夹帖子数
-                    boolean updateFavoritePostNumResult = favoriteService.lambdaUpdate().eq(Favorite::getId, favoriteId).gt(Favorite::getPostNum, 0).setSql("post_num = post_num - 1").update();
-                    if (updatePostFavoritesNumResult && updateFavoritePostNumResult) {
-                        return jsonResult;
-                    }
-                }
-                throw new RuntimeException("帖子取消收藏操作数据异常");
+        // 查询是否已收藏
+        QueryWrapper<UserPostFavorite> favoriteQueryWrapper = new QueryWrapper<>();
+        favoriteQueryWrapper.lambda().eq(UserPostFavorite::getPostId, postId).eq(UserPostFavorite::getFavoriteId, favoriteId);
+        if (userPostFavoriteMapper.selectOne(favoriteQueryWrapper) == null) {
+            // 未收藏
+            UserPostFavorite userPostFavorite = new UserPostFavorite(postId, userId, favoriteId, LocalDateTime.now());
+            if (userPostFavoriteMapper.insert(userPostFavorite) > 0) {
+                return jsonResult;
             }
-
-        }
-        finally {
-            try {
-                collectFavoriteLock.unlock();
-                synchronized (collectFavoriteLocks) {
-                    if (((ReentrantLock) collectFavoriteLock).getQueueLength() == 0) {
-                        collectFavoriteLocks.remove(postId);
-                    }
-                }
-            } finally {
-                collectPostLock.unlock();
-                synchronized (collectPostLocks) {
-                    if (((ReentrantLock) collectPostLock).getQueueLength() == 0) {
-                        collectPostLocks.remove(postId);
-                    }
-                }
+            throw new RuntimeException("帖子收藏操作数据异常");
+        } else {
+            // 已收藏
+            if (userPostFavoriteMapper.delete(favoriteQueryWrapper) > 0) {
+                return jsonResult;
             }
+            throw new RuntimeException("帖子取消收藏操作数据异常");
         }
     }
 

@@ -1,6 +1,7 @@
 package com.play.playsystem.post.domain.vo;
 
 import com.play.playsystem.post.domain.entity.Favorite;
+import com.play.playsystem.user.domain.vo.UserCreatedVo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -25,6 +26,11 @@ public class FavoriteVo {
      * 所属用户id
      */
     private Long createdId;
+
+    /**
+     * 所属用户
+     */
+    private UserCreatedVo favoriteCreatedBy;
 
     /**
      * 描述
@@ -61,7 +67,6 @@ public class FavoriteVo {
             this.favoriteName = favorite.getFavoriteName();
             this.createdId = favorite.getCreatedId();
             this.introduction = favorite.getIntroduction();
-            this.postNum = favorite.getPostNum();
             this.opened = favorite.isOpened();
             this.updateDate = favorite.getUpdateDate();
             this.createdDate = favorite.getCreatedDate();

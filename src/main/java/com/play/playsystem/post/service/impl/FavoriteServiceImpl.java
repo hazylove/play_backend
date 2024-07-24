@@ -5,16 +5,22 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.basic.utils.result.ResultCode;
 import com.play.playsystem.post.domain.entity.Favorite;
+import com.play.playsystem.post.domain.entity.UserPostFavorite;
 import com.play.playsystem.post.domain.vo.FavoriteVo;
 import com.play.playsystem.post.mapper.FavoriteMapper;
+import com.play.playsystem.post.mapper.UserPostFavoriteMapper;
 import com.play.playsystem.post.service.IFavoriteService;
+import com.play.playsystem.user.domain.vo.UserCreatedVo;
+import com.play.playsystem.user.service.impl.UserServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -23,6 +29,12 @@ import java.util.stream.Collectors;
 public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite> implements IFavoriteService {
     @Autowired
     private FavoriteMapper favoriteMapper;
+
+    @Autowired
+    private UserServiceImpl userService;
+
+    @Autowired
+    private UserPostFavoriteMapper userPostFavoriteMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -68,9 +80,8 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite> i
 
     @Override
     public List<FavoriteVo> getFavoritesByUserId(Long userId) {
-        QueryWrapper<Favorite> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(Favorite::getCreatedId, userId);
-        return toFavoriteVoList(favoriteMapper.selectList(queryWrapper));
+        List<FavoriteVo> favoriteVoList = favoriteMapper.getFavoritesByUserId(userId);
+        return setFavoriteVoCreator(favoriteVoList);
     }
 
     @Override
@@ -80,7 +91,12 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite> i
             return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("用户异常操作");
         }
         Favorite favorite = favoriteMapper.selectById(favoriteId);
-        return jsonResult.setData(favorite);
+        FavoriteVo favoriteVo = new FavoriteVo(favorite);
+        favoriteVo.setFavoriteCreatedBy(userService.getUserCreatedVo(favoriteVo.getCreatedId()));
+        QueryWrapper<UserPostFavorite> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(UserPostFavorite::getFavoriteId, favoriteId);
+        favoriteVo.setPostNum(Math.toIntExact(userPostFavoriteMapper.selectCount(queryWrapper)));
+        return jsonResult.setData(favoriteVo);
     }
 
     @Override
@@ -95,9 +111,8 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite> i
 
     @Override
     public List<FavoriteVo> getOpenedFavoritesByUserId(Long userId) {
-        QueryWrapper<Favorite> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda().eq(Favorite::getCreatedId, userId).eq(Favorite::isOpened, 1);
-        return toFavoriteVoList(favoriteMapper.selectList(queryWrapper));
+        List<FavoriteVo> favoriteVoList = favoriteMapper.getOpenedFavoritesByUserId(userId);
+        return setFavoriteVoCreator(favoriteVoList);
     }
 
     @Override
@@ -108,5 +123,18 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite> i
         return favorites.stream()
                 .map(FavoriteVo::new)
                 .collect(Collectors.toList());
+    }
+
+    private List<FavoriteVo> setFavoriteVoCreator(List<FavoriteVo> favoriteVoList) {
+        Map<Long, UserCreatedVo> userCreatedVoMap = new HashMap<>();
+        favoriteVoList.forEach(favoriteVo -> {
+            Long userId = favoriteVo.getCreatedId();
+            if (!userCreatedVoMap.containsKey(userId)) {
+                UserCreatedVo userCreatedVo = userService.getUserCreatedVo(userId);
+                userCreatedVoMap.put(userId, userCreatedVo);
+            }
+            favoriteVo.setFavoriteCreatedBy(userCreatedVoMap.get(userId));
+        });
+        return favoriteVoList;
     }
 }

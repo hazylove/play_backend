@@ -155,6 +155,10 @@ public class PostController {
         return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
 
+    /**
+     * 收藏列表
+     * @param postQuery 查询参数
+     */
     @PostMapping("/collectList")
     public JsonResult getCollectPostPage(@RequestBody PostQuery postQuery){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
