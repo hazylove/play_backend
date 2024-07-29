@@ -245,11 +245,6 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements IP
             return jsonResult.setCode(ResultCode.POST_NOT_EXIST).setSuccess(false).setMessage("帖子不存在");
         }
 
-        Long favoriteCreatedId = favoriteMapper.getCreatedIdById(favoriteId);
-        if (!Objects.equals(favoriteCreatedId, userId)) {
-            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("收藏操作异常");
-        }
-
         // 查询是否已收藏
         QueryWrapper<UserPostFavorite> favoriteQueryWrapper = new QueryWrapper<>();
         favoriteQueryWrapper.lambda().eq(UserPostFavorite::getPostId, postId).eq(UserPostFavorite::getFavoriteId, favoriteId);

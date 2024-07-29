@@ -53,6 +53,8 @@ public class ResultCode {
     public static final int AVATAR_SIZE_TOO_LARGE = 1040;
     // 头像文件类型错误
     public static final int AVATAR_TYPE_ERROR = 1041;
+    // 用户不存在
+    public static final int USER_NOT_EXIST = 1051;
 
     /**
      * 帖子相关返回码

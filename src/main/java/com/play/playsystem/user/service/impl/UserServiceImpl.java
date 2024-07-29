@@ -179,6 +179,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     @Override
+    public Boolean UserNotExist(Long userId) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.lambda().eq(User::getId, userId);
+        return userMapper.selectOne(queryWrapper) == null;
+    }
+
+    @Override
     @Transactional(rollbackFor = Exception.class)
     public JsonResult changeAvatar(Long userId, MultipartFile avatarImage) throws IOException {
         JsonResult jsonResult = new JsonResult();

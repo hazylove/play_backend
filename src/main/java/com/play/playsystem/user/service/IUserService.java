@@ -90,4 +90,11 @@ public interface IUserService extends IService<User> {
      * @return 用户
      */
     User getUserByEmail(String email);
+
+    /**
+     * 检查用户是否不存在
+     * @param userId 用户id
+     * @return 不存在：true，存在：false
+     */
+    Boolean UserNotExist(Long userId);
 }
