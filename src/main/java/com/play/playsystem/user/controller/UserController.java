@@ -65,6 +65,9 @@ public class UserController {
         return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
 
+    /**
+     * 个人信息
+     */
     @GetMapping("/details")
     public JsonResult getUserDetails(){
         JsonResult jsonResult = new JsonResult();

@@ -35,16 +35,6 @@ public class UserDetailsVo {
     private String avatar;
 
     /**
-     * 邮箱
-     */
-    private String email;
-
-    /**
-     * 电话
-     */
-    private String phone;
-
-    /**
      * 创建时间
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -71,6 +61,36 @@ public class UserDetailsVo {
     private LocalDate birth;
 
     /**
+     * 关注数量
+     */
+    private int followerCount;
+
+    /**
+     * 粉丝数量
+     */
+    private int fansCount;
+
+    /**
+     * 好友数量
+     */
+    private int friendCount;
+
+    /**
+     * 发帖数量
+     */
+    private int postCount;
+
+    /**
+     * 点赞数量
+     */
+    private int likeCount;
+
+    /**
+     * 收藏夹数量
+     */
+    private int favoritesCount;
+
+    /**
      * 根据User实体构造UserDetailsVo
      * @param user 用户实体
      */
@@ -80,8 +100,6 @@ public class UserDetailsVo {
             this.username = user.getUsername();
             this.nickname = user.getNickname();
             this.avatar = MyFileUtil.reSetFileUrl(user.getAvatar());
-            this.email = user.getEmail();
-            this.phone = user.getPhone();
             this.createdDate = user.getCreatedDate();
             this.gender = user.getGender();
             this.age = user.getAge();

@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.play.playsystem.user.mapper.UserMapper">
-    <select id="getUserInfoById" resultType="com.play.playsystem.user.domain.entity.User">
-        SELECT
-            t_user.id, t_user.nickname, t_user.avatar
-        from
-            forum.t_user
-        where
-            id = #{id}
+    <select id="getUserDetailsById" resultType="com.play.playsystem.user.domain.vo.UserDetailsVo">
+        select
+            id,
+            username,
+            nickname,
+            avatar,
+            age,
+            gender,
+            profile,
+            birth,
+            created_date,
+            (select count(*) from user_user_follow where fans_user_id = #{id}) followerCount,
+            (select count(*) from user_user_follow where followed_user_id = #{id}) fansCount,
+            (select count(*) from user_user_friend where user_id1 = #{id} and status = 1) friendCount,
+            (select count(*) from t_post where post_created_id = #{id}) postCount,
+            (select count(*) from user_post_like where user_id = #{id}) likeCount,
+            (select count(*) from t_favorite where created_id = #{id}) favoritesCount
+        from t_user where id = #{id}
     </select>
 </mapper>

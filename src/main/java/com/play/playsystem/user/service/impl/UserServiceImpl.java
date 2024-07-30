@@ -225,23 +225,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
     @Override
     public UserDetailsVo getUserDetails(Long userId) {
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.lambda()
-                .select(
-                        User::getId,
-                        User::getNickname,
-                        User::getAvatar,
-                        User::getUsername,
-                        User::getEmail,
-                        User::getPhone,
-                        User::getGender,
-                        User::getAge,
-                        User::getBirth,
-                        User::getProfile
-                )
-                .eq(User::getId, userId);
-        User user = userMapper.selectOne(queryWrapper);
-        return new UserDetailsVo(user);
+        return userMapper.getUserDetailsById(userId);
     }
 
     @Override
