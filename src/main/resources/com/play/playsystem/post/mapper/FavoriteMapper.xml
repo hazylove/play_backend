@@ -13,23 +13,24 @@
             created_date
         from
             t_favorite
-        where
-            created_id = #{userId}
+        <include refid="query"/>
+        limit #{page},#{pageSize}
     </select>
 
-    <select id="getOpenedFavoritesByUserId" resultType="com.play.playsystem.post.domain.vo.FavoriteVo">
+    <select id="countFavoritesByUserId" resultType="java.lang.Long">
         select
-            id,
-            favorite_name,
-            introduction,
-            (select count(*) from user_post_favorite where favorite_id = t_favorite.id) post_num,
-            opened,
-            created_id,
-            update_date,
-            created_date
+            count(*)
         from
             t_favorite
-        where
-            created_id = #{userId} and opened = 1
+        <include refid="query"/>
     </select>
+
+    <sql id="query">
+        <where>
+            created_id = #{userId}
+            <if test="owner == true">
+                and opened = 1
+            </if>
+        </where>
+    </sql>
 </mapper>

@@ -1,8 +1,10 @@
 package com.play.playsystem.post.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.play.playsystem.basic.utils.dto.PageList;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.post.domain.entity.Favorite;
+import com.play.playsystem.post.domain.query.FavoriteQuery;
 import com.play.playsystem.post.domain.vo.FavoriteVo;
 
 import java.util.List;
@@ -30,10 +32,10 @@ public interface IFavoriteService extends IService<Favorite> {
 
     /**
      * 根据用户id获取收藏夹列表
-     * @param userId 用户id
+     * @param favoriteQuery 查询参数
      * @return 收藏夹列表
      */
-    List<FavoriteVo> getFavoritesByUserId(Long userId);
+    PageList<FavoriteVo> getFavoritesByUserId(FavoriteQuery favoriteQuery);
 
     /**
      * 获取收藏夹详情
@@ -49,12 +51,6 @@ public interface IFavoriteService extends IService<Favorite> {
      * @return 是否有权限
      */
     Boolean checkFavorite(Long favoriteId, Long userId);
-
-    /**
-     * 根据用户id获取公开的收藏夹
-     * @param userId 用户id
-     */
-    List<FavoriteVo> getOpenedFavoritesByUserId(Long userId);
 
     /**
      * 由 List<Favorite> 转 List<FavoriteVo>

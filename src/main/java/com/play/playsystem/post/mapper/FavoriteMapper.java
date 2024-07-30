@@ -2,6 +2,7 @@ package com.play.playsystem.post.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.play.playsystem.post.domain.entity.Favorite;
+import com.play.playsystem.post.domain.query.FavoriteQuery;
 import com.play.playsystem.post.domain.vo.FavoriteVo;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -16,7 +17,8 @@ public interface FavoriteMapper extends BaseMapper<Favorite> {
     @Select("SELECT opened FROM t_favorite WHERE id = #{favoriteId}")
     Boolean getOpenedById(Long favoriteId);
 
-    List<FavoriteVo> getFavoritesByUserId(Long userId);
+    List<FavoriteVo> getFavoritesByUserId(FavoriteQuery favoriteQuery);
 
-    List<FavoriteVo> getOpenedFavoritesByUserId(Long userId);
+    Long countFavoritesByUserId(FavoriteQuery favoriteQuery);
+
 }

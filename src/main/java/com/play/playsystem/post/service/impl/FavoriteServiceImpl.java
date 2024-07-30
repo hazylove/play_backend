@@ -2,10 +2,12 @@ package com.play.playsystem.post.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.play.playsystem.basic.utils.dto.PageList;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.basic.utils.result.ResultCode;
 import com.play.playsystem.post.domain.entity.Favorite;
 import com.play.playsystem.post.domain.entity.UserPostFavorite;
+import com.play.playsystem.post.domain.query.FavoriteQuery;
 import com.play.playsystem.post.domain.vo.FavoriteVo;
 import com.play.playsystem.post.mapper.FavoriteMapper;
 import com.play.playsystem.post.mapper.UserPostFavoriteMapper;
@@ -79,9 +81,10 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite> i
     }
 
     @Override
-    public List<FavoriteVo> getFavoritesByUserId(Long userId) {
-        List<FavoriteVo> favoriteVoList = favoriteMapper.getFavoritesByUserId(userId);
-        return setFavoriteVoCreator(favoriteVoList);
+    public PageList<FavoriteVo> getFavoritesByUserId(FavoriteQuery favoriteQuery) {
+        Long total = favoriteMapper.countFavoritesByUserId(favoriteQuery);
+        List<FavoriteVo> favoriteVoList = favoriteMapper.getFavoritesByUserId(favoriteQuery);
+        return new PageList<>(total, setFavoriteVoCreator(favoriteVoList));
     }
 
     @Override
@@ -92,7 +95,7 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite> i
         }
         Favorite favorite = favoriteMapper.selectById(favoriteId);
         FavoriteVo favoriteVo = new FavoriteVo(favorite);
-        favoriteVo.setFavoriteCreatedBy(userService.getUserCreatedVo(favoriteVo.getCreatedId()));
+        favoriteVo.setCreatedBy(userService.getUserCreatedVo(favoriteVo.getCreatedId()));
         QueryWrapper<UserPostFavorite> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(UserPostFavorite::getFavoriteId, favoriteId);
         favoriteVo.setPostNum(Math.toIntExact(userPostFavoriteMapper.selectCount(queryWrapper)));
@@ -107,12 +110,6 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite> i
             return result != null && result;
         }
         return true;
-    }
-
-    @Override
-    public List<FavoriteVo> getOpenedFavoritesByUserId(Long userId) {
-        List<FavoriteVo> favoriteVoList = favoriteMapper.getOpenedFavoritesByUserId(userId);
-        return setFavoriteVoCreator(favoriteVoList);
     }
 
     @Override
@@ -133,7 +130,7 @@ public class FavoriteServiceImpl extends ServiceImpl<FavoriteMapper, Favorite> i
                 UserCreatedVo userCreatedVo = userService.getUserCreatedVo(userId);
                 userCreatedVoMap.put(userId, userCreatedVo);
             }
-            favoriteVo.setFavoriteCreatedBy(userCreatedVoMap.get(userId));
+            favoriteVo.setCreatedBy(userCreatedVoMap.get(userId));
         });
         return favoriteVoList;
     }

@@ -3,6 +3,7 @@ package com.play.playsystem.post.controller;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.basic.utils.result.ResultCode;
 import com.play.playsystem.post.domain.entity.Favorite;
+import com.play.playsystem.post.domain.query.FavoriteQuery;
 import com.play.playsystem.post.service.IFavoriteService;
 import com.play.playsystem.user.utils.UserCheckUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -70,25 +71,16 @@ public class FavoriteController {
     /**
      * 获取本人用户收藏夹
      */
-    @GetMapping("/personalList")
-    public JsonResult getFavorites() {
+    @PostMapping("/list")
+    public JsonResult getFavorites(@RequestBody FavoriteQuery favoriteQuery) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (UserCheckUtil.checkAuth(authentication)) {
-            Long userId = Long.valueOf(authentication.getName());
-            return new JsonResult().setData(favoriteService.getFavoritesByUserId(userId));
-        }
-        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
-    }
-
-    /**
-     * 获取他人收藏夹列表
-     * @param userId 用户id
-     */
-    @GetMapping("/otherList/{userId}")
-    public JsonResult getFavorites(@PathVariable Long userId) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
-            return new JsonResult().setData(favoriteService.getOpenedFavoritesByUserId(userId));
+            if (favoriteQuery.getUserId() == null) {
+                Long userId = Long.valueOf(authentication.getName());
+                favoriteQuery.setUserId(userId);
+                favoriteQuery.setOwner(false);
+            }
+            return new JsonResult().setData(favoriteService.getFavoritesByUserId(favoriteQuery));
         }
         return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }

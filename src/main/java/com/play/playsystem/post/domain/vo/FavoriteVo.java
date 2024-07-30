@@ -30,7 +30,7 @@ public class FavoriteVo {
     /**
      * 所属用户
      */
-    private UserCreatedVo favoriteCreatedBy;
+    private UserCreatedVo createdBy;
 
     /**
      * 描述
