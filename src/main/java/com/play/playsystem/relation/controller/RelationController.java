@@ -20,7 +20,7 @@ public class RelationController {
 
     /**
      * 关注、取消关注
-     * @param followedUserId 本关注用户id
+     * @param followedUserId 关注用户id
      */
     @PostMapping("/follow/{followedUserId}")
     public JsonResult follow(@PathVariable("followedUserId") Long followedUserId) {
@@ -46,6 +46,24 @@ public class RelationController {
                 followQuery.setUserId(userId);
             }
             return relationService.getFollowList(followQuery);
+        }
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
+    }
+
+    /**
+     * 查看粉丝列表
+     * @param followQuery 查询参数
+     */
+    @PostMapping("/fansList")
+    public JsonResult getFansList(@RequestBody FollowQuery followQuery) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (UserCheckUtil.checkAuth(authentication)) {
+            if (followQuery.getUserId() == null) {
+                // 查看本人粉丝列表
+                Long userId = Long.valueOf(authentication.getName());
+                followQuery.setUserId(userId);
+            }
+            return relationService.getFansList(followQuery);
         }
         return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }

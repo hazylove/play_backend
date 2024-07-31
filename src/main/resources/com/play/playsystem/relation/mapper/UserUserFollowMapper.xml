@@ -20,9 +20,38 @@
         limit #{page}, #{pageSize}
     </select>
 
+    <select id="countFans" resultType="java.lang.Long">
+        select count(*)
+        from user_user_follow uuf
+        left join t_user tu on tu.id = uuf.fans_user_id
+        <include refid="fansQuery"/>
+    </select>
+
+    <select id="getFansList" resultType="com.play.playsystem.user.domain.vo.UserListVo">
+        select
+        tu.id,
+        tu.nickname,
+        tu.avatar,
+        tu.profile
+        from user_user_follow uuf
+        left join t_user tu on tu.id = uuf.fans_user_id
+        <include refid="fansQuery"/>
+        limit #{page}, #{pageSize}
+    </select>
+
+
     <sql id="followQuery">
         <where>
             uuf.fans_user_id = #{userId}
+            <if test="keywords != null and keywords !=''">
+                and tu.nickname like concat('%',#{keywords},'%')
+            </if>
+        </where>
+    </sql>
+
+    <sql id="fansQuery">
+        <where>
+            uuf.followed_user_id = #{userId}
             <if test="keywords != null and keywords !=''">
                 and tu.nickname like concat('%',#{keywords},'%')
             </if>

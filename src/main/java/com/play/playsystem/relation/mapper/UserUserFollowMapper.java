@@ -12,4 +12,8 @@ public interface UserUserFollowMapper extends BaseMapper<UserUserFollow> {
     List<UserListVo> getFollowList(FollowQuery followQuery);
 
     Long countFollow(FollowQuery followQuery);
+
+    Long countFans(FollowQuery followQuery);
+
+    List<UserListVo> getFansList(FollowQuery followQuery);
 }

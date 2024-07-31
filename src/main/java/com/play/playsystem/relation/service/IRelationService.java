@@ -17,4 +17,10 @@ public interface IRelationService {
      * @param followQuery 查询参数
      */
     JsonResult getFollowList(FollowQuery followQuery);
+
+    /**
+     * 粉丝列表
+     * @param followQuery 查询参数
+     */
+    JsonResult getFansList(FollowQuery followQuery);
 }

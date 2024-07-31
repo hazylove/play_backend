@@ -32,6 +32,10 @@ public class RelationServiceImpl implements IRelationService {
             return jsonResult.setCode(ResultCode.USER_NOT_EXIST).setSuccess(false).setMessage("用户不存在");
         }
 
+        if (followedUserId.equals(userId)) {
+            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("不可关注自己");
+        }
+
         // 查询是否已关注
         QueryWrapper<UserUserFollow> queryWrapper = new QueryWrapper<>();
         queryWrapper.lambda().eq(UserUserFollow::getFollowedUserId, followedUserId).eq(UserUserFollow::getFansUserId, userId);
@@ -55,9 +59,15 @@ public class RelationServiceImpl implements IRelationService {
     public JsonResult getFollowList(FollowQuery followQuery) {
         Long total = userUserFollowMapper.countFollow(followQuery);
         List<UserListVo> userList = userUserFollowMapper.getFollowList(followQuery);
-        userList.forEach(user -> {
-            user.setAvatar(MyFileUtil.reSetFileUrl(user.getAvatar()));
-        });
+        userList.forEach(user -> user.setAvatar(MyFileUtil.reSetFileUrl(user.getAvatar())));
+        return new JsonResult().setData(new PageList<>(total, userList));
+    }
+
+    @Override
+    public JsonResult getFansList(FollowQuery followQuery) {
+        Long total = userUserFollowMapper.countFans(followQuery);
+        List<UserListVo> userList = userUserFollowMapper.getFansList(followQuery);
+        userList.forEach(user -> user.setAvatar(MyFileUtil.reSetFileUrl(user.getAvatar())));
         return new JsonResult().setData(new PageList<>(total, userList));
     }
 }
