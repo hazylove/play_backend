@@ -1,16 +1,21 @@
 package com.play.playsystem.relation.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.play.playsystem.basic.utils.dto.PageList;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.basic.utils.result.ResultCode;
+import com.play.playsystem.basic.utils.tool.MyFileUtil;
 import com.play.playsystem.relation.domain.entity.UserUserFollow;
+import com.play.playsystem.relation.domain.query.FollowQuery;
 import com.play.playsystem.relation.mapper.UserUserFollowMapper;
 import com.play.playsystem.relation.service.IRelationService;
+import com.play.playsystem.user.domain.vo.UserListVo;
 import com.play.playsystem.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 public class RelationServiceImpl implements IRelationService {
@@ -44,5 +49,15 @@ public class RelationServiceImpl implements IRelationService {
             }
             throw new RuntimeException("取消关注异常");
         }
+    }
+
+    @Override
+    public JsonResult getFollowList(FollowQuery followQuery) {
+        Long total = userUserFollowMapper.countFollow(followQuery);
+        List<UserListVo> userList = userUserFollowMapper.getFollowList(followQuery);
+        userList.forEach(user -> {
+            user.setAvatar(MyFileUtil.reSetFileUrl(user.getAvatar()));
+        });
+        return new JsonResult().setData(new PageList<>(total, userList));
     }
 }

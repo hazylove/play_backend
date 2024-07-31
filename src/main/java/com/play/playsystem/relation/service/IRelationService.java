@@ -1,6 +1,7 @@
 package com.play.playsystem.relation.service;
 
 import com.play.playsystem.basic.utils.result.JsonResult;
+import com.play.playsystem.relation.domain.query.FollowQuery;
 
 public interface IRelationService {
 
@@ -10,4 +11,10 @@ public interface IRelationService {
      * @param userId 当前用户id
      */
     JsonResult follow(Long followedUserId, Long userId);
+
+    /**
+     * 关注列表
+     * @param followQuery 查询参数
+     */
+    JsonResult getFollowList(FollowQuery followQuery);
 }

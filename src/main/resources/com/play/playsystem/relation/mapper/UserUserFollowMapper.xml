@@ -1,4 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.play.playsystem.relation.mapper.UserUserFollowMapper">
+    <select id="countFollow" resultType="java.lang.Long">
+        select count(*)
+        from user_user_follow uuf
+        left join t_user tu on tu.id = uuf.followed_user_id
+        <include refid="followQuery"/>
+    </select>
+
+    <select id="getFollowList" resultType="com.play.playsystem.user.domain.vo.UserListVo">
+        select
+        tu.id,
+        tu.nickname,
+        tu.avatar,
+        tu.profile
+        from user_user_follow uuf
+        left join t_user tu on tu.id = uuf.followed_user_id
+        <include refid="followQuery"/>
+        limit #{page}, #{pageSize}
+    </select>
+
+    <sql id="followQuery">
+        <where>
+            uuf.fans_user_id = #{userId}
+            <if test="keywords != null and keywords !=''">
+                and tu.nickname like concat('%',#{keywords},'%')
+            </if>
+        </where>
+    </sql>
 </mapper>

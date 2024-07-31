@@ -2,16 +2,14 @@ package com.play.playsystem.relation.controller;
 
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.basic.utils.result.ResultCode;
+import com.play.playsystem.relation.domain.query.FollowQuery;
 import com.play.playsystem.relation.service.IRelationService;
 import com.play.playsystem.user.utils.UserCheckUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("${api.prefix}/relation")
@@ -30,6 +28,24 @@ public class RelationController {
         if (UserCheckUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             return relationService.follow(followedUserId, userId);
+        }
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
+    }
+
+    /**
+     * 关注列表
+     * @param followQuery 查询参数
+     */
+    @PostMapping("/followList")
+    public JsonResult getFollowList(@RequestBody FollowQuery followQuery) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (UserCheckUtil.checkAuth(authentication)) {
+            if (followQuery.getUserId() == null) {
+                // 查看本人关注列表
+                Long userId = Long.valueOf(authentication.getName());
+                followQuery.setUserId(userId);
+            }
+            return relationService.getFollowList(followQuery);
         }
         return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
