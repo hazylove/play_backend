@@ -5,40 +5,40 @@
         c1.id, c1.comment_content, c1.comment_post_id, c1.comment_likes_num, c1.comment_blocks_num, c1.comment_created_id, c1.comment_created_date
     </sql>
     <select id="count" resultType="java.lang.Long">
-        SELECT
+        select
             count(c1.id)
-        FROM t_comment c1
+        from t_comment c1
         <include refid="query"/>
     </select>
     <select id="getMainCommentList" resultMap="mainCommentMap">
-        SELECT
+        select
         COUNT(c2.id) AS sub_count,
-        (select count(*) from user_comment_like ucl where ucl.comment_id = c1.id and ucl.user_id = #{userId}) AS user_liked,
-        (select count(*) from user_comment_block ucb where ucb.comment_id = c1.id and ucb.user_id = #{userId}) AS user_blocked,
+        (select count(*) from user_comment_like ucl where ucl.comment_id = c1.id and ucl.user_id = #{userId}) as user_liked,
+        (select count(*) from user_comment_block ucb where ucb.comment_id = c1.id and ucb.user_id = #{userId}) as user_blocked,
         <include refid="baseColumns"/>
-        FROM t_comment c1
-        LEFT JOIN t_comment c2 ON c2.comment_main_id = c1.id AND c2.comment_post_id = c1.comment_post_id
+        from t_comment c1
+        left join t_comment c2 ON c2.comment_main_id = c1.id AND c2.comment_post_id = c1.comment_post_id
         <include refid="query"/>
-        GROUP BY
+        group by
         c1.id,
         c1.comment_content,
         c1.comment_created_id,
         c1.comment_created_date
         <include refid="orderSql"/>
-        LIMIT #{page},#{pageSize}
+        limit #{page},#{pageSize}
     </select>
 
     <select id="getSubCommentList" resultMap="subCommentMap">
-        SELECT
+        select
         c1.comment_main_id,
         c1.comment_reply_id,
-        (select count(*) from user_comment_like ucl where ucl.comment_id = c1.id and ucl.user_id = #{userId}) AS user_liked,
-        (select count(*) from user_comment_block ucb where ucb.comment_id = c1.id and ucb.user_id = #{userId}) AS user_blocked,
+        (select count(*) from user_comment_like ucl where ucl.comment_id = c1.id and ucl.user_id = #{userId}) as user_liked,
+        (select count(*) from user_comment_block ucb where ucb.comment_id = c1.id and ucb.user_id = #{userId}) as user_blocked,
         <include refid="baseColumns"/>
-        FROM t_comment c1
+        from t_comment c1
         <include refid="subCommentQuery"/>
         <include refid="subCommentOrderBy"/>
-        LIMIT #{page},#{pageSize}
+        limit #{page},#{pageSize}
     </select>
 
     <sql id="query">
@@ -66,11 +66,11 @@
         </where>
     </sql>
     <sql id="subCommentOrderBy">
-    ORDER BY
-        IF(c1.comment_reply_id IS NULL, c1.comment_likes_num, NULL) DESC,
-        IF(c1.comment_reply_id IS NOT NULL, c1.comment_reply_id, NULL) ASC,
-        c1.comment_likes_num DESC,
-        c1.comment_created_date DESC
+    order by
+        if(c1.comment_reply_id is null, c1.comment_likes_num, NULL) desc,
+        if(c1.comment_reply_id is not null, c1.comment_reply_id, NULL) asc,
+        c1.comment_likes_num desc,
+        c1.comment_created_date desc
 </sql>
 
     <sql id="orderSql">

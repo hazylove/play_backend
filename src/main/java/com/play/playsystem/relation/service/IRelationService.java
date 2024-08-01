@@ -1,7 +1,7 @@
 package com.play.playsystem.relation.service;
 
 import com.play.playsystem.basic.utils.result.JsonResult;
-import com.play.playsystem.relation.domain.query.FollowQuery;
+import com.play.playsystem.relation.domain.query.RelationQuery;
 
 public interface IRelationService {
 
@@ -14,15 +14,15 @@ public interface IRelationService {
 
     /**
      * 关注列表
-     * @param followQuery 查询参数
+     * @param relationQuery 查询参数
      */
-    JsonResult getFollowList(FollowQuery followQuery);
+    JsonResult getFollowList(RelationQuery relationQuery);
 
     /**
      * 粉丝列表
-     * @param followQuery 查询参数
+     * @param relationQuery 查询参数
      */
-    JsonResult getFansList(FollowQuery followQuery);
+    JsonResult getFansList(RelationQuery relationQuery);
 
     /**
      * 拉黑用户
@@ -30,4 +30,10 @@ public interface IRelationService {
      * @param userId 当前用户id
      */
     JsonResult block(Long blockedUserId, Long userId);
+
+    /**
+     * 查看拉黑列表
+     * @param relationQuery 查询参数
+     */
+    JsonResult getBlockList(RelationQuery relationQuery);
 }

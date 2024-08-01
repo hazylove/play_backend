@@ -17,6 +17,7 @@
         from user_user_follow uuf
         left join t_user tu on tu.id = uuf.followed_user_id
         <include refid="followQuery"/>
+        order by uuf.created_date desc
         limit #{page}, #{pageSize}
     </select>
 
@@ -36,6 +37,7 @@
         from user_user_follow uuf
         left join t_user tu on tu.id = uuf.fans_user_id
         <include refid="fansQuery"/>
+        order by uuf.created_date desc
         limit #{page}, #{pageSize}
     </select>
 

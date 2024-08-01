@@ -1,4 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.play.playsystem.relation.mapper.UserUserBlockMapper">
+
+    <select id="countBlock" resultType="java.lang.Long">
+        select count(*)
+        from user_user_block uub
+        left join t_user tu on tu.id = uub.blocked_user_id
+        <include refid="query"/>
+    </select>
+
+    <select id="getBlockList" resultType="com.play.playsystem.user.domain.vo.UserListVo">
+        select
+            *
+        from
+            user_user_block uub
+        left join t_user tu on tu.id = uub.blocked_user_id
+        <include refid="query"/>
+        order by uub.created_date desc
+        limit #{page}, #{pageSize}
+    </select>
+
+    <sql id="query">
+        <where>
+            uub.user_id = #{userId}
+            <if test="keywords != null and keywords !=''">
+                and tu.nickname like concat('%',#{keywords},'%')
+            </if>
+        </where>
+    </sql>
 </mapper>

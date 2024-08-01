@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class FollowQuery extends PageQuery {
+public class RelationQuery extends PageQuery {
     private String keywords;
     private Long userId;
 }

@@ -7,7 +7,7 @@ import com.play.playsystem.basic.utils.result.ResultCode;
 import com.play.playsystem.basic.utils.tool.MyFileUtil;
 import com.play.playsystem.relation.domain.entity.UserUserBlock;
 import com.play.playsystem.relation.domain.entity.UserUserFollow;
-import com.play.playsystem.relation.domain.query.FollowQuery;
+import com.play.playsystem.relation.domain.query.RelationQuery;
 import com.play.playsystem.relation.mapper.UserUserBlockMapper;
 import com.play.playsystem.relation.mapper.UserUserFollowMapper;
 import com.play.playsystem.relation.service.IRelationService;
@@ -72,17 +72,17 @@ public class RelationServiceImpl implements IRelationService {
     }
 
     @Override
-    public JsonResult getFollowList(FollowQuery followQuery) {
-        Long total = userUserFollowMapper.countFollow(followQuery);
-        List<UserListVo> userList = userUserFollowMapper.getFollowList(followQuery);
+    public JsonResult getFollowList(RelationQuery relationQuery) {
+        Long total = userUserFollowMapper.countFollow(relationQuery);
+        List<UserListVo> userList = userUserFollowMapper.getFollowList(relationQuery);
         userList.forEach(user -> user.setAvatar(MyFileUtil.reSetFileUrl(user.getAvatar())));
         return new JsonResult().setData(new PageList<>(total, userList));
     }
 
     @Override
-    public JsonResult getFansList(FollowQuery followQuery) {
-        Long total = userUserFollowMapper.countFans(followQuery);
-        List<UserListVo> userList = userUserFollowMapper.getFansList(followQuery);
+    public JsonResult getFansList(RelationQuery relationQuery) {
+        Long total = userUserFollowMapper.countFans(relationQuery);
+        List<UserListVo> userList = userUserFollowMapper.getFansList(relationQuery);
         userList.forEach(user -> user.setAvatar(MyFileUtil.reSetFileUrl(user.getAvatar())));
         return new JsonResult().setData(new PageList<>(total, userList));
     }
@@ -122,5 +122,13 @@ public class RelationServiceImpl implements IRelationService {
             }
             throw new RuntimeException("取消拉黑异常");
         }
+    }
+
+    @Override
+    public JsonResult getBlockList(RelationQuery relationQuery) {
+        Long total = userUserBlockMapper.countBlock(relationQuery);
+        List<UserListVo> userList = userUserBlockMapper.getBlockList(relationQuery);
+        userList.forEach(user -> user.setAvatar(MyFileUtil.reSetFileUrl(user.getAvatar())));
+        return new JsonResult().setData(new PageList<>(total, userList));
     }
 }

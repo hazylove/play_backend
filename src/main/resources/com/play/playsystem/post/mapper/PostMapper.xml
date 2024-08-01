@@ -69,7 +69,7 @@
         from t_post p
         JOIN forum.user_post_like upl on p.id = upl.post_id
         <include refid="likeQuery"/>
-        ORDER BY upl.created_date DESC
+        order by upl.created_date DESC
         limit #{page},#{pageSize}
     </select>
 
@@ -95,7 +95,7 @@
             p.post_content,
             p.post_likes_num,
             p.post_blocks_num,
-        (select count(*) from user_post_favorite upf where upf.post_id = p.id) as post_favorites_num,
+            (select count(*) from user_post_favorite upf where upf.post_id = p.id) as post_favorites_num,
             (select count(*) from t_comment c where c.comment_post_id = p.id) as comment_count,
             0 as user_liked,
             1 as user_blocked,
@@ -105,7 +105,7 @@
         from t_post p
         JOIN forum.user_post_block upb on p.id = upb.post_id
         <include refid="blockQuery"/>
-        ORDER BY upb.created_date DESC
+        order by upb.created_date DESC
         limit #{page},#{pageSize}
     </select>
 
@@ -141,7 +141,7 @@
         from t_post p
         JOIN forum.user_post_favorite upf on p.id = upf.post_id
         <include refid="collectQuery"/>
-        ORDER BY upf.created_date DESC
+        order by upf.created_date DESC
         limit #{page},#{pageSize}
     </select>
 
