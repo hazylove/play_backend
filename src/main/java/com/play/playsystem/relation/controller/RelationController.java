@@ -67,4 +67,18 @@ public class RelationController {
         }
         return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
+
+    /**
+     * 拉黑用户
+     * @param blockedUserId 拉黑用户id
+     */
+    @PostMapping("/block/{blockedUserId}")
+    public JsonResult block(@PathVariable("blockedUserId") Long blockedUserId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (UserCheckUtil.checkAuth(authentication)) {
+            Long userId = Long.valueOf(authentication.getName());
+            return relationService.block(blockedUserId, userId);
+        }
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
+    }
 }

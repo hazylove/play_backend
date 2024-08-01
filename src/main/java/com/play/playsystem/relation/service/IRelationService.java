@@ -23,4 +23,11 @@ public interface IRelationService {
      * @param followQuery 查询参数
      */
     JsonResult getFansList(FollowQuery followQuery);
+
+    /**
+     * 拉黑用户
+     * @param blockedUserId 拉黑用户id
+     * @param userId 当前用户id
+     */
+    JsonResult block(Long blockedUserId, Long userId);
 }
