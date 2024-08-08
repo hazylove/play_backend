@@ -4,6 +4,7 @@
     <select id="count" resultType="java.lang.Long">
         select count(*) from t_post p
         left join user_post_block upb ON p.id = upb.post_id AND upb.user_id = #{userId}
+        left join user_user_block uub ON p.post_created_id = uub.blocked_user_id AND uub.user_id = #{userId}
         <include refid="query"/>
     </select>
 
@@ -23,6 +24,7 @@
             p.post_created_date
         from t_post p
         left join user_post_block upb ON p.id = upb.post_id AND upb.user_id = #{userId}
+        left join user_user_block uub ON p.post_created_id = uub.blocked_user_id AND uub.user_id = #{userId}
         <include refid="query"/>
         <include refid="orderSql"/>
         limit #{page},#{pageSize}
@@ -159,7 +161,7 @@
             <if test="keywords != null and keywords !=''">
                 and (p.post_title like concat('%',#{keywords},'%') or p.post_content like concat('%',#{keywords},'%'))
             </if>
-            and upb.post_id IS NULL
+            and upb.post_id IS NULL and uub.blocked_user_id IS NULL
         </where>
     </sql>
 

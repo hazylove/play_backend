@@ -8,6 +8,7 @@
         select
             count(c1.id)
         from t_comment c1
+        left join user_user_block uub ON c1.comment_created_id = uub.blocked_user_id AND uub.user_id = #{userId}
         <include refid="query"/>
     </select>
     <select id="getMainCommentList" resultMap="mainCommentMap">
@@ -18,6 +19,7 @@
         <include refid="baseColumns"/>
         from t_comment c1
         left join t_comment c2 ON c2.comment_main_id = c1.id AND c2.comment_post_id = c1.comment_post_id
+        left join user_user_block uub ON c1.comment_created_id = uub.blocked_user_id AND uub.user_id = #{userId}
         <include refid="query"/>
         group by
         c1.id,
@@ -36,6 +38,7 @@
         (select count(*) from user_comment_block ucb where ucb.comment_id = c1.id and ucb.user_id = #{userId}) as user_blocked,
         <include refid="baseColumns"/>
         from t_comment c1
+        left join user_user_block uub ON c1.comment_created_id = uub.blocked_user_id AND uub.user_id = #{userId}
         <include refid="subCommentQuery"/>
         <include refid="subCommentOrderBy"/>
         limit #{page},#{pageSize}
@@ -49,7 +52,7 @@
             <if test="isMain == false">
                 and c1.comment_main_id = #{mainId}
             </if>
-            and c1.comment_post_id = #{postId}
+            and c1.comment_post_id = #{postId} and uub.blocked_user_id is NULL
         </where>
     </sql>
 
@@ -63,6 +66,7 @@
             </if>
             and c1.comment_post_id = #{postId}
             and c1.comment_main_id = #{mainId}
+            and uub.blocked_user_id is NULL
         </where>
     </sql>
     <sql id="subCommentOrderBy">
