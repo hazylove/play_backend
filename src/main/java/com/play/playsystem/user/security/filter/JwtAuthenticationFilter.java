@@ -52,22 +52,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throw new JwtException("token 异常");
         }
 
-        String username = claim.getSubject();
+        Long userId = Long.valueOf(claim.getSubject());
 
-        Object tokenInRedis = redisUtil.get(TOKEN_REDIS_PREFIX + username);
+        Object tokenInRedis = redisUtil.get(TOKEN_REDIS_PREFIX + userId);
         if (tokenInRedis == null || !tokenInRedis.equals(cleanedToken)) {
             throw new JwtException("token 异常");
         }
 
         // 获取用户的权限等信息
-        User user = userService.getUserByUsername(username);
+        //User user = userService.getUserByUsername(username);
+        User user = userService.getUserById(userId);
 
         // 构建UsernamePasswordAuthenticationToken,这里密码为null，是因为提供了正确的JWT,实现自动登录
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(user.getId(), null, userDetailsService.getUserAuthority(user.getId()));
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
         // 刷新token过期时间
-        redisUtil.expire(TOKEN_REDIS_PREFIX + username, jwtUtil.getExpiration());
+        redisUtil.expire(TOKEN_REDIS_PREFIX + userId, jwtUtil.getExpiration());
 
         chain.doFilter(request, response);
     }

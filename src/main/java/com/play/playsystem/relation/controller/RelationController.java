@@ -11,6 +11,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("${api.prefix}/relation")
 @Slf4j
@@ -97,6 +99,20 @@ public class RelationController {
             Long userId = Long.valueOf(authentication.getName());
             relationQuery.setUserId(userId);
             return relationService.getBlockList(relationQuery);
+        }
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
+    }
+
+    /**
+     * 添加好友
+     * @param friendId 好友id
+     */
+    @PostMapping("/addFriend/{friendId}")
+    public JsonResult addFriend(@PathVariable("friendId") Long friendId) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (UserCheckUtil.checkAuth(authentication)) {
+            Long userId = Long.valueOf(authentication.getName());
+            return relationService.addFriend(friendId, userId);
         }
         return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }

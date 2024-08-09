@@ -3,6 +3,8 @@ package com.play.playsystem.relation.service;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.relation.domain.query.RelationQuery;
 
+import java.io.IOException;
+
 public interface IRelationService {
 
     /**
@@ -36,4 +38,11 @@ public interface IRelationService {
      * @param relationQuery 查询参数
      */
     JsonResult getBlockList(RelationQuery relationQuery);
+
+    /**
+     * 添加好友
+     * @param friendId 好友id
+     * @param userId 当前用户id
+     */
+    JsonResult addFriend(Long friendId, Long userId) throws IOException;
 }

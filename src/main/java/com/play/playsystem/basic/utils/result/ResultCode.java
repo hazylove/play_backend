@@ -57,8 +57,8 @@ public class ResultCode {
     // 用户不存在
     public static final int USER_NOT_EXIST = 1051;
 
-    // 被拉黑不可关注
-    public static final int CANNOT_FOLLOW = 1060;
+    // 被拉黑不能操作
+    public static final int BLOCKED_NOT_OPERATE = 1060;
 
     /**
      * 帖子相关返回码

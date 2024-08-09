@@ -49,13 +49,6 @@ public interface IUserService extends IService<User> {
     UserCreatedVo getUserCreatedVo(Long userId);
 
     /**
-     * 根据用户名查询用户
-     * @param username 用户名
-     * @return 用户
-     */
-    User getUserByUsername(String username);
-
-    /**
      * 根据用户名或邮箱查询用户
      * @param Account 账号：用户名或邮箱
      * @return 用户
@@ -97,4 +90,18 @@ public interface IUserService extends IService<User> {
      * @return 不存在：true，存在：false
      */
     Boolean UserNotExist(Long userId);
+
+    /**
+     * 根据用户id获取用户信息
+     * @param userId 用户id
+     * @return 用户信息
+     */
+    User getUserById(Long userId);
+
+    /**
+     * 根据用户名获取用户id
+     * @param username 用户名
+     * @return 用户id
+     */
+    Long getIdByUsername(String username);
 }

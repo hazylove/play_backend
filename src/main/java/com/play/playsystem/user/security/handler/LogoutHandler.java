@@ -36,8 +36,8 @@ public class LogoutHandler implements LogoutSuccessHandler {
             String cleanedToken = token.substring(7);
             Claims claim = jwtUtil.getClaimsByToken(cleanedToken);
             if (claim != null) {
-                String username = claim.getSubject();
-                redisUtil.del(AuthConstant.TOKEN_REDIS_PREFIX + username);
+                long userId = Long.parseLong(claim.getSubject());
+                redisUtil.del(AuthConstant.TOKEN_REDIS_PREFIX + userId);
             }
         }
 

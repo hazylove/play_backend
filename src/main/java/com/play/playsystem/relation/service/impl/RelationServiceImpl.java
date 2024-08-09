@@ -1,21 +1,26 @@
 package com.play.playsystem.relation.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.play.playsystem.basic.handler.MyWebSocketHandler;
 import com.play.playsystem.basic.utils.dto.PageList;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.basic.utils.result.ResultCode;
 import com.play.playsystem.basic.utils.tool.MyFileUtil;
+import com.play.playsystem.relation.domain.entity.FriendApplication;
 import com.play.playsystem.relation.domain.entity.UserUserBlock;
 import com.play.playsystem.relation.domain.entity.UserUserFollow;
 import com.play.playsystem.relation.domain.query.RelationQuery;
+import com.play.playsystem.relation.mapper.FriendApplicationMapper;
 import com.play.playsystem.relation.mapper.UserUserBlockMapper;
 import com.play.playsystem.relation.mapper.UserUserFollowMapper;
 import com.play.playsystem.relation.service.IRelationService;
 import com.play.playsystem.user.domain.vo.UserListVo;
 import com.play.playsystem.user.service.IUserService;
+import com.play.playsystem.user.service.IUserStatusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -29,6 +34,15 @@ public class RelationServiceImpl implements IRelationService {
 
     @Autowired
     private UserUserBlockMapper userUserBlockMapper;
+
+    @Autowired
+    private IUserStatusService userStatusService;
+
+    @Autowired
+    private MyWebSocketHandler webSocketHandler;
+
+    @Autowired
+    private FriendApplicationMapper friendApplicationMapper;
 
     @Override
     public JsonResult follow(Long followedUserId, Long userId) {
@@ -45,7 +59,7 @@ public class RelationServiceImpl implements IRelationService {
         QueryWrapper<UserUserBlock> blockQueryWrapper = new QueryWrapper<>();
         blockQueryWrapper.lambda().eq(UserUserBlock::getBlockedUserId, userId).eq(UserUserBlock::getUserId, followedUserId);
         if (userUserBlockMapper.selectOne(blockQueryWrapper) != null) {
-            return jsonResult.setCode(ResultCode.CANNOT_FOLLOW).setSuccess(false).setMessage("被对方拉黑，不可关注");
+            return jsonResult.setCode(ResultCode.BLOCKED_NOT_OPERATE).setSuccess(false).setMessage("被对方拉黑，不可关注");
         }
 
         // 查询是否已关注
@@ -130,5 +144,38 @@ public class RelationServiceImpl implements IRelationService {
         List<UserListVo> userList = userUserBlockMapper.getBlockList(relationQuery);
         userList.forEach(user -> user.setAvatar(MyFileUtil.reSetFileUrl(user.getAvatar())));
         return new JsonResult().setData(new PageList<>(total, userList));
+    }
+
+    @Override
+    public JsonResult addFriend(Long friendId, Long userId) throws IOException {
+        JsonResult jsonResult = new JsonResult();
+
+        if (friendId.equals(userId)) {
+            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("不可想自己发送申请");
+        }
+
+        // 查询是否被拉黑
+        QueryWrapper<UserUserBlock> blockQueryWrapper = new QueryWrapper<>();
+        blockQueryWrapper.lambda().eq(UserUserBlock::getBlockedUserId, userId).eq(UserUserBlock::getUserId, friendId);
+        if (userUserBlockMapper.selectOne(blockQueryWrapper) != null) {
+            return jsonResult.setCode(ResultCode.BLOCKED_NOT_OPERATE).setSuccess(false).setMessage("被对方拉黑，不可添加");
+        }
+
+        // 保存好友请求
+        FriendApplication friendApplication = new FriendApplication(
+                null,
+                userId,
+                friendId,
+                false,
+                0,
+                LocalDateTime.now()
+        );
+        friendApplicationMapper.insert(friendApplication);
+
+        if (userStatusService.isUserOnline(friendId)) {
+            // 立即通知在线用户
+            webSocketHandler.sendMessageToUser(friendId, "你有新的好友申请！");
+        }
+        return jsonResult;
     }
 }

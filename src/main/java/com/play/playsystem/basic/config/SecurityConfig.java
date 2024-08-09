@@ -18,11 +18,14 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.Arrays;
+import java.util.Collections;
 
 //                .csrf().disable().authorizeRequests()
 //                .and().authorizeRequests().anyRequest().permitAll()
@@ -73,7 +76,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http
-                .cors().and().csrf().disable()
+                .cors(cors -> cors
+                        .configurationSource(request -> {
+                            CorsConfiguration corsConfig = new CorsConfiguration();
+                            corsConfig.setAllowedOrigins(Collections.singletonList("*"));
+                            corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+                            corsConfig.setAllowedHeaders(Collections.singletonList("*"));
+                            return corsConfig;
+                        })
+                ).csrf().disable()
 
                 //禁用session
                 .sessionManagement()
@@ -82,6 +93,7 @@ public class SecurityConfig {
                 //配置拦截规则
                 .and()
                 .authorizeRequests()
+                .antMatchers("/ws/**").permitAll()
                 .antMatchers(ignorePaths).permitAll()
                 .anyRequest()
                 .authenticated()
@@ -112,6 +124,11 @@ public class SecurityConfig {
                 //验证码过滤器
                 .addFilterBefore(captchaFilter, JwtAuthenticationFilter.class)
                 .build();
+    }
+
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().antMatchers("/ws/**");
     }
 
     @Bean
