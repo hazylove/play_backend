@@ -24,7 +24,6 @@ import static com.play.playsystem.basic.constant.AuthConstant.TOKEN_PREFIX;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
     @Autowired
     private JwtUtil jwtUtil;
 

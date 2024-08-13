@@ -2,7 +2,6 @@ package com.play.playsystem.user.security.handler;
 
 import com.alibaba.fastjson.JSON;
 import com.play.playsystem.user.service.IUserService;
-import com.play.playsystem.user.service.IUserStatusService;
 import com.play.playsystem.user.utils.JwtUtil;
 import com.play.playsystem.basic.utils.tool.RedisUtil;
 import com.play.playsystem.basic.utils.result.JsonResult;
@@ -27,9 +26,6 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
     private RedisUtil redisUtil;
 
     @Autowired
-    private IUserStatusService userStatusService;
-
-    @Autowired
     private IUserService userService;
 
     @Override
@@ -42,8 +38,6 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         // 将token存入redis，并设置过期时间
         redisUtil.set(TOKEN_REDIS_PREFIX + userId, token, jwtUtil.getExpiration());
-
-        userStatusService.userOnline(userId);
 
         response.setContentType("application/json;charset=UTF-8");
         response.getWriter().println(JSON.toJSON(result));

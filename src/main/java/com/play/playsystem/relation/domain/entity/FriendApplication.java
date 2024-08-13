@@ -3,6 +3,7 @@ package com.play.playsystem.relation.domain.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.play.playsystem.basic.constant.FriendRequestStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,12 +24,12 @@ public class FriendApplication {
     /**
      * 用户id
      */
-    private Long user_id;
+    private Long userId;
 
     /**
      * 被申请用户id
      */
-    private Long apply_user_id;
+    private Long applyUserId;
 
     /**
      * 已读
@@ -38,11 +39,10 @@ public class FriendApplication {
     /**
      * 申请状态 -1拒绝 1同意 0未处理
      */
-    private int status;
+    private FriendRequestStatusEnum status;
 
     /**
      * 创建时间
      */
-    private LocalDateTime created_date;
-
+    private LocalDateTime createdDate;
 }

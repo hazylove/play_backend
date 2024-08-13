@@ -6,7 +6,7 @@ server:
 logging:
   level:
     root: info #全局使用info级别
-    com.example: trace #指定org.example包下的日志使用trace级别
+    com.play.playsystem: DEBUG #指定com.play.playsystem包下的日志使用trace级别
   file:
     path: logs #日志保存路径
     name: logs/springboot.log #日志文件名
@@ -80,7 +80,9 @@ spring:
       write-dates-as-timestamps: false
 
 mybatis-plus:
+  type-enums-package: com.play.playsystem.basic.constant
   configuration:
+    default-enum-type-handler: org.apache.ibatis.type.EnumOrdinalTypeHandler
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 # 静态资源映射配置

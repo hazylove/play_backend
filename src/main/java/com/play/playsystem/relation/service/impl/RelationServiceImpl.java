@@ -1,10 +1,13 @@
 package com.play.playsystem.relation.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.play.playsystem.basic.constant.MessageTypeEnum;
 import com.play.playsystem.basic.handler.MyWebSocketHandler;
 import com.play.playsystem.basic.utils.dto.PageList;
 import com.play.playsystem.basic.utils.result.JsonResult;
+import com.play.playsystem.basic.utils.result.MessageResult;
 import com.play.playsystem.basic.utils.result.ResultCode;
+import com.play.playsystem.basic.constant.FriendRequestStatusEnum;
 import com.play.playsystem.basic.utils.tool.MyFileUtil;
 import com.play.playsystem.relation.domain.entity.FriendApplication;
 import com.play.playsystem.relation.domain.entity.UserUserBlock;
@@ -16,13 +19,14 @@ import com.play.playsystem.relation.mapper.UserUserFollowMapper;
 import com.play.playsystem.relation.service.IRelationService;
 import com.play.playsystem.user.domain.vo.UserListVo;
 import com.play.playsystem.user.service.IUserService;
-import com.play.playsystem.user.service.IUserStatusService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class RelationServiceImpl implements IRelationService {
@@ -34,9 +38,6 @@ public class RelationServiceImpl implements IRelationService {
 
     @Autowired
     private UserUserBlockMapper userUserBlockMapper;
-
-    @Autowired
-    private IUserStatusService userStatusService;
 
     @Autowired
     private MyWebSocketHandler webSocketHandler;
@@ -150,6 +151,10 @@ public class RelationServiceImpl implements IRelationService {
     public JsonResult addFriend(Long friendId, Long userId) throws IOException {
         JsonResult jsonResult = new JsonResult();
 
+        if (friendId == null || userId == null) {
+            return jsonResult.setCode(ResultCode.UNPROCESSABLE_ENTITY).setSuccess(false).setMessage("参数错误");
+        }
+
         if (friendId.equals(userId)) {
             return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("不可想自己发送申请");
         }
@@ -161,21 +166,47 @@ public class RelationServiceImpl implements IRelationService {
             return jsonResult.setCode(ResultCode.BLOCKED_NOT_OPERATE).setSuccess(false).setMessage("被对方拉黑，不可添加");
         }
 
-        // 保存好友请求
-        FriendApplication friendApplication = new FriendApplication(
-                null,
-                userId,
-                friendId,
-                false,
-                0,
-                LocalDateTime.now()
-        );
-        friendApplicationMapper.insert(friendApplication);
+        // 查询是否已有好友申请
+        QueryWrapper<FriendApplication> applicationQueryWrapper = new QueryWrapper<>();
+        applicationQueryWrapper.lambda().eq(FriendApplication::getUserId, userId).eq(FriendApplication::getApplyUserId, friendId);
+        FriendApplication friendApplication = friendApplicationMapper.selectOne(applicationQueryWrapper);
 
-        if (userStatusService.isUserOnline(friendId)) {
-            // 立即通知在线用户
-            webSocketHandler.sendMessageToUser(friendId, "你有新的好友申请！");
+        if (friendApplication == null) {
+            // 保存好友请求
+            friendApplication = new FriendApplication(
+                    null,
+                    userId,
+                    friendId,
+                    false,
+                    FriendRequestStatusEnum.PENDING,
+                    LocalDateTime.now()
+            );
+            if (friendApplicationMapper.insert(friendApplication) > 0) {
+                sendFriendApplicationMessage(friendId, userId, friendApplication.getId());
+            }
+        } else {
+            if (friendApplication.getBeRead()) {
+                friendApplication.setStatus(FriendRequestStatusEnum.PENDING);
+                friendApplication.setBeRead(false);
+                if (friendApplicationMapper.updateById(friendApplication) > 0) {
+                    sendFriendApplicationMessage(friendId, userId, friendApplication.getId());
+                }
+            }
         }
+
         return jsonResult;
+    }
+
+    private void sendFriendApplicationMessage(Long friendId, Long userId, Long friendApplicationId) throws IOException {
+        if (userService.isUserOnline(friendId)) {
+            Map<String, Object> dataMap = new HashMap<>();
+            dataMap.put("requestId", friendApplicationId);
+            dataMap.put("fromUserId", userId);
+            dataMap.put("message", "你有新的好友申请！");
+            dataMap.put("timestamp", LocalDateTime.now().toString());
+            MessageResult messageResult = new MessageResult(MessageTypeEnum.FRIEND_APPLICATION, dataMap);
+            // 立即通知在线用户
+            webSocketHandler.sendMessageToUser(friendId, messageResult);
+        }
     }
 }

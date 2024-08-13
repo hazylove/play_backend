@@ -3,6 +3,7 @@ package com.play.playsystem.user.security.handler;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson.JSON;
 import com.play.playsystem.basic.constant.AuthConstant;
+import com.play.playsystem.basic.handler.MyWebSocketHandler;
 import com.play.playsystem.user.utils.JwtUtil;
 import com.play.playsystem.basic.utils.tool.RedisUtil;
 import com.play.playsystem.basic.utils.result.JsonResult;
@@ -26,6 +27,9 @@ public class LogoutHandler implements LogoutSuccessHandler {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private MyWebSocketHandler myWebSocketHandler;
+
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         if (authentication != null) {
@@ -38,6 +42,7 @@ public class LogoutHandler implements LogoutSuccessHandler {
             if (claim != null) {
                 long userId = Long.parseLong(claim.getSubject());
                 redisUtil.del(AuthConstant.TOKEN_REDIS_PREFIX + userId);
+                myWebSocketHandler.removeSession(userId);
             }
         }
 
