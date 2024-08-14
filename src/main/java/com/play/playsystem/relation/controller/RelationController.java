@@ -2,6 +2,7 @@ package com.play.playsystem.relation.controller;
 
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.basic.utils.result.ResultCode;
+import com.play.playsystem.relation.domain.dto.FriendApplicationDto;
 import com.play.playsystem.relation.domain.query.RelationQuery;
 import com.play.playsystem.relation.service.IRelationService;
 import com.play.playsystem.user.utils.UserCheckUtil;
@@ -105,14 +106,34 @@ public class RelationController {
 
     /**
      * 添加好友
-     * @param friendId 好友id
+     * @param friendApplicationDto 申请信息
      */
-    @PostMapping("/addFriend/{friendId}")
-    public JsonResult addFriend(@PathVariable("friendId") Long friendId) throws IOException {
+    @PostMapping("/addFriend")
+    public JsonResult addFriend(@RequestBody FriendApplicationDto friendApplicationDto) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (UserCheckUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
-            return relationService.addFriend(friendId, userId);
+            friendApplicationDto.setUserId(userId);
+            return relationService.addFriend(friendApplicationDto);
+        }
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
+    }
+
+    /**
+     * 获取好友申请列表
+     * @param relationQuery 查询参数
+     */
+    @PostMapping("/friendApplicationList")
+    public JsonResult getFriendApplicationList(@RequestBody RelationQuery relationQuery) {
+        if (relationQuery.getUserId() != null) {
+            return new JsonResult().setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("用户异常操作！");
+        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (UserCheckUtil.checkAuth(authentication)) {
+            // 只能查看本人拉黑列表
+            Long userId = Long.valueOf(authentication.getName());
+            relationQuery.setUserId(userId);
+            return relationService.getFriendApplicationList(relationQuery);
         }
         return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }

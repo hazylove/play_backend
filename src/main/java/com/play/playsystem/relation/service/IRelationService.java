@@ -1,6 +1,7 @@
 package com.play.playsystem.relation.service;
 
 import com.play.playsystem.basic.utils.result.JsonResult;
+import com.play.playsystem.relation.domain.dto.FriendApplicationDto;
 import com.play.playsystem.relation.domain.query.RelationQuery;
 
 import java.io.IOException;
@@ -41,8 +42,13 @@ public interface IRelationService {
 
     /**
      * 添加好友
-     * @param friendId 好友id
-     * @param userId 当前用户id
+     * @param friendApplicationDto 申请信息
      */
-    JsonResult addFriend(Long friendId, Long userId) throws IOException;
+    JsonResult addFriend(FriendApplicationDto friendApplicationDto) throws IOException;
+
+    /**
+     * 获取好友申请列表
+     * @param relationQuery 查询参数
+     */
+    JsonResult getFriendApplicationList(RelationQuery relationQuery);
 }

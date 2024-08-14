@@ -32,12 +32,17 @@ public class FriendApplication {
     private Long applyUserId;
 
     /**
+     * 申请信息
+     */
+    private String applyInfo;
+
+    /**
      * 已读
      */
     private Boolean beRead;
 
     /**
-     * 申请状态 -1拒绝 1同意 0未处理
+     * 申请状态
      */
     private FriendRequestStatusEnum status;
 

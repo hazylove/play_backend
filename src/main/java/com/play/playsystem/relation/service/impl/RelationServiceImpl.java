@@ -9,10 +9,12 @@ import com.play.playsystem.basic.utils.result.MessageResult;
 import com.play.playsystem.basic.utils.result.ResultCode;
 import com.play.playsystem.basic.constant.FriendRequestStatusEnum;
 import com.play.playsystem.basic.utils.tool.MyFileUtil;
+import com.play.playsystem.relation.domain.dto.FriendApplicationDto;
 import com.play.playsystem.relation.domain.entity.FriendApplication;
 import com.play.playsystem.relation.domain.entity.UserUserBlock;
 import com.play.playsystem.relation.domain.entity.UserUserFollow;
 import com.play.playsystem.relation.domain.query.RelationQuery;
+import com.play.playsystem.relation.domain.vo.FriendApplicationVo;
 import com.play.playsystem.relation.mapper.FriendApplicationMapper;
 import com.play.playsystem.relation.mapper.UserUserBlockMapper;
 import com.play.playsystem.relation.mapper.UserUserFollowMapper;
@@ -148,8 +150,11 @@ public class RelationServiceImpl implements IRelationService {
     }
 
     @Override
-    public JsonResult addFriend(Long friendId, Long userId) throws IOException {
+    public JsonResult addFriend(FriendApplicationDto friendApplicationDto) throws IOException {
         JsonResult jsonResult = new JsonResult();
+
+        Long friendId = friendApplicationDto.getApplyUserId();
+        Long userId = friendApplicationDto.getUserId();
 
         if (friendId == null || userId == null) {
             return jsonResult.setCode(ResultCode.UNPROCESSABLE_ENTITY).setSuccess(false).setMessage("参数错误");
@@ -177,6 +182,7 @@ public class RelationServiceImpl implements IRelationService {
                     null,
                     userId,
                     friendId,
+                    friendApplicationDto.getApplyInfo(),
                     false,
                     FriendRequestStatusEnum.PENDING,
                     LocalDateTime.now()
@@ -195,6 +201,14 @@ public class RelationServiceImpl implements IRelationService {
         }
 
         return jsonResult;
+    }
+
+    @Override
+    public JsonResult getFriendApplicationList(RelationQuery relationQuery) {
+        Long total = friendApplicationMapper.countFriendApplication(relationQuery);
+        List<FriendApplicationVo> userList = friendApplicationMapper.getFriendApplicationList(relationQuery);
+        userList.forEach(user -> user.setAvatar(MyFileUtil.reSetFileUrl(user.getAvatar())));
+        return new JsonResult().setData(new PageList<>(total, userList));
     }
 
     private void sendFriendApplicationMessage(Long friendId, Long userId, Long friendApplicationId) throws IOException {

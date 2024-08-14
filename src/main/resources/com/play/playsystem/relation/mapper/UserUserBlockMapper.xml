@@ -11,7 +11,10 @@
 
     <select id="getBlockList" resultType="com.play.playsystem.user.domain.vo.UserListVo">
         select
-            *
+            tu.id,
+            tu.nickname,
+            tu.avatar,
+            tu.profile
         from
             user_user_block uub
         left join t_user tu on tu.id = uub.blocked_user_id

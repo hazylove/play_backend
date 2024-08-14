@@ -1,4 +1,29 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.play.playsystem.relation.mapper.FriendApplicationMapper">
+    <select id="countFriendApplication" resultType="java.lang.Long">
+        select count(*)
+        from friend_application fa
+        <include refid="query"/>
+    </select>
+    <select id="getFriendApplicationList" resultType="com.play.playsystem.relation.domain.vo.FriendApplicationVo">
+        select
+            tu.id,
+            tu.nickname,
+            tu.avatar,
+            fa.apply_info,
+            fa.status
+        from
+            friend_application fa
+        left join t_user tu on tu.id = fa.apply_user_id
+        <include refid="query"/>
+        order by fa.created_date desc
+        limit #{page}, #{pageSize}
+    </select>
+
+    <sql id="query">
+        <where>
+            fa.apply_user_id = #{userId}
+        </where>
+    </sql>
 </mapper>
