@@ -1,5 +1,6 @@
 package com.play.playsystem.relation.service;
 
+import com.play.playsystem.basic.constant.FriendRequestStatusEnum;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.relation.domain.dto.FriendApplicationDto;
 import com.play.playsystem.relation.domain.query.RelationQuery;
@@ -51,4 +52,12 @@ public interface IRelationService {
      * @param relationQuery 查询参数
      */
     JsonResult getFriendApplicationList(RelationQuery relationQuery);
+
+    /**
+     * 审批好友申请
+     * @param friendApplicationId 好友申请id
+     * @param userId 用户id
+     * @param friendRequestStatus 审批状态
+     */
+    JsonResult approveFriendApplication(Long friendApplicationId, Long userId, FriendRequestStatusEnum friendRequestStatus);
 }

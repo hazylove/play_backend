@@ -13,24 +13,30 @@ import com.play.playsystem.relation.domain.dto.FriendApplicationDto;
 import com.play.playsystem.relation.domain.entity.FriendApplication;
 import com.play.playsystem.relation.domain.entity.UserUserBlock;
 import com.play.playsystem.relation.domain.entity.UserUserFollow;
+import com.play.playsystem.relation.domain.entity.UserUserFriend;
 import com.play.playsystem.relation.domain.query.RelationQuery;
 import com.play.playsystem.relation.domain.vo.FriendApplicationVo;
 import com.play.playsystem.relation.mapper.FriendApplicationMapper;
 import com.play.playsystem.relation.mapper.UserUserBlockMapper;
 import com.play.playsystem.relation.mapper.UserUserFollowMapper;
+import com.play.playsystem.relation.mapper.UserUserFriendMapper;
 import com.play.playsystem.relation.service.IRelationService;
 import com.play.playsystem.user.domain.vo.UserListVo;
 import com.play.playsystem.user.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
+@Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
 public class RelationServiceImpl implements IRelationService {
     @Autowired
     private IUserService userService;
@@ -47,7 +53,11 @@ public class RelationServiceImpl implements IRelationService {
     @Autowired
     private FriendApplicationMapper friendApplicationMapper;
 
+    @Autowired
+    private UserUserFriendMapper userUserFriendMapper;
+
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public JsonResult follow(Long followedUserId, Long userId) {
         JsonResult jsonResult = new JsonResult();
         if (followedUserId == null || userService.UserNotExist(followedUserId)) {
@@ -105,6 +115,7 @@ public class RelationServiceImpl implements IRelationService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public JsonResult block(Long blockedUserId, Long userId) {
         JsonResult jsonResult = new JsonResult();
         if (blockedUserId == null || userService.UserNotExist(blockedUserId)) {
@@ -150,6 +161,7 @@ public class RelationServiceImpl implements IRelationService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public JsonResult addFriend(FriendApplicationDto friendApplicationDto) throws IOException {
         JsonResult jsonResult = new JsonResult();
 
@@ -209,6 +221,31 @@ public class RelationServiceImpl implements IRelationService {
         List<FriendApplicationVo> userList = friendApplicationMapper.getFriendApplicationList(relationQuery);
         userList.forEach(user -> user.setAvatar(MyFileUtil.reSetFileUrl(user.getAvatar())));
         return new JsonResult().setData(new PageList<>(total, userList));
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public JsonResult approveFriendApplication(Long friendApplicationId, Long userId, FriendRequestStatusEnum friendRequestStatus) {
+        JsonResult jsonResult = new JsonResult();
+        FriendApplication friendApplication = friendApplicationMapper.selectById(friendApplicationId);
+        if (friendApplication == null) {
+            return jsonResult.setCode(ResultCode.DATA_NOT_EXIST).setSuccess(false).setMessage("申请已取消");
+        }
+        if (friendApplication.getStatus() != FriendRequestStatusEnum.PENDING) {
+            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("数据异常，请刷新重试");
+        }
+        if ((friendRequestStatus == FriendRequestStatusEnum.ACCEPTED || friendRequestStatus == FriendRequestStatusEnum.REJECTED) && !Objects.equals(friendApplication.getApplyUserId(), userId)) {
+            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("用户异常操作");
+        }
+
+        friendApplication.setStatus(friendRequestStatus);
+        friendApplicationMapper.updateById(friendApplication);
+        UserUserFriend userUserFriend1 = new UserUserFriend(null, friendApplication.getUserId(), userId, LocalDateTime.now());
+        UserUserFriend userUserFriend2 = new UserUserFriend(null, userId, friendApplication.getUserId(), LocalDateTime.now());
+        userUserFriendMapper.insert(userUserFriend1);
+        userUserFriendMapper.insert(userUserFriend2);
+
+        return jsonResult;
     }
 
     private void sendFriendApplicationMessage(Long friendId, Long userId, Long friendApplicationId) throws IOException {

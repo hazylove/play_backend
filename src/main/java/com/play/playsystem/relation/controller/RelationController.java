@@ -1,5 +1,6 @@
 package com.play.playsystem.relation.controller;
 
+import com.play.playsystem.basic.constant.FriendRequestStatusEnum;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.basic.utils.result.ResultCode;
 import com.play.playsystem.relation.domain.dto.FriendApplicationDto;
@@ -130,10 +131,25 @@ public class RelationController {
         }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (UserCheckUtil.checkAuth(authentication)) {
-            // 只能查看本人拉黑列表
+            // 只能查看本人申请列表
             Long userId = Long.valueOf(authentication.getName());
             relationQuery.setUserId(userId);
             return relationService.getFriendApplicationList(relationQuery);
+        }
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
+    }
+
+    /**
+     * 同意好友申请
+     * @param friendApplicationId 好友申请记录id
+     */
+    @PostMapping("/agreeFriend/{friendApplicationId}")
+    public JsonResult agreeFriend(@PathVariable("friendApplicationId") Long friendApplicationId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (UserCheckUtil.checkAuth(authentication)) {
+            // 只能查看本人申请列表
+            Long userId = Long.valueOf(authentication.getName());
+            return relationService.approveFriendApplication(friendApplicationId, userId, FriendRequestStatusEnum.ACCEPTED);
         }
         return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }

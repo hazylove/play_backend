@@ -22,6 +22,8 @@ public class ResultCode {
      */
     // 用户异常操作
     public static final int USER_OPERATION_ERROR = 990;
+    // 数据不存在
+    public static final int DATA_NOT_EXIST = 991;
 
     // 验证码错误
     public static final int VERIFICATION_CODE_ERROR_CODE = 1001;
@@ -68,7 +70,6 @@ public class ResultCode {
 
     // 评论不存在
     public static final int COMMENT_NOT_EXIST = 1151;
-
 
     /**
      * 富文本图片上传返回码
