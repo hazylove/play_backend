@@ -166,4 +166,18 @@ public class RelationController {
         }
         return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
+
+    /**
+     * 删除好友申请记录
+     * @param friendApplicationId 记录id
+     */
+    @DeleteMapping("/friendApplication/{friendApplicationId}")
+    public JsonResult deleteFriendApplication(@PathVariable("friendApplicationId") Long friendApplicationId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (UserCheckUtil.checkAuth(authentication)) {
+            Long userId = Long.valueOf(authentication.getName());
+            return relationService.deleteFriendApplication(friendApplicationId, userId);
+        }
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
+    }
 }

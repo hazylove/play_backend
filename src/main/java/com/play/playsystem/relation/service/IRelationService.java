@@ -60,4 +60,11 @@ public interface IRelationService {
      * @param friendRequestStatus 审批状态
      */
     JsonResult approveFriendApplication(Long friendApplicationId, Long userId, FriendRequestStatusEnum friendRequestStatus);
+
+    /**
+     * 删除好友申请记录
+     * @param friendApplicationId 记录id
+     * @param userId 用户id
+     */
+    JsonResult deleteFriendApplication(Long friendApplicationId, Long userId);
 }

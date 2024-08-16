@@ -248,6 +248,17 @@ public class RelationServiceImpl implements IRelationService {
         return jsonResult;
     }
 
+    @Override
+    public JsonResult deleteFriendApplication(Long friendApplicationId, Long userId) {
+        JsonResult jsonResult = new JsonResult();
+        FriendApplication friendApplication = friendApplicationMapper.selectById(friendApplicationId);
+        if (!Objects.equals(friendApplication.getApplyUserId(), userId)) {
+            return jsonResult.setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("用户异常操作");
+        }
+        friendApplicationMapper.deleteById(friendApplicationId);
+        return jsonResult;
+    }
+
     private void sendFriendApplicationMessage(Long friendId, Long userId, Long friendApplicationId) throws IOException {
         if (userService.isUserOnline(friendId)) {
             Map<String, Object> dataMap = new HashMap<>();
