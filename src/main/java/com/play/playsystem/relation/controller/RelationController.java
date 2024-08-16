@@ -147,9 +147,22 @@ public class RelationController {
     public JsonResult agreeFriend(@PathVariable("friendApplicationId") Long friendApplicationId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (UserCheckUtil.checkAuth(authentication)) {
-            // 只能查看本人申请列表
             Long userId = Long.valueOf(authentication.getName());
             return relationService.approveFriendApplication(friendApplicationId, userId, FriendRequestStatusEnum.ACCEPTED);
+        }
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
+    }
+
+    /**
+     * 拒绝好友申请
+     * @param friendApplicationId 申请记录id
+     */
+    @PostMapping("/rejectFriend/{friendApplicationId}")
+    public JsonResult rejectFriend(@PathVariable("friendApplicationId") Long friendApplicationId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (UserCheckUtil.checkAuth(authentication)) {
+            Long userId = Long.valueOf(authentication.getName());
+            return relationService.approveFriendApplication(friendApplicationId, userId, FriendRequestStatusEnum.REJECTED);
         }
         return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
