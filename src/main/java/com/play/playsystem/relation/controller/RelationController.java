@@ -198,4 +198,18 @@ public class RelationController {
         }
         return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
+
+    /**
+     * 删除还有
+     * @param friendId 好友id
+     */
+    @DeleteMapping("/friend/{friendId}")
+    public JsonResult deleteFriend(@PathVariable Long friendId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (UserCheckUtil.checkAuth(authentication)) {
+            Long userId = Long.valueOf(authentication.getName());
+            return relationService.deleteFriend(userId, friendId);
+        }
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
+    }
 }

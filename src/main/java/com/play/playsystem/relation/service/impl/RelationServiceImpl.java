@@ -276,6 +276,17 @@ public class RelationServiceImpl implements IRelationService {
         return new JsonResult().setData(new PageList<>(total, userList));
     }
 
+    @Override
+    public JsonResult deleteFriend(Long userId, Long friendId) {
+        QueryWrapper<UserUserFriend> friendQueryWrapper1 = new QueryWrapper<>();
+        QueryWrapper<UserUserFriend> friendQueryWrapper2 = new QueryWrapper<>();
+        friendQueryWrapper1.lambda().eq(UserUserFriend::getUserId1, userId).eq(UserUserFriend::getUserId2, friendId);
+        friendQueryWrapper2.lambda().eq(UserUserFriend::getUserId1, friendId).eq(UserUserFriend::getUserId2, userId);
+        userUserFriendMapper.delete(friendQueryWrapper1);
+        userUserFriendMapper.delete(friendQueryWrapper2);
+        return new JsonResult();
+    }
+
     private void sendFriendApplicationMessage(Long friendId, Long userId, Long friendApplicationId) throws IOException {
         if (userService.isUserOnline(friendId)) {
             Map<String, Object> dataMap = new HashMap<>();
