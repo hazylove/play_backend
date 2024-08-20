@@ -140,11 +140,13 @@ public class RelationServiceImpl implements IRelationService {
                         .and(wrapper -> wrapper.eq(UserUserFollow::getFollowedUserId, blockedUserId).eq(UserUserFollow::getFansUserId, userId))
                         .or(wrapper -> wrapper.eq(UserUserFollow::getFollowedUserId, userId).eq(UserUserFollow::getFansUserId, blockedUserId));
                 userUserFollowMapper.delete(followQueryWrapper);
+                // 删除好友
+                deleteFriend(userId, blockedUserId);
                 return jsonResult;
             }
             throw new RuntimeException("拉黑异常");
         } else {
-            // 已关注
+            // 已拉黑
             if (userUserBlockMapper.delete(blockQueryWrapper) > 0) {
                 return jsonResult;
             }
@@ -258,6 +260,7 @@ public class RelationServiceImpl implements IRelationService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public JsonResult deleteFriendApplication(Long friendApplicationId, Long userId) {
         JsonResult jsonResult = new JsonResult();
         FriendApplication friendApplication = friendApplicationMapper.selectById(friendApplicationId);
@@ -277,6 +280,7 @@ public class RelationServiceImpl implements IRelationService {
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public JsonResult deleteFriend(Long userId, Long friendId) {
         QueryWrapper<UserUserFriend> friendQueryWrapper1 = new QueryWrapper<>();
         QueryWrapper<UserUserFriend> friendQueryWrapper2 = new QueryWrapper<>();
