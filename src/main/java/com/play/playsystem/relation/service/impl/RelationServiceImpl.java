@@ -183,6 +183,15 @@ public class RelationServiceImpl implements IRelationService {
             return jsonResult.setCode(ResultCode.BLOCKED_NOT_OPERATE).setSuccess(false).setMessage("被对方拉黑，不可添加");
         }
 
+        // 查询是否已经成为好友
+        QueryWrapper<UserUserFriend> friendQueryWrapper1 = new QueryWrapper<>();
+        QueryWrapper<UserUserFriend> friendQueryWrapper2 = new QueryWrapper<>();
+        friendQueryWrapper1.lambda().eq(UserUserFriend::getUserId1, userId).eq(UserUserFriend::getUserId2, friendId);
+        friendQueryWrapper1.lambda().eq(UserUserFriend::getUserId1, friendId).eq(UserUserFriend::getUserId2, userId);
+        if (userUserFriendMapper.selectOne(friendQueryWrapper2) != null && userUserFriendMapper.selectOne(friendQueryWrapper2) != null) {
+            return jsonResult.setCode(ResultCode.BECAME_FRIEND).setSuccess(false).setMessage("已成为好友，不可重复添加");
+        }
+
         // 查询是否已有好友申请
         QueryWrapper<FriendApplication> applicationQueryWrapper = new QueryWrapper<>();
         applicationQueryWrapper.lambda().eq(FriendApplication::getUserId, userId).eq(FriendApplication::getApplyUserId, friendId);
@@ -257,6 +266,14 @@ public class RelationServiceImpl implements IRelationService {
         }
         friendApplicationMapper.deleteById(friendApplicationId);
         return jsonResult;
+    }
+
+    @Override
+    public JsonResult getFriendList(RelationQuery relationQuery) {
+        Long total = userUserFriendMapper.countFriends(relationQuery);
+        List<UserListVo> userList = userUserFriendMapper.getFriendList(relationQuery);
+        userList.forEach(user -> user.setAvatar(MyFileUtil.reSetFileUrl(user.getAvatar())));
+        return new JsonResult().setData(new PageList<>(total, userList));
     }
 
     private void sendFriendApplicationMessage(Long friendId, Long userId, Long friendApplicationId) throws IOException {

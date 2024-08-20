@@ -1,4 +1,33 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.play.playsystem.relation.mapper.UserUserFriendMapper">
+    <select id="countFriends" resultType="java.lang.Long">
+        select count(*)
+        from user_user_friend uuf
+        left join t_user tu on tu.id = uuf.user_id2
+        <include refid="query"/>
+    </select>
+
+    <select id="getFriendList" resultType="com.play.playsystem.user.domain.vo.UserListVo">
+        select
+        tu.id,
+        tu.nickname,
+        tu.avatar,
+        tu.profile
+        from
+        user_user_friend uuf
+        left join t_user tu on tu.id = uuf.user_id2
+        <include refid="query"/>
+        order by uuf.created_date desc
+        limit #{page}, #{pageSize}
+    </select>
+
+    <sql id="query">
+        <where>
+            uuf.user_id1 = #{userId}
+            <if test="keywords != null and keywords !=''">
+                and tu.nickname like concat('%',#{keywords},'%')
+            </if>
+        </where>
+    </sql>
 </mapper>

@@ -180,4 +180,22 @@ public class RelationController {
         }
         return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
     }
+
+    /**
+     * 获取好友列表
+     * @param relationQuery 查询参数
+     */
+    @PostMapping("/friendList")
+    public JsonResult getFriendList(@RequestBody RelationQuery relationQuery) {
+        if (relationQuery.getUserId() != null) {
+            return new JsonResult().setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("用户异常操作！");
+        }
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (UserCheckUtil.checkAuth(authentication)) {
+            Long userId = Long.valueOf(authentication.getName());
+            relationQuery.setUserId(userId);
+            return relationService.getFriendList(relationQuery);
+        }
+        return new JsonResult().setCode(ResultCode.FORBIDDEN_CODE).setSuccess(false).setMessage("未认证用户！");
+    }
 }

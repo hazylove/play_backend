@@ -67,4 +67,10 @@ public interface IRelationService {
      * @param userId 用户id
      */
     JsonResult deleteFriendApplication(Long friendApplicationId, Long userId);
+
+    /**
+     * 查询好友列表
+     * @param relationQuery 查询参数
+     */
+    JsonResult getFriendList(RelationQuery relationQuery);
 }

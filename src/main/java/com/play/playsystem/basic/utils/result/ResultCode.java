@@ -59,6 +59,9 @@ public class ResultCode {
     // 用户不存在
     public static final int USER_NOT_EXIST = 1051;
 
+    // 已成为好友，不可重复添加
+    public static final int BECAME_FRIEND = 1055;
+
     // 被拉黑不能操作
     public static final int BLOCKED_NOT_OPERATE = 1060;
 
