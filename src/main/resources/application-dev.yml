@@ -116,6 +116,9 @@ jwt:
     # 登录邮箱验证码
     - ${api.prefix}/email/sendLoginCode
 
+# websocket心跳检测时间间隔，单位毫秒
+websocket:
+  heartbeat-interval: 5000
 
 # 接口前缀
 api:

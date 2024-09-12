@@ -21,7 +21,7 @@ import com.play.playsystem.user.domain.dto.UserRegistrationDto;
 import com.play.playsystem.user.domain.entity.User;
 import com.play.playsystem.user.mapper.UserMapper;
 import com.play.playsystem.user.utils.PasswordEncoder;
-import com.play.playsystem.user.utils.UserCheckUtil;
+import com.play.playsystem.user.utils.UserUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,7 +48,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private UserCheckUtil userCheckUtil;
+    private UserUtil userUtil;
 
     @Autowired
     private RedisUtil redisUtil;
@@ -68,7 +68,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     public JsonResult register(UserRegistrationDto userRegistrationDto) {
         JsonResult jsonResult = new JsonResult();
         // 校验用户名格式
-        if (UserCheckUtil.isInvalidUsername(userRegistrationDto.getUsername()) && FormatCheckUtil.validateEmail(userRegistrationDto.getUsername())) {
+        if (UserUtil.isInvalidUsername(userRegistrationDto.getUsername()) && FormatCheckUtil.validateEmail(userRegistrationDto.getUsername())) {
             return jsonResult.setSuccess(false).setCode(ResultCode.USERNAME_FORMAT_ERROR).setMessage("用户名格式不正确");
         }
         // 校验手机号格式
@@ -88,7 +88,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             return new JsonResult().setCode(ResultCode.EMAIL_EXISTING).setSuccess(false).setMessage("该邮箱已注册");
         }
         // 校验邮箱验证码
-        if (userCheckUtil.isInvalidEmailCode(userRegistrationDto.getEmail(), userRegistrationDto.getEmailCode())) {
+        if (userUtil.isInvalidEmailCode(userRegistrationDto.getEmail(), userRegistrationDto.getEmailCode())) {
             return jsonResult.setSuccess(false).setCode(ResultCode.EMAIL_CODE_ERROR).setMessage("邮箱验证码错误");
         }
         // 创建用户
@@ -121,7 +121,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             return jsonResult.setSuccess(false).setCode(ResultCode.TWICE_PASSWORD_INCONSISTENT).setMessage("两次输入密码不一致");
         }
         // 校验邮箱验证码
-        if (userCheckUtil.isInvalidEmailCode(email, changePasswordDto.getEmailCode())) {
+        if (userUtil.isInvalidEmailCode(email, changePasswordDto.getEmailCode())) {
             return jsonResult.setSuccess(false).setCode(ResultCode.EMAIL_CODE_ERROR).setMessage("邮箱验证码错误");
         }
         // 修改密码

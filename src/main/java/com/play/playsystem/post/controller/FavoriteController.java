@@ -5,7 +5,7 @@ import com.play.playsystem.basic.utils.result.ResultCode;
 import com.play.playsystem.post.domain.entity.Favorite;
 import com.play.playsystem.post.domain.query.FavoriteQuery;
 import com.play.playsystem.post.service.IFavoriteService;
-import com.play.playsystem.user.utils.UserCheckUtil;
+import com.play.playsystem.user.utils.UserUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -27,7 +27,7 @@ public class FavoriteController {
     @PostMapping("/add")
     public JsonResult addFavorite(@RequestBody Favorite favorite) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             favorite.setCreatedId(userId);
             favoriteService.insert(favorite);
@@ -46,7 +46,7 @@ public class FavoriteController {
             return new JsonResult().setCode(ResultCode.UNPROCESSABLE_ENTITY).setSuccess(false).setMessage("缺少必要的参数：id");
         }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             favorite.setCreatedId(userId);
             return favoriteService.updateFavorite(favorite, userId);
@@ -61,7 +61,7 @@ public class FavoriteController {
     @DeleteMapping("/{favoriteId}")
     public JsonResult deleteFavorite(@PathVariable Long favoriteId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             return favoriteService.deleteFavorite(favoriteId, userId);
         }
@@ -74,7 +74,7 @@ public class FavoriteController {
     @PostMapping("/list")
     public JsonResult getFavorites(@RequestBody FavoriteQuery favoriteQuery) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             if (favoriteQuery.getUserId() == null) {
                 Long userId = Long.valueOf(authentication.getName());
                 favoriteQuery.setUserId(userId);
@@ -92,7 +92,7 @@ public class FavoriteController {
     @GetMapping("/details/{favoriteId}")
     public JsonResult getFavorite(@PathVariable Long favoriteId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             return favoriteService.getFavoriteDetails(favoriteId, userId);
         }

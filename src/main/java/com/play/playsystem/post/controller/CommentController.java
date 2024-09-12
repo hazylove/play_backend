@@ -8,7 +8,7 @@ import com.play.playsystem.post.domain.query.CommentQuery;
 import com.play.playsystem.post.domain.vo.MainCommentVo;
 import com.play.playsystem.post.domain.vo.SubCommentVo;
 import com.play.playsystem.post.service.ICommentService;
-import com.play.playsystem.user.utils.UserCheckUtil;
+import com.play.playsystem.user.utils.UserUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -31,7 +31,7 @@ public class CommentController {
     @PostMapping("/mainList")
     public JsonResult getMainCommentList(@RequestBody CommentQuery commentQuery){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             commentQuery.setUserId(Long.valueOf(authentication.getName()));
             commentQuery.setIsMain(true);
             PageList<MainCommentVo> pageList = commentService.getMainCommentList(commentQuery);
@@ -49,7 +49,7 @@ public class CommentController {
     @PostMapping("/subList")
     public JsonResult getSubCommentList(@RequestBody CommentQuery commentQuery){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             commentQuery.setUserId(Long.valueOf(authentication.getName()));
             commentQuery.setIsMain(false);
             PageList<SubCommentVo> pageList = commentService.getSubCommentList(commentQuery);
@@ -66,7 +66,7 @@ public class CommentController {
     @PostMapping("/add")
     public JsonResult addComment(@RequestBody Comment comment){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             comment.setCommentCreatedId(userId);
             commentService.insert(comment);
@@ -83,7 +83,7 @@ public class CommentController {
     @DeleteMapping("/{commentId}")
     public JsonResult deleteComment(@PathVariable Long commentId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             return commentService.deleteComment(commentId, userId);
         } else {
@@ -98,7 +98,7 @@ public class CommentController {
     @PostMapping("/like/{commentId}")
     public JsonResult likePost(@PathVariable Long commentId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             return commentService.likeComment(commentId, userId);
         }else {
@@ -113,7 +113,7 @@ public class CommentController {
     @PostMapping("/block/{commentId}")
     public JsonResult blockPost(@PathVariable Long commentId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             return commentService.blockComment(commentId, userId);
         } else {

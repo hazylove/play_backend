@@ -1,14 +1,23 @@
 package com.play.playsystem.user.utils;
 
+import cn.hutool.core.util.StrUtil;
 import com.play.playsystem.basic.utils.tool.RedisUtil;
+import io.jsonwebtoken.Claims;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
 
+import static com.play.playsystem.basic.constant.AuthConstant.TOKEN_REDIS_PREFIX;
+
+@Slf4j
 @Component
-public class UserCheckUtil {
+public class UserUtil {
+    @Autowired
+    private JwtUtil jwtUtil;
+
     @Autowired
     private RedisUtil redisUtil;
 
@@ -34,5 +43,31 @@ public class UserCheckUtil {
 
     public static boolean checkAuth(Authentication authentication) {
         return authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser");
+    }
+
+    /**
+     * 根据token解析用户ID
+     * @param token token
+     * @return 用户ID
+     */
+    public Long extractUserIdFromToken(String token) {
+        if (StrUtil.isBlankOrUndefined(token)) {
+            return null;
+        }
+
+        Claims claims = jwtUtil.getClaimsByToken(token);
+        if (claims == null) {
+            log.error("无效token: {}", token);
+            return null;
+        }
+
+        Long userId = Long.valueOf(claims.getSubject());
+        Object storedToken = redisUtil.get(TOKEN_REDIS_PREFIX + userId);
+        if (storedToken == null || !storedToken.equals(token)) {
+            log.error("用户id {} 的令牌失效: {}", userId, token);
+            return null;
+        }
+
+        return userId;
     }
 }

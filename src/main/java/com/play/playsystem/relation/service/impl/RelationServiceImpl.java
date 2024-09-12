@@ -2,7 +2,7 @@ package com.play.playsystem.relation.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.play.playsystem.basic.constant.MessageTypeEnum;
-import com.play.playsystem.basic.handler.MyWebSocketHandler;
+import com.play.playsystem.basic.handler.NotificationWebSocketHandlerMy;
 import com.play.playsystem.basic.utils.dto.PageList;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.basic.utils.result.MessageResult;
@@ -48,7 +48,7 @@ public class RelationServiceImpl implements IRelationService {
     private UserUserBlockMapper userUserBlockMapper;
 
     @Autowired
-    private MyWebSocketHandler webSocketHandler;
+    private NotificationWebSocketHandlerMy webSocketHandler;
 
     @Autowired
     private FriendApplicationMapper friendApplicationMapper;
@@ -189,8 +189,8 @@ public class RelationServiceImpl implements IRelationService {
         QueryWrapper<UserUserFriend> friendQueryWrapper1 = new QueryWrapper<>();
         QueryWrapper<UserUserFriend> friendQueryWrapper2 = new QueryWrapper<>();
         friendQueryWrapper1.lambda().eq(UserUserFriend::getUserId1, userId).eq(UserUserFriend::getUserId2, friendId);
-        friendQueryWrapper1.lambda().eq(UserUserFriend::getUserId1, friendId).eq(UserUserFriend::getUserId2, userId);
-        if (userUserFriendMapper.selectOne(friendQueryWrapper2) != null && userUserFriendMapper.selectOne(friendQueryWrapper2) != null) {
+        friendQueryWrapper2.lambda().eq(UserUserFriend::getUserId1, friendId).eq(UserUserFriend::getUserId2, userId);
+        if (userUserFriendMapper.selectOne(friendQueryWrapper1) != null && userUserFriendMapper.selectOne(friendQueryWrapper2) != null) {
             return jsonResult.setCode(ResultCode.BECAME_FRIEND).setSuccess(false).setMessage("已成为好友，不可重复添加");
         }
 
@@ -199,6 +199,7 @@ public class RelationServiceImpl implements IRelationService {
         applicationQueryWrapper.lambda().eq(FriendApplication::getUserId, userId).eq(FriendApplication::getApplyUserId, friendId);
         FriendApplication friendApplication = friendApplicationMapper.selectOne(applicationQueryWrapper);
 
+        // 首次申请
         if (friendApplication == null) {
             // 保存好友请求
             friendApplication = new FriendApplication(
@@ -211,14 +212,15 @@ public class RelationServiceImpl implements IRelationService {
                     LocalDateTime.now()
             );
             if (friendApplicationMapper.insert(friendApplication) > 0) {
-                sendFriendApplicationMessage(friendId, userId, friendApplication.getId());
+                sendFriendApplicationMessage(friendId, userId, friendApplication.getId(), friendApplicationDto.getApplyInfo());
             }
         } else {
             if (friendApplication.getBeRead()) {
-                friendApplication.setStatus(FriendRequestStatusEnum.PENDING);
-                friendApplication.setBeRead(false);
+                friendApplication.setStatus(FriendRequestStatusEnum.PENDING);   // 状态
+                friendApplication.setApplyInfo(friendApplicationDto.getApplyInfo());    // 申请信息
+                friendApplication.setBeRead(false); // 未读
                 if (friendApplicationMapper.updateById(friendApplication) > 0) {
-                    sendFriendApplicationMessage(friendId, userId, friendApplication.getId());
+                    sendFriendApplicationMessage(friendId, userId, friendApplication.getId(), friendApplicationDto.getApplyInfo());
                 }
             }
         }
@@ -291,12 +293,12 @@ public class RelationServiceImpl implements IRelationService {
         return new JsonResult();
     }
 
-    private void sendFriendApplicationMessage(Long friendId, Long userId, Long friendApplicationId) throws IOException {
+    private void sendFriendApplicationMessage(Long friendId, Long userId, Long friendApplicationId,String applyInfo) throws IOException {
         if (userService.isUserOnline(friendId)) {
             Map<String, Object> dataMap = new HashMap<>();
             dataMap.put("requestId", friendApplicationId);
             dataMap.put("fromUserId", userId);
-            dataMap.put("message", "你有新的好友申请！");
+            dataMap.put("message", applyInfo);
             dataMap.put("timestamp", LocalDateTime.now().toString());
             MessageResult messageResult = new MessageResult(MessageTypeEnum.FRIEND_APPLICATION, dataMap);
             // 立即通知在线用户

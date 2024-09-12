@@ -6,7 +6,7 @@ import com.play.playsystem.basic.utils.result.ResultCode;
 import com.play.playsystem.relation.domain.dto.FriendApplicationDto;
 import com.play.playsystem.relation.domain.query.RelationQuery;
 import com.play.playsystem.relation.service.IRelationService;
-import com.play.playsystem.user.utils.UserCheckUtil;
+import com.play.playsystem.user.utils.UserUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -29,7 +29,7 @@ public class RelationController {
     @PostMapping("/follow/{followedUserId}")
     public JsonResult follow(@PathVariable("followedUserId") Long followedUserId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             return relationService.follow(followedUserId, userId);
         }
@@ -43,7 +43,7 @@ public class RelationController {
     @PostMapping("/followList")
     public JsonResult getFollowList(@RequestBody RelationQuery relationQuery) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             if (relationQuery.getUserId() == null) {
                 // 查看本人关注列表
                 Long userId = Long.valueOf(authentication.getName());
@@ -61,7 +61,7 @@ public class RelationController {
     @PostMapping("/fansList")
     public JsonResult getFansList(@RequestBody RelationQuery relationQuery) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             if (relationQuery.getUserId() == null) {
                 // 查看本人粉丝列表
                 Long userId = Long.valueOf(authentication.getName());
@@ -79,7 +79,7 @@ public class RelationController {
     @PostMapping("/block/{blockedUserId}")
     public JsonResult block(@PathVariable("blockedUserId") Long blockedUserId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             return relationService.block(blockedUserId, userId);
         }
@@ -96,7 +96,7 @@ public class RelationController {
             return new JsonResult().setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("用户异常操作！");
         }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             // 只能查看本人拉黑列表
             Long userId = Long.valueOf(authentication.getName());
             relationQuery.setUserId(userId);
@@ -112,7 +112,7 @@ public class RelationController {
     @PostMapping("/addFriend")
     public JsonResult addFriend(@RequestBody FriendApplicationDto friendApplicationDto) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             friendApplicationDto.setUserId(userId);
             return relationService.addFriend(friendApplicationDto);
@@ -130,7 +130,7 @@ public class RelationController {
             return new JsonResult().setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("用户异常操作！");
         }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             // 只能查看本人申请列表
             Long userId = Long.valueOf(authentication.getName());
             relationQuery.setUserId(userId);
@@ -146,7 +146,7 @@ public class RelationController {
     @PostMapping("/agreeFriend/{friendApplicationId}")
     public JsonResult agreeFriend(@PathVariable("friendApplicationId") Long friendApplicationId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             return relationService.approveFriendApplication(friendApplicationId, userId, FriendRequestStatusEnum.ACCEPTED);
         }
@@ -160,7 +160,7 @@ public class RelationController {
     @PostMapping("/rejectFriend/{friendApplicationId}")
     public JsonResult rejectFriend(@PathVariable("friendApplicationId") Long friendApplicationId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             return relationService.approveFriendApplication(friendApplicationId, userId, FriendRequestStatusEnum.REJECTED);
         }
@@ -174,7 +174,7 @@ public class RelationController {
     @DeleteMapping("/friendApplication/{friendApplicationId}")
     public JsonResult deleteFriendApplication(@PathVariable("friendApplicationId") Long friendApplicationId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             return relationService.deleteFriendApplication(friendApplicationId, userId);
         }
@@ -191,7 +191,7 @@ public class RelationController {
             return new JsonResult().setCode(ResultCode.USER_OPERATION_ERROR).setSuccess(false).setMessage("用户异常操作！");
         }
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             relationQuery.setUserId(userId);
             return relationService.getFriendList(relationQuery);
@@ -200,13 +200,13 @@ public class RelationController {
     }
 
     /**
-     * 删除还有
+     * 删除好友
      * @param friendId 好友id
      */
     @DeleteMapping("/friend/{friendId}")
     public JsonResult deleteFriend(@PathVariable Long friendId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             return relationService.deleteFriend(userId, friendId);
         }

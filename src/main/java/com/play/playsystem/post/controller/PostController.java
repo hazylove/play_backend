@@ -7,7 +7,7 @@ import com.play.playsystem.post.domain.entity.Post;
 import com.play.playsystem.post.domain.query.PostQuery;
 import com.play.playsystem.post.domain.vo.PostVo;
 import com.play.playsystem.post.service.IPostService;
-import com.play.playsystem.user.utils.UserCheckUtil;
+import com.play.playsystem.user.utils.UserUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -29,7 +29,7 @@ public class PostController {
     @PostMapping("/list")
     public JsonResult getPostPage(@RequestBody PostQuery postQuery){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             postQuery.setUserId(Long.valueOf(authentication.getName()));
         }
         PageList<PostVo> pageList = postService.getPostList(postQuery);
@@ -43,7 +43,7 @@ public class PostController {
     @PostMapping("/add")
     public JsonResult addPost(@RequestBody Post post){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             post.setPostCreatedId(userId);
             postService.insert(post);
@@ -59,7 +59,7 @@ public class PostController {
     @GetMapping("/{postId}")
     public JsonResult selectOne(@PathVariable Long postId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             PostVo postVo = postService.selectById(postId, userId);
             return new JsonResult().setData(postVo);
@@ -74,7 +74,7 @@ public class PostController {
     @DeleteMapping("/{postId}")
     public JsonResult deletePost(@PathVariable Long postId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             return postService.deletePost(postId, userId);
         }
@@ -88,7 +88,7 @@ public class PostController {
     @PostMapping("/like/{postId}")
     public JsonResult likePost(@PathVariable Long postId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             return postService.likePost(postId, userId);
         }
@@ -102,7 +102,7 @@ public class PostController {
     @PostMapping("/likeList")
     public JsonResult getLikePostPage(@RequestBody PostQuery postQuery){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             postQuery.setUserId(Long.valueOf(authentication.getName()));
             PageList<PostVo> pageList = postService.getLikePostList(postQuery);
             return new JsonResult().setData(pageList);
@@ -117,7 +117,7 @@ public class PostController {
     @PostMapping("/block/{postId}")
     public JsonResult blockPost(@PathVariable Long postId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             return postService.blockPost(postId, userId);
         }
@@ -131,7 +131,7 @@ public class PostController {
     @PostMapping("/blockList")
     public JsonResult getBlockPostPage(@RequestBody PostQuery postQuery){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             postQuery.setUserId(Long.valueOf(authentication.getName()));
             PageList<PostVo> pageList = postService.getBlockPostList(postQuery);
             return new JsonResult().setData(pageList);
@@ -148,7 +148,7 @@ public class PostController {
     @PostMapping("/collect")
     public JsonResult collectPost(@RequestParam Long postId, @RequestParam Long favoriteId){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             Long userId = Long.valueOf(authentication.getName());
             return postService.collectPost(postId, favoriteId, userId);
         }
@@ -162,7 +162,7 @@ public class PostController {
     @PostMapping("/collectList")
     public JsonResult getCollectPostPage(@RequestBody PostQuery postQuery){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (UserCheckUtil.checkAuth(authentication)) {
+        if (UserUtil.checkAuth(authentication)) {
             postQuery.setUserId(Long.valueOf(authentication.getName()));
             return postService.getCollectPostPageList(postQuery);
         }
