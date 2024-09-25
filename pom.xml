@@ -26,8 +26,6 @@
         <fastjson.version>2.0.1</fastjson.version>
         <!--mysql版本号-->
         <mysql.version>8.0.28</mysql.version>
-        <!--swagger版本号-->
-        <swagger.version>2.9.2</swagger.version>
     </properties>
 
     <dependencies>

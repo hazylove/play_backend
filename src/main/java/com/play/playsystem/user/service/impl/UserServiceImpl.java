@@ -35,8 +35,6 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
-import static com.play.playsystem.basic.constant.AuthConstant.TOKEN_REDIS_PREFIX;
-
 @Slf4j
 @Service
 @Transactional(propagation = Propagation.SUPPORTS, readOnly = true, rollbackFor = Exception.class)
@@ -188,12 +186,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     @Override
     public Long getIdByUsername(String username) {
         return userMapper.getIdByUsername(username);
-    }
-
-    @Override
-    public boolean isUserOnline(Long userId) {
-        Object token = redisUtil.get(TOKEN_REDIS_PREFIX + userId);
-        return token != null;
     }
 
     @Override

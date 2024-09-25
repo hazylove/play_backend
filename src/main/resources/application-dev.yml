@@ -21,9 +21,9 @@ logging:
 spring:
   # mysql数据库配置
   datasource:
-    username: root
-    password: 'Aa123456'
-    url: jdbc:mysql://123.57.83.114:3306/forum?useUnicode=true&characterEncoding=UTF-8
+    username: xxx
+    password: 'xxx'
+    url: jdbc:mysql://localhost:3306/forum?useUnicode=true&characterEncoding=UTF-8
     driver-class-name: com.mysql.cj.jdbc.Driver
     type: com.alibaba.druid.pool.DruidDataSource #指定使用druid的连接池
     druid:
@@ -41,9 +41,9 @@ spring:
       max-open-prepared-statements: 20
   # redis数据库配置
   redis:
-    host: 123.57.83.114
+    host: localhost
     port: 6379
-    password: 'Aa123456.'
+    password: 'xxx'
     lettuce:
       pool:
         max-active: 8
@@ -60,11 +60,11 @@ spring:
     static-path-pattern: ${file.pattern-path}/**
   # 邮箱配置
   mail:
-    email: j70028333@126.com
+    email: xxx@126.com
     host: smtp.126.com
     port: 465
-    username: j70028333@126.com
-    password: WEXYEPBWMKUYWTUS
+    username: xxx@126.com
+    password: xxx
     # 邮箱验证码有效时间
     code:
       expiration: 300
@@ -80,7 +80,7 @@ spring:
       write-dates-as-timestamps: false
 
 mybatis-plus:
-  type-enums-package: com.play.playsystem.basic.constant
+  type-enums-package: com.play.playsystem.basic.constant,com.play.playsystem.*.domain.constant
   configuration:
     default-enum-type-handler: org.apache.ibatis.type.EnumOrdinalTypeHandler
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
@@ -115,6 +115,10 @@ jwt:
     - ${api.prefix}/email/sendRegisterCode
     # 登录邮箱验证码
     - ${api.prefix}/email/sendLoginCode
+    # 消息推送ws
+    - /notifications/**
+    # 聊天ws
+    - /chat/**
 
 # websocket心跳检测时间间隔，单位毫秒
 websocket:

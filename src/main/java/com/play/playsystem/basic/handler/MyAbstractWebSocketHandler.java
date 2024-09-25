@@ -33,7 +33,6 @@ public abstract class MyAbstractWebSocketHandler extends TextWebSocketHandler {
         Long userId = extractUserIdFromToken(token);
         if (userId != null) {
             session.getAttributes().put("userId", userId);
-            log.info("用户: {} 已连接", userId);
             sessions.put(userId, session);
             startHeartbeat(userId, session);
         } else {
@@ -66,7 +65,6 @@ public abstract class MyAbstractWebSocketHandler extends TextWebSocketHandler {
         // 检测pang
         scheduler.scheduleAtFixedRate(() -> {
             Long lastPongTimestamp = lastPongTimestamps.get(userId);
-            log.info("检测{}", lastPongTimestamp);
             if (lastPongTimestamp == null || (System.currentTimeMillis() - lastPongTimestamp > heartbeatInterval * 3)) {
                 if (session.isOpen()) {
                     try {
@@ -91,7 +89,6 @@ public abstract class MyAbstractWebSocketHandler extends TextWebSocketHandler {
     public void handlePongMessage(WebSocketSession session, PongMessage message) {
         Long userId = (Long) session.getAttributes().get("userId");
         lastPongTimestamps.put(userId, System.currentTimeMillis());
-        log.info("收到心跳回复");
     }
 
     protected String extractToken(WebSocketSession session) {
@@ -119,6 +116,5 @@ public abstract class MyAbstractWebSocketHandler extends TextWebSocketHandler {
         if (future != null) {
             future.cancel(true);
         }
-        log.info("用户: {} 连接已关闭", userId);
     }
 }

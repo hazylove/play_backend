@@ -104,11 +104,4 @@ public interface IUserService extends IService<User> {
      * @return 用户id
      */
     Long getIdByUsername(String username);
-
-    /**
-     * 查询用户是否在线
-     * @param userId 用户id
-     * @return 在线状态
-     */
-    boolean isUserOnline(Long userId);
 }

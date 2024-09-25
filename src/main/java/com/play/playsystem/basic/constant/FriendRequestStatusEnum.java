@@ -1,6 +1,7 @@
 package com.play.playsystem.basic.constant;
 
 import com.baomidou.mybatisplus.annotation.EnumValue;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -16,6 +17,7 @@ public enum FriendRequestStatusEnum {
     CANCELLED("cancelled", "已取消"); // 申请已取消
 
     @EnumValue
+    @JsonValue
     private final String key;
 
     private final String value;
@@ -23,23 +25,5 @@ public enum FriendRequestStatusEnum {
     public String toString() {
         return value;
     }
-
-
-    //public static FriendRequestStatusEnum fromKey(String key) {
-    //    for (FriendRequestStatusEnum status : values()) {
-    //        if (status.getKey().equals(key)) {
-    //            return status;
-    //        }
-    //    }
-    //    throw new IllegalArgumentException("Unknown status: " + key);
-    //}
-
-    //public static SexStatusConstant of(Integer key) {
-    //    Objects.requireNonNull(key);
-    //    return Stream.of(values()).filter(bean -> bean.getKey().equals(key))
-    //            .findFirst()
-    //            .orElseThrow(() -> new RuntimeException("no search bean by key=" + key));
-    //}
-
 }
 

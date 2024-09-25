@@ -2,7 +2,7 @@ package com.play.playsystem.relation.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.play.playsystem.basic.constant.MessageTypeEnum;
-import com.play.playsystem.basic.handler.NotificationWebSocketHandlerMy;
+import com.play.playsystem.basic.handler.NotificationWebSocketHandler;
 import com.play.playsystem.basic.utils.dto.PageList;
 import com.play.playsystem.basic.utils.result.JsonResult;
 import com.play.playsystem.basic.utils.result.MessageResult;
@@ -23,6 +23,7 @@ import com.play.playsystem.relation.mapper.UserUserFriendMapper;
 import com.play.playsystem.relation.service.IRelationService;
 import com.play.playsystem.user.domain.vo.UserListVo;
 import com.play.playsystem.user.service.IUserService;
+import com.play.playsystem.user.utils.UserUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -42,13 +43,16 @@ public class RelationServiceImpl implements IRelationService {
     private IUserService userService;
 
     @Autowired
+    private UserUtil userUtil;
+
+    @Autowired
     private UserUserFollowMapper userUserFollowMapper;
 
     @Autowired
     private UserUserBlockMapper userUserBlockMapper;
 
     @Autowired
-    private NotificationWebSocketHandlerMy webSocketHandler;
+    private NotificationWebSocketHandler webSocketHandler;
 
     @Autowired
     private FriendApplicationMapper friendApplicationMapper;
@@ -294,7 +298,7 @@ public class RelationServiceImpl implements IRelationService {
     }
 
     private void sendFriendApplicationMessage(Long friendId, Long userId, Long friendApplicationId,String applyInfo) throws IOException {
-        if (userService.isUserOnline(friendId)) {
+        if (userUtil.isUserOnline(friendId)) {
             Map<String, Object> dataMap = new HashMap<>();
             dataMap.put("requestId", friendApplicationId);
             dataMap.put("fromUserId", userId);

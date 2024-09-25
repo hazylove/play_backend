@@ -70,4 +70,9 @@ public class UserUtil {
 
         return userId;
     }
+
+    public boolean isUserOnline(Long userId) {
+        Object token = redisUtil.get(TOKEN_REDIS_PREFIX + userId);
+        return token != null;
+    }
 }

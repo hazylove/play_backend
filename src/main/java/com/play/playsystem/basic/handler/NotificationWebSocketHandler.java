@@ -13,7 +13,7 @@ import java.io.IOException;
 
 @Slf4j
 @Component
-public class ChatWebSocketHandlerMy extends MyAbstractWebSocketHandler {
+public class NotificationWebSocketHandler extends MyAbstractWebSocketHandler {
     @Autowired
     private UserUtil userUtils;
 
@@ -25,7 +25,7 @@ public class ChatWebSocketHandlerMy extends MyAbstractWebSocketHandler {
     @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) {
         // 处理传入消息
-        log.info("接收消息: {}", message.getPayload());
+        log.info("通知接收消息: {}", message.getPayload());
     }
 
     public void sendMessageToUser(Long userId, MessageResult messageResult) throws IOException {
@@ -35,9 +35,5 @@ public class ChatWebSocketHandlerMy extends MyAbstractWebSocketHandler {
             String jsonMessage = objectMapper.writeValueAsString(messageResult);
             session.sendMessage(new TextMessage(jsonMessage));
         }
-    }
-
-    public void removeSession(Long userId) {
-        super.removeSession(userId);
     }
 }
